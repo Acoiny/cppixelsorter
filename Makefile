@@ -13,7 +13,7 @@ DEBUG_FLAGS = -g3 -O0 -ggdb
 RELEASE_FLAGS := -O3
 
 CFLAGS = -Wall -Wextra -Werror -std=gnu++23 -march=native -Wno-unused-parameter
-CFLAGS = -std=gnu++23 -finline-functions -fno-exceptions
+CFLAGS = -std=gnu++23 -finline-functions # -fno-exceptions
 
 HDR = hdr
 
