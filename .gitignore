@@ -1,1 +1,7 @@
 *.png
+cppixelsorter
+debug_cppixelsorter
+compile_commands.json
+
+bin/
+.cache/

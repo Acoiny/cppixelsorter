@@ -4,14 +4,13 @@
 #include "stb_image_write.h"
 
 #include <algorithm>
+#include <array>
 #include <getopt.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <array>
-#include <stdexcept>
 
 int get_hue_from_rgb(unsigned char r, unsigned char g, unsigned char b);
-
 
 int main(int argc, char *argv[])
 {
@@ -86,13 +85,19 @@ int main(int argc, char *argv[])
         if (in_path)
         {
           // sort the path by hue
-          std::sort(path.begin(), path.end(), [](const std::array<unsigned char, 3> &a, const std::array<unsigned char, 3> &b)
-                    { return get_hue_from_rgb(a[0], a[1], a[2]) < get_hue_from_rgb(b[0], b[1], b[2]); });
+          std::sort(path.begin(), path.end(),
+                    [](const std::array<unsigned char, 3> &a,
+                       const std::array<unsigned char, 3> &b)
+                    {
+                      return get_hue_from_rgb(a[0], a[1], a[2]) <
+                             get_hue_from_rgb(b[0], b[1], b[2]);
+                    });
 
           // write the sorted path back to the image
           for (size_t k = 0; k < path.size(); k++)
           {
-            unsigned char *sorted_pixel = image + ((j - path.size() + k) * width + i) * 3;
+            unsigned char *sorted_pixel =
+                image + ((j - path.size() + k) * width + i) * 3;
             sorted_pixel[0] = path[k][0];
             sorted_pixel[1] = path[k][1];
             sorted_pixel[2] = path[k][2];
@@ -102,16 +107,22 @@ int main(int argc, char *argv[])
         }
       }
     }
-    if(in_path)
+    if (in_path)
     {
       // sort the path by hue
-      std::sort(path.begin(), path.end(), [](const std::array<unsigned char, 3> &a, const std::array<unsigned char, 3> &b)
-                { return get_hue_from_rgb(a[0], a[1], a[2]) < get_hue_from_rgb(b[0], b[1], b[2]); });
+      std::sort(path.begin(), path.end(),
+                [](const std::array<unsigned char, 3> &a,
+                   const std::array<unsigned char, 3> &b)
+                {
+                  return get_hue_from_rgb(a[0], a[1], a[2]) <
+                         get_hue_from_rgb(b[0], b[1], b[2]);
+                });
 
       // write the sorted path back to the image
       for (size_t k = 0; k < path.size(); k++)
       {
-        unsigned char *sorted_pixel = image + ((height - path.size() + k) * width + i) * 3;
+        unsigned char *sorted_pixel =
+            image + ((height - path.size() + k) * width + i) * 3;
         sorted_pixel[0] = path[k][0];
         sorted_pixel[1] = path[k][1];
         sorted_pixel[2] = path[k][2];
