@@ -9,7 +9,9 @@ int get_hue_from_rgb(unsigned char r, unsigned char g, unsigned char b);
 
 void usage(const std::string &progname)
 {
-  std::println(stderr, "Usage: {} -i <input_file> -h <hue_value>", progname);
+  std::println(stderr,
+               "Usage: {} -i <input_file> -h <hue_value> -o <output_file>",
+               progname);
 }
 
 int main(int argc, char *argv[])
@@ -17,6 +19,8 @@ int main(int argc, char *argv[])
   int c;
 
   char *infile = nullptr;
+  std::string outfile = "output.png";
+
   int hue_value = 0;
 
   while ((c = getopt(argc, argv, "i:h:")) != -1)
@@ -37,6 +41,14 @@ int main(int argc, char *argv[])
       hue_value = v;
       break;
     }
+    case 'o':
+      outfile = optarg;
+      if (!outfile.ends_with(".png"))
+      {
+        std::println(stderr, "Output must be a png-file!");
+        return 1;
+      }
+      break;
     default:
       usage(argv[0]);
       return 1;
@@ -61,7 +73,7 @@ int main(int argc, char *argv[])
 
   std::println("Sorting took {0}", duration);
 
-  img.write_to_file("output.png");
+  img.write_to_file(outfile);
 
   return 0;
 }
