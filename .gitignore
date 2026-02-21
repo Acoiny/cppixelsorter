@@ -1,4 +1,6 @@
 *.png
+*.jpg
+*.jpeg
 cppixelsorter
 debug_cppixelsorter
 compile_commands.json
