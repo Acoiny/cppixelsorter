@@ -4,6 +4,7 @@
 #include <chrono>
 #include <getopt.h>
 #include <print>
+#include <stdexcept>
 
 int get_hue_from_rgb(unsigned char r, unsigned char g, unsigned char b);
 
@@ -23,7 +24,7 @@ int main(int argc, char *argv[])
 
   int hue_value = 0;
 
-  while ((c = getopt(argc, argv, "i:h:")) != -1)
+  while ((c = getopt(argc, argv, "i:h:o:")) != -1)
   {
     switch (c)
     {
@@ -43,11 +44,6 @@ int main(int argc, char *argv[])
     }
     case 'o':
       outfile = optarg;
-      if (!outfile.ends_with(".png"))
-      {
-        std::println(stderr, "Output must be a png-file!");
-        return 1;
-      }
       break;
     default:
       usage(argv[0]);
@@ -73,7 +69,15 @@ int main(int argc, char *argv[])
 
   std::println("Sorting took {0}", duration);
 
-  img.write_to_file(outfile);
+  try
+  {
+    img.write_to_file(outfile);
+  }
+  catch (std::runtime_error &e)
+  {
+    std::println(stderr, "{}", e.what());
+    return 1;
+  }
 
   return 0;
 }

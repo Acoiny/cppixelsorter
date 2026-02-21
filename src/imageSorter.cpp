@@ -11,14 +11,14 @@
 #include <format>
 #include <stdexcept>
 
-constexpr auto n_channels = 3;
+constexpr auto CHANNELS = 3;
 
 int get_hue(uint8_t r, uint8_t g, uint8_t b);
 
 ImageSorter::ImageSorter(const std::string &filename)
     : m_filename(filename),
       m_image(stbi_load(filename.c_str(), &m_width, &m_height, &m_channels,
-                        n_channels)) // for now only RGB
+                        CHANNELS)) // for now only RGB
 {
   if (!m_image)
   {
@@ -44,7 +44,7 @@ void ImageSorter::sort_column(int column_index, int start, int end,
   for (int i = start; i < end; i++)
   {
     uint8_t *pixel =
-        m_image + (i * m_width + column_index) * n_channels; // 3 channels
+        m_image + (i * m_width + column_index) * CHANNELS; // 3 channels
     uint8_t r = pixel[0], g = pixel[1], b = pixel[2];
 
     int hue = get_hue(r, g, b);
@@ -58,7 +58,7 @@ void ImageSorter::sort_column(int column_index, int start, int end,
   {
     int pixel_height = start + i;
     uint8_t *pixel = m_image + (pixel_height * m_width + column_index) *
-                                   n_channels; // 3 channels
+                                   CHANNELS; // 3 channels
 
     pixel[0] = sorted_pixels[i][0];
     pixel[1] = sorted_pixels[i][1];
@@ -74,7 +74,7 @@ void ImageSorter::sort_vertical(int hue_value)
 
   const auto hue_at = [this](int w, int h)
   {
-    uint8_t *pixel = m_image + (h * m_width + w) * n_channels; // 3 channels
+    uint8_t *pixel = m_image + (h * m_width + w) * CHANNELS; // 3 channels
     uint8_t r = pixel[0], g = pixel[1], b = pixel[2];
 
     return get_hue(r, g, b);
@@ -129,7 +129,19 @@ void ImageSorter::sort_vertical(int hue_value)
 
 void ImageSorter::write_to_file(const std::string &filename)
 {
-  stbi_write_png(filename.c_str(), m_width, m_height, 3, m_image, m_width * 3);
+  if (filename.ends_with(".png"))
+  {
+    stbi_write_png(filename.c_str(), m_width, m_height, CHANNELS, m_image,
+                   m_width * 3);
+  }
+  else if (filename.ends_with(".jpg") || filename.ends_with(".jpeg"))
+  {
+    stbi_write_jpg(filename.c_str(), m_width, m_height, CHANNELS, m_image, 100);
+  }
+  else
+  {
+    throw std::runtime_error(std::format("Unknown file ending: {}", filename));
+  }
 }
 
 int get_hue(uint8_t r, uint8_t g, uint8_t b)
