@@ -1,6 +1,7 @@
 #include "imageSorter.hpp"
 #include <algorithm>
 #include <cstdint>
+#include <print>
 #include <vector>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -129,18 +130,37 @@ void ImageSorter::sort_vertical(int hue_value)
 
 void ImageSorter::write_to_file(const std::string &filename)
 {
-  if (filename.ends_with(".png"))
+  std::string outfile_name = filename;
+  // if filename is empty, it will use the file ending of the original file
+  if (filename.size() == 0)
   {
-    stbi_write_png(filename.c_str(), m_width, m_height, CHANNELS, m_image,
+    auto dot_pos = m_filename.find_last_of('.');
+
+    if (dot_pos == std::string::npos)
+    {
+      throw std::runtime_error(
+          std::format("Unable to detect file ending of {}", m_filename));
+    }
+
+    outfile_name = "output" + m_filename.substr(dot_pos);
+  }
+
+  if (outfile_name.ends_with(".png"))
+  {
+    std::println("Writing image to {}", outfile_name);
+    stbi_write_png(outfile_name.c_str(), m_width, m_height, CHANNELS, m_image,
                    m_width * 3);
   }
-  else if (filename.ends_with(".jpg") || filename.ends_with(".jpeg"))
+  else if (outfile_name.ends_with(".jpg") || outfile_name.ends_with(".jpeg"))
   {
-    stbi_write_jpg(filename.c_str(), m_width, m_height, CHANNELS, m_image, 100);
+    std::println("Writing image to {}", outfile_name);
+    stbi_write_jpg(outfile_name.c_str(), m_width, m_height, CHANNELS, m_image,
+                   100);
   }
   else
   {
-    throw std::runtime_error(std::format("Unknown file ending: {}", filename));
+    throw std::runtime_error(
+        std::format("Unknown file ending: {}", outfile_name));
   }
 }
 

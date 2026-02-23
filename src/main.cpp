@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   int c;
 
   char *infile = nullptr;
-  std::string outfile = "output.png";
+  std::string outfile = "";
 
   int hue_value = 0;
 
