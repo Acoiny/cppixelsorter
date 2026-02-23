@@ -16,7 +16,7 @@ public:
 
 private: // methods
   void sort_column(int column_index, int start, int end,
-                   std::array<int, 361> &hues);
+                   std::array<int, 360> &hues);
 
 private:
   uint8_t *m_image;

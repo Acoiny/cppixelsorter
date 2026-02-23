@@ -31,7 +31,7 @@ ImageSorter::ImageSorter(const std::string &filename)
 ImageSorter::~ImageSorter() { stbi_image_free(m_image); }
 
 void ImageSorter::sort_column(int column_index, int start, int end,
-                              std::array<int, 361> &hues)
+                              std::array<int, 360> &hues)
 {
   std::vector<std::array<uint8_t, 3>> sorted_pixels;
 
@@ -55,7 +55,7 @@ void ImageSorter::sort_column(int column_index, int start, int end,
   }
 
   // write pixels back
-  for (int i = 0; i < (end - start); i += 1)
+  for (int i = 0; i < sorted_pixels.size(); i += 1)
   {
     int pixel_height = start + i;
     uint8_t *pixel = m_image + (pixel_height * m_width + column_index) *
@@ -69,17 +69,7 @@ void ImageSorter::sort_column(int column_index, int start, int end,
 
 void ImageSorter::sort_vertical(int hue_value)
 {
-  std::array<int, 361> counts = {0};
-
-  std::vector<uint8_t> sorted_pixels;
-
-  const auto hue_at = [this](int w, int h)
-  {
-    uint8_t *pixel = m_image + (h * m_width + w) * CHANNELS; // 3 channels
-    uint8_t r = pixel[0], g = pixel[1], b = pixel[2];
-
-    return get_hue(r, g, b);
-  };
+  std::array<int, 360> counts = {0};
 
   for (int w = 0; w < m_width; w++)
   {
@@ -87,7 +77,10 @@ void ImageSorter::sort_vertical(int hue_value)
 
     for (int h = 0; h < m_height; h++)
     {
-      int hue = hue_at(w, h);
+      uint8_t *pixel = m_image + (h * m_width + w) * CHANNELS; // 3 channels
+      uint8_t r = pixel[0], g = pixel[1], b = pixel[2];
+
+      int hue = get_hue(r, g, b);
 
       if (hue >= hue_value)
       {
