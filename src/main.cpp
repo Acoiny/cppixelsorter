@@ -1,6 +1,8 @@
 #include "imageSorter.hpp"
 #include "stb_image.h"
 
+#include "gui.hpp"
+
 #include <chrono>
 #include <getopt.h>
 #include <print>
@@ -56,6 +58,17 @@ int main(int argc, char *argv[])
     usage(argv[0]);
     return 1;
   }
+
+  // GUI
+  Gui gui(620, 480, "Pixelsorter");
+  gui.LoadImage(infile);
+
+  while (!gui.ShouldClose())
+  {
+    gui.Update();
+  }
+  return 0;
+  // END GUI
 
   ImageSorter img(infile);
 
