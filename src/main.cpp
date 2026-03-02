@@ -12,10 +12,23 @@ int get_hue_from_rgb(unsigned char r, unsigned char g, unsigned char b);
 
 void usage(const std::string &progname)
 {
-  std::println(stderr,
-               "Usage: {} -i <input_file> -h <hue_value> -o <output_file>",
+  std::println(stderr, R"(Usage: {} -i <input_file> [OPTIONS]
+    OPTIONAL:
+        -h <value>      Hue threshold.
+        -o <file>       Output file name. Ending specifies filetype.
+        -g              Activates graphical user interface.
+)",
                progname);
 }
+
+int gui_mode(const std::string &infile);
+
+enum class APP_MODE
+{
+  NONE,
+  CLI,
+  GUI,
+};
 
 int main(int argc, char *argv[])
 {
@@ -26,10 +39,17 @@ int main(int argc, char *argv[])
 
   int hue_value = 0;
 
-  while ((c = getopt(argc, argv, "i:h:o:")) != -1)
+  APP_MODE mode = APP_MODE::CLI;
+
+  while ((c = getopt(argc, argv, "gi:h:o:")) != -1)
   {
     switch (c)
     {
+    case 'g':
+    {
+      mode = APP_MODE::GUI;
+      break;
+    }
     case 'i':
       infile = optarg;
       break;
@@ -60,14 +80,8 @@ int main(int argc, char *argv[])
   }
 
   // GUI
-  Gui gui(620, 480, "Pixelsorter");
-  gui.LoadImage(infile);
-
-  while (!gui.ShouldClose())
-  {
-    gui.Update();
-  }
-  return 0;
+  if (mode == APP_MODE::GUI)
+    return gui_mode(infile);
   // END GUI
 
   ImageSorter img(infile);
@@ -92,5 +106,18 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  return 0;
+}
+
+int gui_mode(const std::string &infile)
+{
+  // GUI
+  Gui gui(620, 480, "Pixelsorter");
+  gui.LoadImage(infile);
+
+  while (!gui.ShouldClose())
+  {
+    gui.Update();
+  }
   return 0;
 }
