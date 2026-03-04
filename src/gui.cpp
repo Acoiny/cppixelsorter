@@ -1,11 +1,11 @@
 #include "gui.hpp"
 
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_pixels.h>
+#include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
-#include <SDL3/SDL_surface.h>
-#include <SDL3/SDL_timer.h>
 #include <SDL3_image/SDL_image.h>
+
+#include <print>
 
 Gui::Gui(int width, int height, const std::string &title)
 {
@@ -31,9 +31,13 @@ void Gui::Update()
   SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
   SDL_RenderClear(m_renderer);
 
+  SDL_FRect blankspace = {0, 0, 200, 600};
+  SDL_RenderFillRect(m_renderer, &blankspace);
+
   if (m_texture)
   {
-    SDL_RenderTexture(m_renderer, m_texture, nullptr, nullptr);
+    const auto rect = get_image_ratio_rect(m_texture->w, m_texture->h);
+    SDL_RenderTexture(m_renderer, m_texture, nullptr, &rect);
   }
 
   SDL_RenderPresent(m_renderer);
@@ -68,4 +72,30 @@ void Gui::LoadImage(const std::string &path)
     m_texture = SDL_CreateTextureFromSurface(m_renderer, m_surface);
     ;
   }
+}
+
+SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height)
+{
+  SDL_FRect res = {0};
+
+  const float aspect_ratio =
+      static_cast<float>(image_width) / static_cast<float>(image_height);
+
+  SDL_Rect viewport;
+
+  if (!SDL_GetRenderViewport(m_renderer, &viewport))
+  {
+    std::println(stderr, "Error: {}", SDL_GetError());
+    return {};
+  }
+
+  if (image_width > viewport.w)
+  {
+    res.w = viewport.w;
+    res.h = (viewport.w / static_cast<float>(image_width)) * image_height;
+  }
+
+  std::println("viewport size: {} {}", res.w, res.h);
+
+  return res;
 }
