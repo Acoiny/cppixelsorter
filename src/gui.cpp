@@ -109,7 +109,7 @@ SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height)
   //   res.h = (viewport.w / static_cast<float>(image_width)) * image_height;
   // }
 
-  std::println("viewport size: {} {}", res.w, res.h);
+  // std::println("viewport size: {} {}", res.w, res.h);
 
   return res;
 }

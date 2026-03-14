@@ -1,3 +1,4 @@
+#include "filepicker.hpp"
 #include "imageSorter.hpp"
 #include "stb_image.h"
 
@@ -21,7 +22,7 @@ void usage(const std::string &progname)
                progname);
 }
 
-int gui_mode(const std::string &infile);
+int gui_mode(const char *infile);
 
 enum class APP_MODE
 {
@@ -73,16 +74,16 @@ int main(int argc, char *argv[])
     }
   }
 
+  // GUI
+  if (mode == APP_MODE::GUI)
+    return gui_mode(infile);
+  // END GUI
+
   if (!infile)
   {
     usage(argv[0]);
     return 1;
   }
-
-  // GUI
-  if (mode == APP_MODE::GUI)
-    return gui_mode(infile);
-  // END GUI
 
   ImageSorter img(infile);
 
@@ -109,11 +110,21 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-int gui_mode(const std::string &infile)
+int gui_mode(const char *infile)
 {
   // GUI
   Gui gui(620, 480, "Pixelsorter");
-  gui.LoadImage(infile);
+
+  if (!infile)
+  {
+    Filepicker fp;
+    fp.open();
+    gui.LoadImage(fp.getFile());
+  }
+  else
+  {
+    gui.LoadImage(infile);
+  }
 
   while (!gui.ShouldClose())
   {

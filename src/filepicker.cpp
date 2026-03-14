@@ -62,7 +62,12 @@ DBusHandlerResult response_filter(DBusConnection *conn, DBusMessage *message,
           printf("Selected file: %s\n", uri);
           if (g_handle)
           {
-            g_handle->m_filenames.emplace_back(uri);
+            std::string str(uri);
+            if (str.starts_with("file://"))
+            {
+              str = str.substr(7);
+            }
+            g_handle->m_filenames.push_back(str);
           }
           dbus_message_iter_next(&array_iter);
         }
