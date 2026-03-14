@@ -17,7 +17,8 @@ public:
   void LoadImage(const std::string &path);
 
 private:
-  SDL_FRect get_image_ratio_rect(int image_width, int image_height);
+  SDL_FRect get_image_ratio_rect(int image_width, int image_height,
+                                 float empty_space_percent = 0);
 
 private:
   SDL_Window *m_window = nullptr;

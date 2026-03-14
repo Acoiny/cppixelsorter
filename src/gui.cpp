@@ -36,7 +36,7 @@ void Gui::Update()
 
   if (m_texture)
   {
-    const auto rect = get_image_ratio_rect(m_texture->w, m_texture->h);
+    const auto rect = get_image_ratio_rect(m_texture->w, m_texture->h, 0.25f);
     SDL_RenderTexture(m_renderer, m_texture, nullptr, &rect);
   }
 
@@ -73,9 +73,9 @@ void Gui::LoadImage(const std::string &path)
   }
 }
 
-SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height)
+SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height,
+                                    float empty_space_percent)
 {
-  SDL_FRect res = {0};
 
   SDL_Rect viewport;
 
@@ -85,17 +85,21 @@ SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height)
     return {};
   }
 
+  const float start_x = viewport.w * empty_space_percent;
+
+  SDL_FRect res = {.x = start_x, .y = 0, .w = 0, .h = 0};
+
   const float image_aspect_ratio =
       static_cast<float>(image_width) / static_cast<float>(image_height);
 
   const float viewport_aspect_ratio =
-      static_cast<float>(viewport.w) / static_cast<float>(viewport.h);
+      static_cast<float>(viewport.w - start_x) / static_cast<float>(viewport.h);
 
   // if image aspect ratio is BIGGER than viewport -> adjust to width
   if (image_aspect_ratio >= viewport_aspect_ratio)
   {
-    res.w = viewport.w;
-    res.h = viewport.w / image_aspect_ratio;
+    res.w = (viewport.w - start_x);
+    res.h = (viewport.w - start_x) / image_aspect_ratio;
   }
   else
   {
