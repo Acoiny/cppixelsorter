@@ -12,8 +12,10 @@ DEBUG_FLAGS = -g3 -O0 -ggdb
 # flags only for release
 RELEASE_FLAGS := -O3
 
-CFLAGS = -Wall -Wextra -Werror -std=gnu++23 -march=native -Wno-unused-parameter
+# CFLAGS = -Wall -Wextra -Werror -std=gnu++23 -march=native -Wno-unused-parameter
 CFLAGS = -std=gnu++23 -finline-functions # -fno-exceptions
+
+CFLAGS += $(shell pkg-config --cflags --libs dbus-1)
 
 HDR = hdr
 
