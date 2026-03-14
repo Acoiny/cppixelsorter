@@ -118,8 +118,8 @@ int gui_mode(const char *infile)
   if (!infile)
   {
     Filepicker fp;
-    fp.open();
-    gui.LoadImage(fp.getFile());
+    if (fp.open())
+      gui.LoadImage(fp.getFile());
   }
   else
   {
