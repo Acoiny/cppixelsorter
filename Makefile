@@ -3,6 +3,9 @@ MAKEFLAGS=-j
 
 BINARY := cppixelsorter
 
+# arguments for the `make run` command
+RUN_ARGS := -g
+
 # prefix with debug, to make running as easy as typing d-TAB
 BINARY_DEBUG := debug_$(BINARY)
 
