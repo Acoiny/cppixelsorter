@@ -1,23 +1,34 @@
 #include "gui.hpp"
+#include "Ui/textButton.hpp"
+#include "Ui/textManager.hpp"
 
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_rect.h>
-#include <SDL3/SDL_render.h>
 #include <SDL3_image/SDL_image.h>
 
+#include <SDL3_ttf/SDL_ttf.h>
+#include <memory>
 #include <print>
 
 Gui::Gui(int width, int height, const std::string &title)
 {
   SDL_Init(SDL_INIT_VIDEO);
+  TTF_Init();
   SDL_SetAppMetadata(title.c_str(), "0.0.1", "com.cpp.pixelsorter");
   SDL_CreateWindowAndRenderer("Pixelsorter", width, height,
                               SDL_WINDOW_RESIZABLE, &m_window, &m_renderer);
 
   m_isRunning = true;
+
+  UI::TextManager::Init(m_renderer);
+
+  m_uiElements.emplace_back(std::make_shared<UI::TextButton>(10, 10, "Sort"));
 }
 
-Gui::~Gui() { SDL_Quit(); }
+Gui::~Gui()
+{
+  SDL_Quit();
+  TTF_Quit();
+}
 
 void Gui::Update()
 {
@@ -25,7 +36,17 @@ void Gui::Update()
   while (SDL_PollEvent(&event))
   {
     if (event.type == SDL_EVENT_QUIT)
+    {
       m_isRunning = false;
+    }
+    else
+    {
+      for (const auto el : m_uiElements)
+      {
+        if (el->HandleEvent(event))
+          break;
+      }
+    }
   }
 
   SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
@@ -38,6 +59,11 @@ void Gui::Update()
   {
     const auto rect = get_image_ratio_rect(m_texture->w, m_texture->h, 0.25f);
     SDL_RenderTexture(m_renderer, m_texture, nullptr, &rect);
+  }
+
+  for (const auto el : m_uiElements)
+  {
+    el->draw(m_renderer);
   }
 
   SDL_RenderPresent(m_renderer);

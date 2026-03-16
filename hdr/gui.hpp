@@ -1,7 +1,10 @@
 #pragma once
 
+#include "Ui/baseElement.hpp"
 #include <SDL3/SDL.h>
+#include <memory>
 #include <string>
+#include <vector>
 
 class Gui
 {
@@ -28,4 +31,6 @@ private:
   SDL_Texture *m_texture = nullptr;
 
   bool m_isRunning = false;
+
+  std::vector<std::shared_ptr<UI::BaseElement>> m_uiElements;
 };
