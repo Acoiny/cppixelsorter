@@ -3,6 +3,8 @@
 #include "Ui/textManager.hpp"
 #include "imageSorter.hpp"
 
+#include "stb_image.h"
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_surface.h>
 #include <SDL3_image/SDL_image.h>
@@ -105,7 +107,15 @@ void Gui::LoadTextureFromSurface(SDL_Surface *surface)
 
 void Gui::LoadImage(const std::string &path)
 {
-  m_surface = IMG_Load(path.c_str());
+  // Loading the surface with stb_image
+  int w, h, channels;
+  uint8_t *img = stbi_load(path.c_str(), &w, &h, &channels, 3);
+
+  std::println("Image: {} {} - channels {}", w, h, channels);
+
+  m_surface =
+      SDL_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_RGB24, img, w * channels);
+  // m_surface = IMG_Load(path.c_str());
 
   if (m_surface)
   {
@@ -115,6 +125,8 @@ void Gui::LoadImage(const std::string &path)
   {
     std::println(stderr, "Unable to load image {}!", path);
   }
+
+  std::println("Needs lock: {}", SDL_MUSTLOCK(m_surface));
 }
 
 SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height,
