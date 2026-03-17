@@ -35,7 +35,7 @@ ASSEMBLY_FILES = $(DOBJECT_FILES:bin/debug/%.o=bin/assembly/%.s)
 
 
 # LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
-LDFLAGS=-lSDL3 -lSDL3_image -lSDL3_ttf
+LDFLAGS=-lSDL3 -lSDL3_ttf
 # LDFLAGS=-lraylib
 
 .PHONY := all debug release clean

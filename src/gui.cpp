@@ -6,8 +6,6 @@
 #include "stb_image.h"
 
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_surface.h>
-#include <SDL3_image/SDL_image.h>
 
 #include <SDL3_ttf/SDL_ttf.h>
 #include <memory>
@@ -25,16 +23,26 @@ Gui::Gui(int width, int height, const std::string &title)
 
   UI::TextManager::Init(m_renderer);
 
-  auto btn = std::make_shared<UI::TextButton>(10, 10, "Sort");
-  btn->onLeftClick = [&]()
   {
-    ImageSorter sorter(m_surface);
-    sorter.sort_vertical(0);
-    // sorter.write_to_file("file_for_ruben.png");
-    LoadTextureFromSurface(m_surface);
-  };
-
-  m_uiElements.emplace_back(btn);
+    auto btn = std::make_shared<UI::TextButton>(10, 10, "Sort");
+    btn->onLeftClick = [&]()
+    {
+      ImageSorter sorter(m_surface);
+      sorter.sort_vertical(0);
+      // sorter.write_to_file("file_for_ruben.png");
+      LoadTextureFromSurface(m_surface);
+    };
+    m_uiElements.emplace_back(btn);
+  }
+  {
+    auto btn = std::make_shared<UI::TextButton>(10, 50, "Save");
+    btn->onLeftClick = [&]()
+    {
+      ImageSorter sorter(m_surface);
+      sorter.write_to_file("output.png");
+    };
+    m_uiElements.emplace_back(btn);
+  }
 }
 
 Gui::~Gui()
