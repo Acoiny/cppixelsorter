@@ -23,6 +23,8 @@ private:
   SDL_FRect get_image_ratio_rect(int image_width, int image_height,
                                  float empty_space_percent = 0);
 
+  void LoadTextureFromSurface(SDL_Surface *surface);
+
 private:
   SDL_Window *m_window = nullptr;
   SDL_Renderer *m_renderer = nullptr;

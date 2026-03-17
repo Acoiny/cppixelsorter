@@ -1,8 +1,10 @@
 #include "gui.hpp"
 #include "Ui/textButton.hpp"
 #include "Ui/textManager.hpp"
+#include "imageSorter.hpp"
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_surface.h>
 #include <SDL3_image/SDL_image.h>
 
 #include <SDL3_ttf/SDL_ttf.h>
@@ -21,7 +23,16 @@ Gui::Gui(int width, int height, const std::string &title)
 
   UI::TextManager::Init(m_renderer);
 
-  m_uiElements.emplace_back(std::make_shared<UI::TextButton>(10, 10, "Sort"));
+  auto btn = std::make_shared<UI::TextButton>(10, 10, "Sort");
+  btn->onLeftClick = [&]()
+  {
+    ImageSorter sorter(m_surface);
+    sorter.sort_vertical(0);
+    // sorter.write_to_file("file_for_ruben.png");
+    LoadTextureFromSurface(m_surface);
+  };
+
+  m_uiElements.emplace_back(btn);
 }
 
 Gui::~Gui()
@@ -70,32 +81,39 @@ void Gui::Update()
   SDL_Delay(20);
 }
 
+void Gui::LoadTextureFromSurface(SDL_Surface *surface)
+{
+  SDL_Surface *newSurface =
+      SDL_ConvertSurface(m_surface, SDL_PIXELFORMAT_RGB24);
+
+  // destroy old surface
+  SDL_DestroySurface(m_surface);
+
+  // if conversion failed, don't load image
+  if (!newSurface)
+  {
+    m_surface = nullptr;
+    std::println(stderr, "Unable to create texture!");
+  }
+  else
+  {
+    m_surface = newSurface;
+  }
+
+  m_texture = SDL_CreateTextureFromSurface(m_renderer, m_surface);
+}
+
 void Gui::LoadImage(const std::string &path)
 {
   m_surface = IMG_Load(path.c_str());
 
   if (m_surface)
   {
-    SDL_Surface *newSurface =
-        SDL_ConvertSurface(m_surface, SDL_PIXELFORMAT_RGBA32);
-
-    // destroy old surface
-    SDL_DestroySurface(m_surface);
-
-    // if conversion failed, don't load image
-    if (!newSurface)
-    {
-      m_surface = nullptr;
-    }
-    else
-    {
-      m_surface = newSurface;
-    }
+    LoadTextureFromSurface(m_surface);
   }
-
-  if (m_surface)
+  else
   {
-    m_texture = SDL_CreateTextureFromSurface(m_renderer, m_surface);
+    std::println(stderr, "Unable to load image {}!", path);
   }
 }
 

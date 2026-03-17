@@ -28,7 +28,19 @@ ImageSorter::ImageSorter(const std::string &filename)
   }
 }
 
-ImageSorter::~ImageSorter() { stbi_image_free(m_image); }
+ImageSorter::ImageSorter(SDL_Surface *surface)
+    : m_image((uint8_t *)surface->pixels), m_width(surface->w),
+      m_height(surface->h), m_channels(3), // TODO: check if this is right!
+      m_destroy_image(false)
+{
+  std::println("Pitch: {}", surface->pitch);
+}
+
+ImageSorter::~ImageSorter()
+{
+  if (m_destroy_image)
+    stbi_image_free(m_image);
+}
 
 void ImageSorter::sort_column(int column_index, int start, int end,
                               std::array<int, 360> &hues)
