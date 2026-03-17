@@ -115,13 +115,7 @@ int gui_mode(const char *infile)
   // GUI
   Gui gui(620, 480, "Pixelsorter");
 
-  if (!infile)
-  {
-    Filepicker fp;
-    if (fp.open())
-      gui.LoadImage(fp.getFile());
-  }
-  else
+  if (infile)
   {
     gui.LoadImage(infile);
   }

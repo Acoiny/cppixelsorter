@@ -9,7 +9,7 @@ class ImageSorter
 public:
   ImageSorter(const std::string &filename);
 
-  ImageSorter(SDL_Surface *surface);
+  ImageSorter(SDL_Surface *surface, int n_channels = 3);
 
   void sort_vertical(int hue_value);
 

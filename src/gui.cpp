@@ -1,6 +1,7 @@
 #include "gui.hpp"
 #include "Ui/textButton.hpp"
 #include "Ui/textManager.hpp"
+#include "filepicker.hpp"
 #include "imageSorter.hpp"
 
 #include "stb_image.h"
@@ -23,23 +24,48 @@ Gui::Gui(int width, int height, const std::string &title)
 
   UI::TextManager::Init(m_renderer);
 
+  // add load button
   {
-    auto btn = std::make_shared<UI::TextButton>(10, 10, "Sort");
+    auto btn = std::make_shared<UI::TextButton>(10, 10, 100, 30, "Load");
+    btn->onLeftClick = [&]()
+    {
+      Filepicker fp;
+      if (fp.open(false))
+      {
+        LoadImage(fp.getFile());
+      }
+      else
+      {
+        std::println("ERROR: Unable to open file!");
+      }
+    };
+    m_uiElements.emplace_back(btn);
+  } // add "sort"-button
+  {
+    auto btn = std::make_shared<UI::TextButton>(10, 50, 100, 30, "Sort");
     btn->onLeftClick = [&]()
     {
       ImageSorter sorter(m_surface);
       sorter.sort_vertical(0);
-      // sorter.write_to_file("file_for_ruben.png");
       LoadTextureFromSurface(m_surface);
     };
     m_uiElements.emplace_back(btn);
   }
+  // add "save"-button
   {
-    auto btn = std::make_shared<UI::TextButton>(10, 50, "Save");
+    auto btn = std::make_shared<UI::TextButton>(10, 90, 100, 30, "Save");
     btn->onLeftClick = [&]()
     {
       ImageSorter sorter(m_surface);
-      sorter.write_to_file("output.png");
+      Filepicker fp;
+      if (fp.open(true))
+      {
+        sorter.write_to_file(fp.getFile());
+      }
+      else
+      {
+        std::println("ERROR: Unable to save file!");
+      }
     };
     m_uiElements.emplace_back(btn);
   }
@@ -78,7 +104,7 @@ void Gui::Update()
 
   if (m_texture)
   {
-    const auto rect = get_image_ratio_rect(m_texture->w, m_texture->h, 0.25f);
+    const auto rect = get_image_ratio_rect(m_texture->w, m_texture->h, 300);
     SDL_RenderTexture(m_renderer, m_texture, nullptr, &rect);
   }
 
@@ -137,7 +163,7 @@ void Gui::LoadImage(const std::string &path)
 }
 
 SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height,
-                                    float empty_space_percent)
+                                    int start_x)
 {
 
   SDL_Rect viewport;
@@ -148,9 +174,7 @@ SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height,
     return {};
   }
 
-  const float start_x = viewport.w * empty_space_percent;
-
-  SDL_FRect res = {.x = start_x, .y = 0, .w = 0, .h = 0};
+  SDL_FRect res = {.x = static_cast<float>(start_x), .y = 0, .w = 0, .h = 0};
 
   const float image_aspect_ratio =
       static_cast<float>(image_width) / static_cast<float>(image_height);

@@ -28,12 +28,10 @@ ImageSorter::ImageSorter(const std::string &filename)
   }
 }
 
-ImageSorter::ImageSorter(SDL_Surface *surface)
+ImageSorter::ImageSorter(SDL_Surface *surface, int n_channels)
     : m_image((uint8_t *)surface->pixels), m_width(surface->w),
-      m_height(surface->h), m_channels(3), // TODO: check if this is right!
-      m_destroy_image(false)
+      m_height(surface->h), m_channels(n_channels), m_destroy_image(false)
 {
-  std::println("Pitch: {}", surface->pitch);
 }
 
 ImageSorter::~ImageSorter()
