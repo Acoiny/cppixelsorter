@@ -11,6 +11,7 @@ typedef struct
   const char *request_path;
 } FilterData;
 
+static bool g_success = false;
 static Filepicker *g_handle = nullptr;
 
 DBusHandlerResult response_filter(DBusConnection *conn, DBusMessage *message,
@@ -68,6 +69,7 @@ DBusHandlerResult response_filter(DBusConnection *conn, DBusMessage *message,
               str = str.substr(7);
             }
             g_handle->m_filenames.push_back(str);
+            g_success = true;
           }
           dbus_message_iter_next(&array_iter);
         }
@@ -89,8 +91,10 @@ DBusHandlerResult response_filter(DBusConnection *conn, DBusMessage *message,
   return DBUS_HANDLER_RESULT_HANDLED;
 }
 
-bool Filepicker::open()
+bool Filepicker::open(bool saving)
 {
+  g_success = false;
+
   DBusConnection *conn;
   DBusError err;
   DBusMessage *msg, *reply;
@@ -108,7 +112,7 @@ bool Filepicker::open()
 
   msg = dbus_message_new_method_call(
       "org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop",
-      "org.freedesktop.portal.FileChooser", "OpenFile");
+      "org.freedesktop.portal.FileChooser", saving ? "SaveFile" : "OpenFile");
   if (msg == NULL)
   {
     fprintf(stderr, "Message Null\n");
@@ -188,5 +192,5 @@ bool Filepicker::open()
   free(req_path);
   dbus_connection_unref(conn);
 
-  return true;
+  return g_success;
 }

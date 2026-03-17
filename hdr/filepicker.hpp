@@ -15,7 +15,7 @@ public:
   /**
    * Opens the filepicker and returns true, if a file has been selected
    */
-  bool open();
+  bool open(bool saving = false);
 
   std::string getFile() { return m_filenames.size() > 0 ? m_filenames[0] : ""; }
 
