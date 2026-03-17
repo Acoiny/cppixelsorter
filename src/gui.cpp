@@ -113,8 +113,7 @@ void Gui::LoadImage(const std::string &path)
 
   std::println("Image: {} {} - channels {}", w, h, channels);
 
-  m_surface =
-      SDL_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_RGB24, img, w * channels);
+  m_surface = SDL_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_RGB24, img, w * 3);
   // m_surface = IMG_Load(path.c_str());
 
   if (m_surface)
