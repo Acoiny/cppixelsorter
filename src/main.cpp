@@ -2,6 +2,7 @@
 #include "stb_image.h"
 
 #include "gui.hpp"
+#include "timer.hpp"
 
 #include <chrono>
 #include <getopt.h>
@@ -86,13 +87,11 @@ int main(int argc, char *argv[])
 
   ImageSorter img(infile);
 
-  auto start = std::chrono::high_resolution_clock::now();
+  Timer t = Timer();
 
   img.sort_vertical(hue_value);
 
-  auto end = std::chrono::high_resolution_clock::now();
-
-  std::chrono::duration<double> duration = end - start;
+  auto duration = t.get();
 
   std::println("Sorting took {0}", duration);
 

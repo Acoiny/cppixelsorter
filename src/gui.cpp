@@ -5,6 +5,7 @@
 #include "imageSorter.hpp"
 
 #include "stb_image.h"
+#include "timer.hpp"
 
 #include <SDL3/SDL.h>
 
@@ -41,13 +42,16 @@ Gui::Gui(int width, int height, const std::string &title)
       }
     };
     m_uiElements.emplace_back(btn);
-  } // add "sort"-button
+  }
+  // add "sort"-button
   {
     auto btn = std::make_shared<UI::TextButton>(10, 50, 100, 30, "Sort");
     btn->onLeftClick = [&]()
     {
       ImageSorter sorter(m_surface);
+      Timer t;
       sorter.sort_vertical(0);
+      std::println("Sorting took {}", t.get());
       LoadTextureFromSurface(m_surface);
     };
     m_uiElements.emplace_back(btn);
