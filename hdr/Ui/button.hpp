@@ -63,7 +63,7 @@ public:
 
 protected:
 private:
-  bool isIntersecting(float x, float y)
+  inline bool isIntersecting(float x, float y)
   {
     return x >= m_rect.x && x <= (m_rect.x + m_rect.w) && // x intersects
            y >= m_rect.y && y <= (m_rect.y + m_rect.h);

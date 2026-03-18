@@ -104,7 +104,8 @@ void Gui::Update()
     }
   }
 
-  SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
+  // SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
+  SDL_SetRenderDrawColor(m_renderer, 93, 59, 107, 255);
   SDL_RenderClear(m_renderer);
 
   SDL_FRect blankspace = {0, 0, 200, 600};
