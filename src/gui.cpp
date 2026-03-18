@@ -11,13 +11,14 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <memory>
 #include <print>
+#include <stdexcept>
 
 Gui::Gui(int width, int height, const std::string &title)
 {
   SDL_Init(SDL_INIT_VIDEO);
   TTF_Init();
   SDL_SetAppMetadata(title.c_str(), "0.0.1", "com.cpp.pixelsorter");
-  SDL_CreateWindowAndRenderer("Pixelsorter", width, height,
+  SDL_CreateWindowAndRenderer(title.c_str(), width, height,
                               SDL_WINDOW_RESIZABLE, &m_window, &m_renderer);
 
   m_isRunning = true;
@@ -60,7 +61,14 @@ Gui::Gui(int width, int height, const std::string &title)
       Filepicker fp;
       if (fp.open(true))
       {
-        sorter.write_to_file(fp.getFile());
+        try
+        {
+          sorter.write_to_file(fp.getFile());
+        }
+        catch (std::runtime_error &e)
+        {
+          std::println(stderr, "{}", e.what());
+        }
       }
       else
       {

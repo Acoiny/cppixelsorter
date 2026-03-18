@@ -1,4 +1,3 @@
-#include "filepicker.hpp"
 #include "imageSorter.hpp"
 #include "stb_image.h"
 
