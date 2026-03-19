@@ -19,6 +19,8 @@ public:
    */
   static void Init(SDL_Renderer *renderer);
 
+  static void Deinit();
+
 private:
   static TextManager *m_instance;
 
@@ -28,8 +30,8 @@ private:
   const std::string getDefaultFont() const;
 
 private:
-  TTF_TextEngine *m_engine;
+  TTF_TextEngine *m_engine = nullptr;
 
-  TTF_Font *m_font;
+  TTF_Font *m_font = nullptr;
 };
 } // namespace UI

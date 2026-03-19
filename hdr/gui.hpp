@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Ui/baseElement.hpp"
+#include "Ui/UiManager.hpp"
+#include "Ui/textBox.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 #include <string>
-#include <vector>
 
 class Gui
 {
@@ -25,7 +25,14 @@ private:
 
   void LoadTextureFromSurface(SDL_Surface *surface);
 
+  void PickFile();
+  void RunSort();
+  void SaveFile();
+
 private:
+  std::string m_currentFile;
+  std::shared_ptr<UI::TextBox> m_fileName;
+
   SDL_Window *m_window = nullptr;
   SDL_Renderer *m_renderer = nullptr;
 
@@ -34,5 +41,5 @@ private:
 
   bool m_isRunning = false;
 
-  std::vector<std::shared_ptr<UI::BaseElement>> m_uiElements;
+  std::unique_ptr<UI::UiManager> m_uiManager;
 };

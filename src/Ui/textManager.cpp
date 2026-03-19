@@ -18,7 +18,11 @@ TextManager::TextManager(SDL_Renderer *renderer)
   m_font = TTF_OpenFont(getDefaultFont().c_str(), FONT_SIZE);
 }
 
-TextManager::~TextManager() { TTF_DestroyRendererTextEngine(m_engine); }
+TextManager::~TextManager()
+{
+  TTF_CloseFont(m_font);
+  TTF_DestroyRendererTextEngine(m_engine);
+}
 
 TextManager &TextManager::getInstance()
 {
@@ -29,6 +33,13 @@ TextManager &TextManager::getInstance()
 void TextManager::Init(SDL_Renderer *renderer)
 {
   m_instance = new TextManager(renderer);
+}
+
+void TextManager::Deinit()
+{
+  if (m_instance)
+    delete m_instance;
+  m_instance = nullptr;
 }
 
 TTF_Text *TextManager::createText(const std::string &text)

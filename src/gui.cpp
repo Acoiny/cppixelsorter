@@ -1,4 +1,6 @@
 #include "gui.hpp"
+#include "Ui/UiManager.hpp"
+#include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
 #include "Ui/textManager.hpp"
 #include "filepicker.hpp"
@@ -9,6 +11,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <SDL3/SDL_render.h>
+#include <SDL3/SDL_surface.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <memory>
 #include <print>
@@ -22,69 +26,37 @@ Gui::Gui(int width, int height, const std::string &title)
   SDL_CreateWindowAndRenderer(title.c_str(), width, height,
                               SDL_WINDOW_RESIZABLE, &m_window, &m_renderer);
 
+  m_uiManager = std::make_unique<UI::UiManager>(m_renderer);
+
   m_isRunning = true;
 
-  UI::TextManager::Init(m_renderer);
+  // corner coordinates
+  float c_x = 10, c_y = 10;
+
+  // add text box to show current path
+  m_fileName = m_uiManager->addElement<UI::TextBox>(c_x, c_y, "Path here");
 
   // add load button
-  {
-    auto btn = std::make_shared<UI::TextButton>(10, 10, 100, 30, "Load");
-    btn->onLeftClick = [&]()
-    {
-      Filepicker fp;
-      if (fp.open(false))
-      {
-        LoadImage(fp.getFile());
-      }
-      else
-      {
-        std::println("ERROR: Unable to open file!");
-      }
-    };
-    m_uiElements.emplace_back(btn);
-  }
+  m_uiManager->addElement<UI::TextButton>(c_x, c_y + 40, 100, 30, "Load")
+      ->onLeftClick = std::bind(&Gui::PickFile, this);
+
   // add "sort"-button
-  {
-    auto btn = std::make_shared<UI::TextButton>(10, 50, 100, 30, "Sort");
-    btn->onLeftClick = [&]()
-    {
-      ImageSorter sorter(m_surface);
-      Timer t;
-      sorter.sort_vertical(0);
-      std::println("Sorting took {}", t.get());
-      LoadTextureFromSurface(m_surface);
-    };
-    m_uiElements.emplace_back(btn);
-  }
+  m_uiManager->addElement<UI::TextButton>(c_x, c_y + 80, 100, 30, "Sort")
+      ->onLeftClick = std::bind(&Gui::RunSort, this);
+
   // add "save"-button
-  {
-    auto btn = std::make_shared<UI::TextButton>(10, 90, 100, 30, "Save");
-    btn->onLeftClick = [&]()
-    {
-      ImageSorter sorter(m_surface);
-      Filepicker fp;
-      if (fp.open(true))
-      {
-        try
-        {
-          sorter.write_to_file(fp.getFile());
-        }
-        catch (std::runtime_error &e)
-        {
-          std::println(stderr, "{}", e.what());
-        }
-      }
-      else
-      {
-        std::println("ERROR: Unable to save file!");
-      }
-    };
-    m_uiElements.emplace_back(btn);
-  }
+  m_uiManager->addElement<UI::TextButton>(c_x, c_y + 120, 100, 30, "Save")
+      ->onLeftClick = std::bind(&Gui::SaveFile, this);
 }
 
 Gui::~Gui()
 {
+  SDL_DestroySurface(m_surface);
+  if (m_texture)
+    SDL_DestroyTexture(m_texture);
+
+  m_uiManager.reset();
+
   SDL_Quit();
   TTF_Quit();
 }
@@ -98,13 +70,9 @@ void Gui::Update()
     {
       m_isRunning = false;
     }
-    else
+    else if (m_uiManager->isEventRelevant(event))
     {
-      for (const auto el : m_uiElements)
-      {
-        if (el->HandleEvent(event))
-          break;
-      }
+      m_uiManager->handleEvent(event);
     }
   }
 
@@ -121,10 +89,7 @@ void Gui::Update()
     SDL_RenderTexture(m_renderer, m_texture, nullptr, &rect);
   }
 
-  for (const auto el : m_uiElements)
-  {
-    el->draw(m_renderer);
-  }
+  m_uiManager->draw(m_renderer);
 
   SDL_RenderPresent(m_renderer);
   SDL_Delay(20);
@@ -136,7 +101,12 @@ void Gui::LoadTextureFromSurface(SDL_Surface *surface)
       SDL_ConvertSurface(m_surface, SDL_PIXELFORMAT_RGB24);
 
   // destroy old surface
-  SDL_DestroySurface(m_surface);
+  if (m_surface)
+  {
+    uint8_t *pixels = (uint8_t *)m_surface->pixels;
+    SDL_DestroySurface(m_surface);
+    stbi_image_free(pixels);
+  }
 
   // if conversion failed, don't load image
   if (!newSurface)
@@ -148,6 +118,9 @@ void Gui::LoadTextureFromSurface(SDL_Surface *surface)
   {
     m_surface = newSurface;
   }
+
+  if (m_texture)
+    SDL_DestroyTexture(m_texture);
 
   m_texture = SDL_CreateTextureFromSurface(m_renderer, m_surface);
 }
@@ -216,4 +189,53 @@ SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height,
   // std::println("viewport size: {} {}", res.w, res.h);
 
   return res;
+}
+
+void Gui::PickFile()
+{
+  Filepicker fp;
+  if (fp.open(false))
+  {
+    auto name = fp.getFile();
+
+    if (m_fileName)
+      m_fileName->setText(name);
+
+    LoadImage(name);
+  }
+  else
+  {
+    std::println("ERROR: Unable to open file!");
+  }
+}
+
+void Gui::RunSort()
+{
+  ImageSorter sorter(m_surface);
+  Timer t;
+  sorter.sort_vertical(0);
+  std::println("Sorting took {}", t.get());
+  LoadTextureFromSurface(m_surface);
+}
+void Gui::SaveFile()
+{
+  ImageSorter sorter(m_surface);
+  Filepicker fp;
+  if (fp.open(true))
+  {
+    auto name = fp.getFile();
+
+    try
+    {
+      sorter.write_to_file(name);
+    }
+    catch (std::runtime_error &e)
+    {
+      std::println(stderr, "{}", e.what());
+    }
+  }
+  else
+  {
+    std::println("ERROR: Unable to save file!");
+  }
 }
