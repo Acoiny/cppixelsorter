@@ -22,7 +22,7 @@ CFLAGS = -std=gnu++23 -finline-functions # -fno-exceptions
 
 CFLAGS += $(shell pkg-config --cflags --libs dbus-1)
 
-HDR = hdr
+CFLAGS += -I hdr -I assets
 
 SRCDIR := src
 
@@ -66,19 +66,19 @@ $(BINARY_DEBUG): $(DOBJECT_FILES)
 ## Release objects
 # rule for all object files directly in the src folder
 bin/release/%.o: $(SRCDIR)/%.cpp
-	$(CXX) $(CFLAGS) -I $(HDR) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 # rule for all subfolders
 bin/release/%.o: $(SRCDIR)/*/%.cpp
-	$(CXX) $(CFLAGS) -I $(HDR) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 ## --
 
 ## Debug objects
 bin/debug/%.o: $(SRCDIR)/%.cpp
-	$(CXX) $(CFLAGS) -I $(HDR) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 bin/debug/%.o: $(SRCDIR)/*/%.cpp
-	$(CXX) $(CFLAGS) -I $(HDR) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 ## --
 
 # rule to dump assembly

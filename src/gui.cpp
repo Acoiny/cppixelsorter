@@ -2,7 +2,6 @@
 #include "Ui/UiManager.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
-#include "Ui/textManager.hpp"
 #include "filepicker.hpp"
 #include "imageSorter.hpp"
 
@@ -11,13 +10,15 @@
 
 #include <SDL3/SDL.h>
 
-#include <SDL3/SDL_render.h>
+#include <SDL3/SDL_iostream.h>
 #include <SDL3/SDL_surface.h>
-#include <SDL3_ttf/SDL_ttf.h>
+#include <SDL3/SDL_video.h>
 #include <cstdint>
 #include <memory>
 #include <print>
 #include <stdexcept>
+
+#include "icon_data.hpp"
 
 Gui::Gui(int width, int height, const std::string &title)
 {
@@ -26,6 +27,14 @@ Gui::Gui(int width, int height, const std::string &title)
   SDL_SetAppMetadata(title.c_str(), "0.0.1", "com.cpp.pixelsorter");
   SDL_CreateWindowAndRenderer(title.c_str(), width, height,
                               SDL_WINDOW_RESIZABLE, &m_window, &m_renderer);
+
+  // setting the window icon
+  {
+    auto stream = SDL_IOFromConstMem(assets_icon_png, assets_icon_png_len);
+    auto icon = SDL_LoadSurface_IO(stream, true);
+    SDL_SetWindowIcon(m_window, icon);
+    SDL_DestroySurface(icon);
+  }
 
   m_uiManager = std::make_unique<UI::UiManager>(m_renderer);
 
