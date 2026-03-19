@@ -36,7 +36,7 @@ ImageSorter::ImageSorter(SDL_Surface *surface, int n_channels)
 
 ImageSorter::~ImageSorter()
 {
-  if (m_destroy_image)
+  if (m_destroy_image && m_image)
     stbi_image_free(m_image);
 }
 

@@ -14,6 +14,7 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_surface.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <cstdint>
 #include <memory>
 #include <print>
 #include <stdexcept>
@@ -51,10 +52,15 @@ Gui::Gui(int width, int height, const std::string &title)
 
 Gui::~Gui()
 {
-  SDL_DestroySurface(m_surface);
   if (m_texture)
     SDL_DestroyTexture(m_texture);
 
+  if (m_surface)
+  {
+    uint8_t *pixels = (uint8_t *)m_surface->pixels;
+    SDL_DestroySurface(m_surface);
+    stbi_image_free(pixels);
+  }
   m_uiManager.reset();
 
   SDL_Quit();
@@ -97,27 +103,27 @@ void Gui::Update()
 
 void Gui::LoadTextureFromSurface(SDL_Surface *surface)
 {
-  SDL_Surface *newSurface =
-      SDL_ConvertSurface(m_surface, SDL_PIXELFORMAT_RGB24);
-
-  // destroy old surface
-  if (m_surface)
-  {
-    uint8_t *pixels = (uint8_t *)m_surface->pixels;
-    SDL_DestroySurface(m_surface);
-    stbi_image_free(pixels);
-  }
-
-  // if conversion failed, don't load image
-  if (!newSurface)
-  {
-    m_surface = nullptr;
-    std::println(stderr, "Unable to create texture!");
-  }
-  else
-  {
-    m_surface = newSurface;
-  }
+  // SDL_Surface *newSurface =
+  //     SDL_ConvertSurface(m_surface, SDL_PIXELFORMAT_RGB24);
+  //
+  // // destroy old surface
+  // if (m_surface)
+  // {
+  //   uint8_t *pixels = (uint8_t *)m_surface->pixels;
+  //   SDL_DestroySurface(m_surface);
+  //   stbi_image_free(pixels);
+  // }
+  //
+  // // if conversion failed, don't load image
+  // if (!newSurface)
+  // {
+  //   m_surface = nullptr;
+  //   std::println(stderr, "Unable to create texture!");
+  // }
+  // else
+  // {
+  //   m_surface = newSurface;
+  // }
 
   if (m_texture)
     SDL_DestroyTexture(m_texture);
