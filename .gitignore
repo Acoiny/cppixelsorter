@@ -5,5 +5,7 @@ cppixelsorter
 debug_cppixelsorter
 compile_commands.json
 
+!assets/*.png
+
 bin/
 .cache/
