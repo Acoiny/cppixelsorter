@@ -3,6 +3,8 @@ MAKEFLAGS=-j
 
 BINARY := cppixelsorter
 
+INSTALL_DIR=~/.local/bin/
+
 # arguments for the `make run` command
 RUN_ARGS := -g
 
@@ -41,6 +43,9 @@ LDFLAGS=-lSDL3 -lSDL3_ttf
 .PHONY := all debug release clean
 
 all: debug
+
+install: release
+	mv $(BINARY) $(INSTALL_DIR)
 
 release: $(BINARY)
 release: CFLAGS += $(RELEASE_FLAGS)
