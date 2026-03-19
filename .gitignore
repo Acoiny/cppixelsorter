@@ -7,5 +7,7 @@ compile_commands.json
 
 !assets/*.png
 
+*.*~
+
 bin/
 .cache/
