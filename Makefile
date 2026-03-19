@@ -22,7 +22,7 @@ CFLAGS = -std=gnu++23 -finline-functions # -fno-exceptions
 
 CFLAGS += $(shell pkg-config --cflags --libs dbus-1)
 
-CFLAGS += -I hdr -I assets
+CFLAGS += -I hdr
 
 SRCDIR := src
 
@@ -47,11 +47,15 @@ all: debug
 install: release
 	mv $(BINARY) $(INSTALL_DIR)
 
-release: $(BINARY)
+release: icon $(BINARY)
 release: CFLAGS += $(RELEASE_FLAGS)
 
-debug: $(BINARY_DEBUG)
+debug: icon $(BINARY_DEBUG)
 debug: CFLAGS += $(DEBUG_FLAGS)
+
+icon: hdr/icon_data.hpp
+	echo "#pragma once" > hdr/icon_data.hpp
+	xxd -i assets/icon.png >> hdr/icon_data.hpp
 
 # rule for building and running debug build
 run: $(BINARY_DEBUG)
