@@ -9,6 +9,7 @@
 #include "imageSorter.hpp"
 
 #include "stb_image.h"
+#include "textureRect.hpp"
 #include "timer.hpp"
 
 #include <SDL3/SDL.h>
@@ -48,12 +49,20 @@ Gui::Gui(int width, int height, const std::string &title)
   auto hb = m_uiManager->addElement<UI::HBox>();
   {
     auto vb = hb->addElement<UI::VBox>();
-    vb->addElement<UI::TextButton>(0, 0, "Hello");
-    vb->addElement<UI::TextButton>(0, 0, "Foo");
-    vb->addElement<UI::TextButton>(0, 0, "Bar");
+    vb->addElement<UI::TextButton>(0, 0, "Load")->onLeftClick =
+        std::bind(&Gui::PickFile, this);
+
+    vb->addElement<UI::TextButton>(0, 0, "Sort")->onLeftClick =
+        std::bind(&Gui::RunSort, this);
+    vb->addElement<UI::TextButton>(0, 0, "Save")->onLeftClick =
+        std::bind(&Gui::SaveFile, this);
+
+    // spacer
+    vb->addElementFrac<UI::TextBox>(10, 0, 0, "");
+
+    m_infoText = vb->addElementFrac<UI::TextBox>(1, 0, 0, "Time: ");
   }
-  hb->addElement<UI::TextButton>(0, 0, "World");
-  hb->addElement<UI::TextBox>(0, 0, "Lalalala");
+  m_texturerect = hb->addElementFrac<TextureRect>(3);
   // "sending" a resize event to update UI layout
   {
     SDL_Event fake_event;
@@ -84,9 +93,6 @@ Gui::Gui(int width, int height, const std::string &title)
 
 Gui::~Gui()
 {
-  if (m_texture)
-    SDL_DestroyTexture(m_texture);
-
   if (m_surface)
   {
     uint8_t *pixels = (uint8_t *)m_surface->pixels;
@@ -118,49 +124,10 @@ void Gui::Update()
   SDL_SetRenderDrawColor(m_renderer, 93, 59, 107, 255);
   SDL_RenderClear(m_renderer);
 
-  SDL_FRect blankspace = {0, 0, 200, 600};
-  SDL_RenderFillRect(m_renderer, &blankspace);
-
-  if (m_texture)
-  {
-    const auto rect = get_image_ratio_rect(m_texture->w, m_texture->h, 300);
-    SDL_RenderTexture(m_renderer, m_texture, nullptr, &rect);
-  }
-
   m_uiManager->draw(m_renderer);
 
   SDL_RenderPresent(m_renderer);
   SDL_Delay(20);
-}
-
-void Gui::LoadTextureFromSurface(SDL_Surface *surface)
-{
-  // SDL_Surface *newSurface =
-  //     SDL_ConvertSurface(m_surface, SDL_PIXELFORMAT_RGB24);
-  //
-  // // destroy old surface
-  // if (m_surface)
-  // {
-  //   uint8_t *pixels = (uint8_t *)m_surface->pixels;
-  //   SDL_DestroySurface(m_surface);
-  //   stbi_image_free(pixels);
-  // }
-  //
-  // // if conversion failed, don't load image
-  // if (!newSurface)
-  // {
-  //   m_surface = nullptr;
-  //   std::println(stderr, "Unable to create texture!");
-  // }
-  // else
-  // {
-  //   m_surface = newSurface;
-  // }
-
-  if (m_texture)
-    SDL_DestroyTexture(m_texture);
-
-  m_texture = SDL_CreateTextureFromSurface(m_renderer, m_surface);
 }
 
 void Gui::LoadImage(const std::string &path)
@@ -176,7 +143,8 @@ void Gui::LoadImage(const std::string &path)
 
   if (m_surface)
   {
-    LoadTextureFromSurface(m_surface);
+    m_texturerect->setTexture(m_renderer, m_surface);
+    // LoadTextureFromSurface(m_surface);
   }
   else
   {
@@ -252,8 +220,11 @@ void Gui::RunSort()
   ImageSorter sorter(m_surface);
   Timer t;
   sorter.sort_vertical(0);
-  std::println("Sorting took {}", t.get());
-  LoadTextureFromSurface(m_surface);
+  auto msg = std::format("Sorting took {}", t.get());
+  std::println("{}", msg);
+  m_infoText->setText(msg);
+
+  m_texturerect->setTexture(m_renderer, m_surface);
 }
 void Gui::SaveFile()
 {

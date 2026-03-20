@@ -25,7 +25,7 @@ class Button : public BaseElement
 {
 public:
   Button(float x, float y, float w = 60, float h = 20);
-  ~Button() override = default;
+  virtual ~Button() override = default;
 
   void draw(SDL_Renderer *renderer) override;
   bool HandleMouseEvent(SDL_Event &event) override;

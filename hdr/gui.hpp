@@ -2,6 +2,7 @@
 
 #include "Ui/UiManager.hpp"
 #include "Ui/textBox.hpp"
+#include "textureRect.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 #include <string>
@@ -23,8 +24,6 @@ private:
   SDL_FRect get_image_ratio_rect(int image_width, int image_height,
                                  int start_x);
 
-  void LoadTextureFromSurface(SDL_Surface *surface);
-
   void PickFile();
   void RunSort();
   void SaveFile();
@@ -37,9 +36,12 @@ private:
   SDL_Renderer *m_renderer = nullptr;
 
   SDL_Surface *m_surface = nullptr;
-  SDL_Texture *m_texture = nullptr;
 
   bool m_isRunning = false;
 
   std::unique_ptr<UI::UiManager> m_uiManager;
+
+  std::shared_ptr<UI::TextBox> m_infoText;
+
+  std::shared_ptr<TextureRect> m_texturerect;
 };

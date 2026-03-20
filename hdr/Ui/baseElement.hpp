@@ -7,7 +7,7 @@ namespace UI
 class BaseElement
 {
 public:
-  virtual ~BaseElement() = 0;
+  virtual ~BaseElement() = default;
 
   virtual void draw(SDL_Renderer *renderer) = 0;
 
