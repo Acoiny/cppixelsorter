@@ -27,8 +27,9 @@ public:
   Button(float x, float y, float w = 60, float h = 20);
   ~Button() override = default;
 
-  bool HandleEvent(SDL_Event &event) override;
   void draw(SDL_Renderer *renderer) override;
+  bool HandleMouseEvent(SDL_Event &event) override;
+  void HandleResizeEvent(const SDL_FRect &space) override;
 
   /**
    * Gets called on left click
@@ -61,6 +62,12 @@ public:
     return *this;
   }
 
+  Button &setMargin(float margin)
+  {
+    m_margin = margin;
+    return *this;
+  }
+
 protected:
 private:
   inline bool isIntersecting(float x, float y)
@@ -73,6 +80,7 @@ protected:
   SDL_Color m_idleColor{0x83, 0x3d, 0xb4, 255};
   SDL_Color m_hoverColor{0xa2, 0x55, 0xd9, 255};
   SDL_Color m_mouseDownColor{0xc3, 0x75, 0xf9, 255};
+  float m_margin = 10;
 
   SDL_FRect m_rect;
 

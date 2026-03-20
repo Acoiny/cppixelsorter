@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL3/SDL_rect.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <string>
 
@@ -18,10 +19,14 @@ public:
 
   void draw(SDL_Renderer *renderer) override;
 
-  bool HandleEvent(SDL_Event &event) override { return false; }
+  bool HandleMouseEvent(SDL_Event &event) override { return false; }
+
+  void HandleResizeEvent(const SDL_FRect &space) override;
 
 private:
   float m_x, m_y;
+
+  std::string m_string;
 
   TTF_Text *m_text;
 };

@@ -1,5 +1,8 @@
 #include "gui.hpp"
 #include "Ui/UiManager.hpp"
+#include "Ui/button.hpp"
+#include "Ui/container/hbox.hpp"
+#include "Ui/container/vbox.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
 #include "filepicker.hpp"
@@ -10,6 +13,7 @@
 
 #include <SDL3/SDL.h>
 
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL_iostream.h>
 #include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_video.h>
@@ -40,6 +44,25 @@ Gui::Gui(int width, int height, const std::string &title)
 
   m_isRunning = true;
 
+  // TODO: properly construct elements!
+  auto hb = m_uiManager->addElement<UI::HBox>();
+  {
+    auto vb = hb->addElement<UI::VBox>();
+    vb->addElement<UI::TextButton>(0, 0, "Hello");
+    vb->addElement<UI::TextButton>(0, 0, "Foo");
+    vb->addElement<UI::TextButton>(0, 0, "Bar");
+  }
+  hb->addElement<UI::TextButton>(0, 0, "World");
+  hb->addElement<UI::TextBox>(0, 0, "Lalalala");
+  // "sending" a resize event to update UI layout
+  {
+    SDL_Event fake_event;
+    fake_event.type = SDL_EVENT_WINDOW_RESIZED;
+    fake_event.window.data1 = width;
+    fake_event.window.data2 = height;
+    m_uiManager->handleEvent(fake_event);
+  }
+  return;
   // corner coordinates
   float c_x = 10, c_y = 10;
 

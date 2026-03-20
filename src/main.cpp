@@ -4,7 +4,6 @@
 #include "gui.hpp"
 #include "timer.hpp"
 
-#include <chrono>
 #include <getopt.h>
 #include <print>
 #include <stdexcept>

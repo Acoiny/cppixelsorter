@@ -3,6 +3,7 @@
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <print>
 
 using namespace UI;
 
@@ -31,7 +32,7 @@ void Button::draw(SDL_Renderer *renderer)
   SDL_RenderFillRect(renderer, &m_rect);
 }
 
-bool Button::HandleEvent(SDL_Event &event)
+bool Button::HandleMouseEvent(SDL_Event &event)
 {
   bool handled = false;
   switch (event.type)
@@ -91,4 +92,13 @@ bool Button::HandleEvent(SDL_Event &event)
   }
 
   return handled;
+}
+
+void Button::HandleResizeEvent(const SDL_FRect &space)
+{
+  m_rect = space;
+  m_rect.x += m_margin;
+  m_rect.y += m_margin;
+  m_rect.w -= 2 * m_margin;
+  m_rect.h -= 2 * m_margin;
 }

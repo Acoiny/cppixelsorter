@@ -26,20 +26,34 @@ UiManager::~UiManager()
 
 void UiManager::handleEvent(SDL_Event &event)
 {
-  if (event.type == SDL_EVENT_WINDOW_RESIZED &&
-      (m_letterboxmode.mode & SDL_LOGICAL_PRESENTATION_LETTERBOX) != 0)
+  if (event.type == SDL_EVENT_WINDOW_RESIZED)
   {
     // TODO: handle resize
     auto x = event.window.data1;
     auto y = event.window.data2;
+
+    for (auto &el : m_elements)
+    {
+      el->HandleResizeEvent({.x = 0,
+                             .y = 0,
+                             .w = static_cast<float>(x),
+                             .h = static_cast<float>(y)});
+    }
     return;
   }
 
-  for (auto &btn : m_elements)
+  // handle mouse events
+  if (event.type == SDL_EVENT_MOUSE_MOTION ||
+      event.type == SDL_EVENT_WINDOW_RESIZED ||
+      event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+      event.type == SDL_EVENT_MOUSE_BUTTON_UP)
   {
-    // stop iterating, if event has been handled
-    if (btn->HandleEvent(event))
-      return;
+    for (auto &btn : m_elements)
+    {
+      // stop iterating, if event has been handled
+      if (btn->HandleMouseEvent(event))
+        return;
+    }
   }
 }
 

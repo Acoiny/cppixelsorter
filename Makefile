@@ -28,6 +28,7 @@ SRCDIR := src
 
 SOURCE_FILES = $(wildcard src/*.cpp)
 SOURCE_FILES += $(wildcard src/*/*.cpp)
+SOURCE_FILES += $(wildcard src/*/*/*.cpp)
 
 OBJECT_FILES = $(patsubst %.cpp,bin/release/%.o,$(shell basename -a $(SOURCE_FILES)))
 
@@ -75,6 +76,9 @@ bin/release/%.o: $(SRCDIR)/%.cpp
 # rule for all subfolders
 bin/release/%.o: $(SRCDIR)/*/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
+
+bin/release/%.o: $(SRCDIR)/*/*/%.cpp
+	$(CXX) $(CFLAGS) -c $< -o $@
 ## --
 
 ## Debug objects
@@ -82,6 +86,9 @@ bin/debug/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 bin/debug/%.o: $(SRCDIR)/*/%.cpp
+	$(CXX) $(CFLAGS) -c $< -o $@
+
+bin/debug/%.o: $(SRCDIR)/*/*/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 ## --
 
