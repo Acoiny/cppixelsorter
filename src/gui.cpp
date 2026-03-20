@@ -62,7 +62,7 @@ Gui::Gui(int width, int height, const std::string &title)
 
     m_infoText = vb->addElementFrac<UI::TextBox>(1, 0, 0, "Time: ");
   }
-  m_texturerect = hb->addElementFrac<TextureRect>(3);
+  m_texturerect = hb->addElementFrac<TextureRect>(5);
   // "sending" a resize event to update UI layout
   {
     SDL_Event fake_event;
