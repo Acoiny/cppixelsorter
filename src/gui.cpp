@@ -41,17 +41,17 @@ Gui::Gui(int width, int height, const std::string &title)
     SDL_DestroySurface(icon);
   }
 
-  m_uiManager = std::make_unique<UI::UiManager>(m_renderer);
-
   m_isRunning = true;
+
+  m_uiManager = std::make_unique<UI::UiManager>(m_renderer);
 
   // TODO: properly construct elements!
   auto hb = m_uiManager->addElement<UI::HBox>();
   {
     auto vb = hb->addElement<UI::VBox>();
+
     vb->addElement<UI::TextButton>(0, 0, "Load")->onLeftClick =
         std::bind(&Gui::PickFile, this);
-
     vb->addElement<UI::TextButton>(0, 0, "Sort")->onLeftClick =
         std::bind(&Gui::RunSort, this);
     vb->addElement<UI::TextButton>(0, 0, "Save")->onLeftClick =
@@ -62,6 +62,7 @@ Gui::Gui(int width, int height, const std::string &title)
 
     m_infoText = vb->addElementFrac<UI::TextBox>(1, 0, 0, "Time: ");
   }
+
   m_texturerect = hb->addElementFrac<TextureRect>(5);
   // "sending" a resize event to update UI layout
   {
@@ -71,24 +72,23 @@ Gui::Gui(int width, int height, const std::string &title)
     fake_event.window.data2 = height;
     m_uiManager->handleEvent(fake_event);
   }
-  return;
-  // corner coordinates
-  float c_x = 10, c_y = 10;
-
-  // add text box to show current path
-  m_fileName = m_uiManager->addElement<UI::TextBox>(c_x, c_y, "Path here");
-
-  // add load button
-  m_uiManager->addElement<UI::TextButton>(c_x, c_y + 40, 100, 30, "Load")
-      ->onLeftClick = std::bind(&Gui::PickFile, this);
-
-  // add "sort"-button
-  m_uiManager->addElement<UI::TextButton>(c_x, c_y + 80, 100, 30, "Sort")
-      ->onLeftClick = std::bind(&Gui::RunSort, this);
-
-  // add "save"-button
-  m_uiManager->addElement<UI::TextButton>(c_x, c_y + 120, 100, 30, "Save")
-      ->onLeftClick = std::bind(&Gui::SaveFile, this);
+  // // corner coordinates
+  // float c_x = 10, c_y = 10;
+  //
+  // // add text box to show current path
+  // m_fileName = m_uiManager->addElement<UI::TextBox>(c_x, c_y, "Path here");
+  //
+  // // add load button
+  // m_uiManager->addElement<UI::TextButton>(c_x, c_y + 40, 100, 30, "Load")
+  //     ->onLeftClick = std::bind(&Gui::PickFile, this);
+  //
+  // // add "sort"-button
+  // m_uiManager->addElement<UI::TextButton>(c_x, c_y + 80, 100, 30, "Sort")
+  //     ->onLeftClick = std::bind(&Gui::RunSort, this);
+  //
+  // // add "save"-button
+  // m_uiManager->addElement<UI::TextButton>(c_x, c_y + 120, 100, 30, "Save")
+  //     ->onLeftClick = std::bind(&Gui::SaveFile, this);
 }
 
 Gui::~Gui()
