@@ -1,6 +1,5 @@
 #include "gui.hpp"
 #include "Ui/UiManager.hpp"
-#include "Ui/button.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
 #include "Ui/logger.hpp"
@@ -21,7 +20,6 @@
 #include <SDL3/SDL_video.h>
 #include <cstdint>
 #include <memory>
-#include <print>
 #include <stdexcept>
 
 #include "icon_data.hpp"
@@ -61,7 +59,7 @@ Gui::Gui(int width, int height, const std::string &title)
     // spacer
     vb->addElementFrac<UI::TextBox>(10, 0, 0, "");
 
-    m_infoText = vb->addElementFrac<UI::TextBox>(1, 0, 0, "Time: ");
+    m_infoText = vb->addElementFrac<UI::TextBox>(1, 0, 0, "");
   }
 
   m_texturerect = hb->addElementFrac<TextureRect>(5);
@@ -173,6 +171,12 @@ void Gui::PickFile()
 
 void Gui::RunSort()
 {
+  if (!m_surface)
+  {
+    UI::Logger::Warn("Load an image before sorting!");
+    return;
+  }
+
   ImageSorter sorter(m_surface);
   Timer t;
   sorter.sort_vertical(0);
