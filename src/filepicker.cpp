@@ -1,4 +1,5 @@
 #include "filepicker.hpp"
+#include "Ui/logger.hpp"
 
 #include <dbus/dbus.h>
 #include <stdio.h>
@@ -60,7 +61,7 @@ DBusHandlerResult response_filter(DBusConnection *conn, DBusMessage *message,
         {
           const char *uri;
           dbus_message_iter_get_basic(&array_iter, &uri);
-          printf("Selected file: %s\n", uri);
+          UI::Logger::Debug("Selected file: {}", uri);
           if (g_handle)
           {
             std::string str(uri);
@@ -80,11 +81,11 @@ DBusHandlerResult response_filter(DBusConnection *conn, DBusMessage *message,
   }
   else if (response == 1)
   {
-    printf("File selection cancelled.\n");
+    UI::Logger::Info("File selection cancelled");
   }
   else
   {
-    printf("File selection failed (response: %u).\n", response);
+    UI::Logger::Error("File selection failed (response: {}).", response);
   }
 
   data->done = 1;
@@ -105,7 +106,7 @@ bool Filepicker::open(bool saving)
   conn = dbus_bus_get(DBUS_BUS_SESSION, &err);
   if (dbus_error_is_set(&err))
   {
-    fprintf(stderr, "Connection Error (%s)\n", err.message);
+    UI::Logger::Error("Connection Error ({})", err.message);
     dbus_error_free(&err);
     return false;
   }
@@ -115,7 +116,7 @@ bool Filepicker::open(bool saving)
       "org.freedesktop.portal.FileChooser", saving ? "SaveFile" : "OpenFile");
   if (msg == NULL)
   {
-    fprintf(stderr, "Message Null\n");
+    UI::Logger::Error("Message Null");
     dbus_connection_unref(conn);
     return false;
   }
@@ -136,7 +137,7 @@ bool Filepicker::open(bool saving)
 
   if (dbus_error_is_set(&err))
   {
-    fprintf(stderr, "Error sending message (%s)\n", err.message);
+    UI::Logger::Error("Error sending message ({})", err.message);
     dbus_error_free(&err);
     dbus_connection_unref(conn);
     return false;
@@ -146,7 +147,7 @@ bool Filepicker::open(bool saving)
   if (!dbus_message_get_args(reply, &err, DBUS_TYPE_OBJECT_PATH, &request_path,
                              DBUS_TYPE_INVALID))
   {
-    fprintf(stderr, "Error getting request path (%s)\n", err.message);
+    UI::Logger::Error("Error getting request path ({})", err.message);
     dbus_error_free(&err);
     dbus_message_unref(reply);
     dbus_connection_unref(conn);
@@ -167,7 +168,7 @@ bool Filepicker::open(bool saving)
   dbus_connection_flush(conn);
   if (dbus_error_is_set(&err))
   {
-    fprintf(stderr, "Match Error (%s)\n", err.message);
+    UI::Logger::Error("Match Error ({})", err.message);
     dbus_error_free(&err);
     free(req_path);
     dbus_connection_unref(conn);

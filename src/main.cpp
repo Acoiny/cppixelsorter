@@ -1,9 +1,11 @@
+#include "Ui/logger.hpp"
 #include "imageSorter.hpp"
 #include "stb_image.h"
 
 #include "gui.hpp"
 #include "timer.hpp"
 
+#include <cstdint>
 #include <getopt.h>
 #include <print>
 #include <stdexcept>
@@ -12,16 +14,23 @@ int get_hue_from_rgb(unsigned char r, unsigned char g, unsigned char b);
 
 void usage(const std::string &progname)
 {
-  std::println(stderr, R"(Usage: {} -i <input_file> [OPTIONS]
+  std::println(stderr, R"(Usage: {} <infile> [OPTIONS]
     OPTIONAL:
-        -h <value>      Hue threshold.
-        -o <file>       Output file name. Ending specifies filetype.
-        -g              Activates graphical user interface.
+        --hue       | -h <value>        Hue threshold.
+
+        --outfile   | -o <file>         Output file name. Ending specifies filetype.
+
+        --gui       | -g                Activates graphical user interface.
+
+        --log-level <level>             Takes comma-separated log-levels:
+                                            debug, info, warn, error, all
+
+        --verbose   | -v                Sets log level to "all"
 )",
                progname);
 }
 
-int gui_mode(const char *infile);
+int gui_mode(const char *infile, const std::string &log_levels);
 
 enum class APP_MODE
 {
@@ -30,18 +39,33 @@ enum class APP_MODE
   GUI,
 };
 
+const struct option long_options[] = {
+    {"hue", required_argument, nullptr, 'h'},
+    {"outfile", required_argument, nullptr, 'o'},
+    {"gui", no_argument, nullptr, 'g'},
+    {"log-level", required_argument, nullptr, 'l'},
+    {"verbose", no_argument, nullptr, 'v'},
+    // last element
+    {nullptr, 0, nullptr, 0},
+};
+
+void parse_flags(int argc, char *argv[]) {}
+
 int main(int argc, char *argv[])
 {
   int c;
 
   char *infile = nullptr;
   std::string outfile = "";
+  std::string log_levels = "";
 
   int hue_value = 0;
 
+  int log_level = 0;
+
   APP_MODE mode = APP_MODE::CLI;
 
-  while ((c = getopt(argc, argv, "gi:h:o:")) != -1)
+  while ((c = getopt_long(argc, argv, "gh:o:l:v", long_options, nullptr)) != -1)
   {
     switch (c)
     {
@@ -67,15 +91,24 @@ int main(int argc, char *argv[])
     case 'o':
       outfile = optarg;
       break;
+    case 'l':
+      log_levels = optarg;
+      break;
+    case 'v':
+      log_levels = "all";
+      break;
     default:
       usage(argv[0]);
       return 1;
     }
   }
 
+  // setting input file to positional argument (or null)
+  infile = argv[optind];
+
   // GUI
   if (mode == APP_MODE::GUI)
-    return gui_mode(infile);
+    return gui_mode(infile, log_levels);
   // END GUI
 
   if (!infile)
@@ -107,8 +140,32 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-int gui_mode(const char *infile)
+uint8_t get_logger_flags(const std::string &log_levels)
 {
+  uint8_t res = 0;
+  auto lower = log_levels;
+  std::transform(lower.begin(), lower.end(), lower.begin(),
+                 [](unsigned char c) { return std::tolower(c); });
+
+  if (lower.contains("info"))
+    res |= 0b1;
+  if (lower.contains("warn"))
+    res |= 0b10;
+  if (lower.contains("error"))
+    res |= 0b100;
+  if (lower.contains("debug"))
+    res |= 0b1000;
+  if (lower.contains("all"))
+    res |= 0b1111;
+  return res;
+}
+
+int gui_mode(const char *infile, const std::string &log_levels)
+{
+  uint8_t log_flags = get_logger_flags(log_levels);
+
+  UI::Logger::SetMode((UI::Logger::Mode)log_flags);
+
   // GUI
   Gui gui(620, 480, "Pixelsorter");
 

@@ -6,7 +6,7 @@ BINARY := cppixelsorter
 INSTALL_DIR=~/.local/bin/
 
 # arguments for the `make run` command
-RUN_ARGS := -g
+RUN_ARGS := -g -v
 
 # prefix with debug, to make running as easy as typing d-TAB
 BINARY_DEBUG := debug_$(BINARY)

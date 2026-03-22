@@ -34,9 +34,6 @@ Gui::Gui(int width, int height, const std::string &title)
   SDL_CreateWindowAndRenderer(title.c_str(), width, height,
                               SDL_WINDOW_RESIZABLE, &m_window, &m_renderer);
 
-  // TODO: remove this line and make logging customizable
-  UI::Logger::SetMode(UI::Logger::Mode::all);
-
   // setting the window icon
   {
     auto stream = SDL_IOFromConstMem(assets_icon_png, assets_icon_png_len);
