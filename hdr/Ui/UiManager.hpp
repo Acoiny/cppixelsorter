@@ -34,11 +34,5 @@ public:
 
 private:
   std::vector<std::shared_ptr<BaseElement>> m_elements;
-
-  struct
-  {
-    int w, h;
-    SDL_RendererLogicalPresentation mode;
-  } m_letterboxmode;
 };
 } // namespace UI

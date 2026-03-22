@@ -2,21 +2,9 @@
 #include "Ui/textManager.hpp"
 #include <SDL3/SDL.h>
 
-#include <print>
-
 using namespace UI;
 
-UiManager::UiManager(SDL_Renderer *renderer)
-{
-  TextManager::Init(renderer);
-
-  if (!SDL_GetRenderLogicalPresentation(renderer, &m_letterboxmode.w,
-                                        &m_letterboxmode.h,
-                                        &m_letterboxmode.mode))
-  {
-    std::println(stderr, "Unable to get render logical presentation!");
-  }
-}
+UiManager::UiManager(SDL_Renderer *renderer) { TextManager::Init(renderer); }
 
 UiManager::~UiManager()
 {
@@ -28,7 +16,6 @@ void UiManager::handleEvent(SDL_Event &event)
 {
   if (event.type == SDL_EVENT_WINDOW_RESIZED)
   {
-    // TODO: handle resize
     auto x = event.window.data1;
     auto y = event.window.data2;
 
