@@ -4,7 +4,7 @@
 void TextureRect::draw(SDL_Renderer *renderer)
 {
   // if (m_texture)
-  SDL_RenderTexture(renderer, m_texture, nullptr, &m_rect);
+  SDL_RenderTexture(renderer, m_texture, nullptr, &m_texture_space);
 }
 
 TextureRect::~TextureRect()
@@ -15,6 +15,8 @@ TextureRect::~TextureRect()
 
 void TextureRect::HandleResizeEvent(const SDL_FRect &space)
 {
+  m_available_space = space;
+
   if (!m_texture)
     return;
 
@@ -25,19 +27,19 @@ void TextureRect::HandleResizeEvent(const SDL_FRect &space)
       static_cast<float>(space.w) / static_cast<float>(space.h);
 
   // setting the corner
-  m_rect.x = space.x;
-  m_rect.y = space.y;
+  m_texture_space.x = space.x;
+  m_texture_space.y = space.y;
 
   // if image aspect ratio is BIGGER than viewport -> adjust to width
   if (image_aspect_ratio >= viewport_aspect_ratio)
   {
-    m_rect.w = space.w;
-    m_rect.h = space.w / image_aspect_ratio;
+    m_texture_space.w = space.w;
+    m_texture_space.h = space.w / image_aspect_ratio;
   }
   else
   {
-    m_rect.w = space.h * image_aspect_ratio;
-    m_rect.h = space.h;
+    m_texture_space.w = space.h * image_aspect_ratio;
+    m_texture_space.h = space.h;
   }
 }
 
@@ -46,4 +48,5 @@ void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface)
   if (m_texture)
     SDL_DestroyTexture(m_texture);
   m_texture = SDL_CreateTextureFromSurface(renderer, surface);
+  HandleResizeEvent(m_available_space);
 }
