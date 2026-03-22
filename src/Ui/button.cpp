@@ -46,6 +46,7 @@ bool Button::HandleMouseEvent(SDL_Event &event)
     if (intersects && m_state == ButtonState::IDLE)
     {
       m_state = ButtonState::MOUSE_HOVER;
+      // TODO: change cursor to pointy finger
       if (onMouseEnter)
         onMouseEnter();
       handled = true;
@@ -53,6 +54,7 @@ bool Button::HandleMouseEvent(SDL_Event &event)
     // mouse is not over button
     else if (!intersects && m_state == ButtonState::MOUSE_HOVER)
     {
+      // TODO: change cursor back
       m_state = ButtonState::IDLE;
       handled = true;
     }
