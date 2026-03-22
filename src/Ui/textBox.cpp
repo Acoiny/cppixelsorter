@@ -2,7 +2,8 @@
 #include "Ui/textManager.hpp"
 #include <SDL3/SDL_error.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <print>
+
+#include "Ui/logger.hpp"
 
 using namespace UI;
 
@@ -18,7 +19,7 @@ void TextBox::setText(const std::string &text)
 {
   if (!TTF_SetTextString(m_text, text.c_str(), 0))
   {
-    std::println(stderr, "Error setting text: {}", SDL_GetError());
+    Logger::Error("Error setting text: {}", SDL_GetError());
   }
   else
   {

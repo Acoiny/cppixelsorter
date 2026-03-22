@@ -1,12 +1,10 @@
 #include "Ui/textManager.hpp"
+#include "Ui/logger.hpp"
 
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include <cassert>
 #include <filesystem>
-
-#include <iostream>
-#include <print>
 
 using namespace UI;
 
@@ -63,7 +61,7 @@ const std::string TextManager::getDefaultFont() const
     }
   }
 
-  std::println(std::cerr, "None of the set fonts found");
+  Logger::Error("None of the set fonts found");
 
   return "";
 }

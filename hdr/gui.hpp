@@ -21,9 +21,6 @@ public:
   void LoadImage(const std::string &path);
 
 private:
-  SDL_FRect get_image_ratio_rect(int image_width, int image_height,
-                                 int start_x);
-
   void PickFile();
   void RunSort();
   void SaveFile();

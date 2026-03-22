@@ -3,6 +3,7 @@
 #include "Ui/button.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
+#include "Ui/logger.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
 #include "filepicker.hpp"
@@ -32,6 +33,9 @@ Gui::Gui(int width, int height, const std::string &title)
   SDL_SetAppMetadata(title.c_str(), "0.0.1", "com.cpp.pixelsorter");
   SDL_CreateWindowAndRenderer(title.c_str(), width, height,
                               SDL_WINDOW_RESIZABLE, &m_window, &m_renderer);
+
+  // TODO: remove this line and make logging customizable
+  UI::Logger::SetMode(UI::Logger::Mode::all);
 
   // setting the window icon
   {
@@ -136,7 +140,7 @@ void Gui::LoadImage(const std::string &path)
   int w, h, channels;
   uint8_t *img = stbi_load(path.c_str(), &w, &h, &channels, 3);
 
-  std::println("Image: {} {} - channels {}", w, h, channels);
+  UI::Logger::Debug("Image: {} {} - channels {}", w, h, channels);
 
   m_surface = SDL_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_RGB24, img, w * 3);
   // m_surface = IMG_Load(path.c_str());
@@ -148,53 +152,8 @@ void Gui::LoadImage(const std::string &path)
   }
   else
   {
-    std::println(stderr, "Unable to load image {}!", path);
+    UI::Logger::Error("Unable to load image {}!", path);
   }
-
-  std::println("Needs lock: {}", SDL_MUSTLOCK(m_surface));
-}
-
-SDL_FRect Gui::get_image_ratio_rect(int image_width, int image_height,
-                                    int start_x)
-{
-
-  SDL_Rect viewport;
-
-  if (!SDL_GetRenderViewport(m_renderer, &viewport))
-  {
-    std::println(stderr, "Error: {}", SDL_GetError());
-    return {};
-  }
-
-  SDL_FRect res = {.x = static_cast<float>(start_x), .y = 0, .w = 0, .h = 0};
-
-  const float image_aspect_ratio =
-      static_cast<float>(image_width) / static_cast<float>(image_height);
-
-  const float viewport_aspect_ratio =
-      static_cast<float>(viewport.w - start_x) / static_cast<float>(viewport.h);
-
-  // if image aspect ratio is BIGGER than viewport -> adjust to width
-  if (image_aspect_ratio >= viewport_aspect_ratio)
-  {
-    res.w = (viewport.w - start_x);
-    res.h = (viewport.w - start_x) / image_aspect_ratio;
-  }
-  else
-  {
-    res.w = viewport.h * image_aspect_ratio;
-    res.h = viewport.h;
-  }
-
-  // if (image_width > viewport.w)
-  // {
-  //   res.w = viewport.w;
-  //   res.h = (viewport.w / static_cast<float>(image_width)) * image_height;
-  // }
-
-  // std::println("viewport size: {} {}", res.w, res.h);
-
-  return res;
 }
 
 void Gui::PickFile()
@@ -211,7 +170,7 @@ void Gui::PickFile()
   }
   else
   {
-    std::println("ERROR: Unable to open file!");
+    UI::Logger::Error("Unable to open file!");
   }
 }
 
@@ -221,11 +180,12 @@ void Gui::RunSort()
   Timer t;
   sorter.sort_vertical(0);
   auto msg = std::format("Sorting took {}", t.get());
-  std::println("{}", msg);
+  UI::Logger::Info("{}", msg);
   m_infoText->setText(msg);
 
   m_texturerect->setTexture(m_renderer, m_surface);
 }
+
 void Gui::SaveFile()
 {
   ImageSorter sorter(m_surface);
@@ -240,11 +200,11 @@ void Gui::SaveFile()
     }
     catch (std::runtime_error &e)
     {
-      std::println(stderr, "{}", e.what());
+      UI::Logger::Error("{}", e.what());
     }
   }
   else
   {
-    std::println("ERROR: Unable to save file!");
+    UI::Logger::Error("Unable to save file!");
   }
 }
