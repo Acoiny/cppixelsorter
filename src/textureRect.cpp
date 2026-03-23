@@ -48,5 +48,6 @@ void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface)
   if (m_texture)
     SDL_DestroyTexture(m_texture);
   m_texture = SDL_CreateTextureFromSurface(renderer, surface);
+  SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST);
   HandleResizeEvent(m_available_space);
 }
