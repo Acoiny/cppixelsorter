@@ -10,6 +10,7 @@ namespace UI
 class TextButton : public Button
 {
 public:
+  TextButton(const std::string &text);
   TextButton(float x, float y, const std::string &text);
   TextButton(float x, float y, float w, float h, const std::string &text);
   ~TextButton() override;
@@ -17,10 +18,6 @@ public:
   void draw(SDL_Renderer *renderer) override;
 
   void setText(const std::string &text);
-
-private:
-  // TODO: calculate middle method
-  std::tuple<float, float> calcMiddleOffset();
 
 private:
   TTF_Text *m_text;

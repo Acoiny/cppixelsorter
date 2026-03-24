@@ -14,10 +14,6 @@
 
 #include <SDL3/SDL.h>
 
-#include <SDL3/SDL_events.h>
-#include <SDL3/SDL_iostream.h>
-#include <SDL3/SDL_surface.h>
-#include <SDL3/SDL_video.h>
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
@@ -49,17 +45,17 @@ Gui::Gui(int width, int height, const std::string &title)
   {
     auto vb = hb->addElement<UI::VBox>();
 
-    vb->addElement<UI::TextButton>(0, 0, "Load")->onLeftClick =
+    vb->addElement<UI::TextButton>("Load")->onLeftClick =
         std::bind(&Gui::PickFile, this);
-    vb->addElement<UI::TextButton>(0, 0, "Sort")->onLeftClick =
+    vb->addElement<UI::TextButton>("Sort")->onLeftClick =
         std::bind(&Gui::RunSort, this);
-    vb->addElement<UI::TextButton>(0, 0, "Save")->onLeftClick =
+    vb->addElement<UI::TextButton>("Save")->onLeftClick =
         std::bind(&Gui::SaveFile, this);
 
     // spacer
-    vb->addElementFrac<UI::TextBox>(10, 0, 0, "");
+    vb->addElementFrac<UI::TextBox>(10, "");
 
-    m_infoText = vb->addElementFrac<UI::TextBox>(1, 0, 0, "");
+    m_infoText = vb->addElementFrac<UI::TextBox>(1, "");
   }
 
   m_texturerect = hb->addElementFrac<TextureRect>(5);

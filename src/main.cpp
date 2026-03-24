@@ -61,8 +61,6 @@ int main(int argc, char *argv[])
 
   int hue_value = 0;
 
-  int log_level = 0;
-
   APP_MODE mode = APP_MODE::CLI;
 
   while ((c = getopt_long(argc, argv, "gh:o:l:v", long_options, nullptr)) != -1)
@@ -167,7 +165,7 @@ int gui_mode(const char *infile, const std::string &log_levels)
   UI::Logger::SetMode((UI::Logger::Mode)log_flags);
 
   // GUI
-  Gui gui(620, 480, "Pixelsorter");
+  Gui gui(1200, 600, "Pixelsorter");
 
   if (infile)
   {

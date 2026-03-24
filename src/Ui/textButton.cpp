@@ -2,11 +2,12 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <cstdlib>
 
 #include "Ui/textManager.hpp"
 
 using namespace UI;
+
+TextButton::TextButton(const std::string &text) : TextButton(0, 0, text) {}
 
 TextButton::TextButton(float x, float y, const std::string &text)
     : TextButton(x, y, 60, 20, text)

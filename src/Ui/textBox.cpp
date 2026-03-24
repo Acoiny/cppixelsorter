@@ -7,6 +7,11 @@
 
 using namespace UI;
 
+TextBox::TextBox(const std::string &text, float fontsize)
+    : TextBox(0, 0, text, fontsize)
+{
+}
+
 TextBox::TextBox(float x, float y, const std::string &text, float fontsize)
     : m_x(x), m_y(y), m_string(text),
       m_text(TextManager::getInstance().createText(text))
@@ -24,6 +29,7 @@ void TextBox::setText(const std::string &text)
   else
   {
     m_string = text;
+    HandleResizeEvent(m_rect);
   }
 }
 
@@ -34,6 +40,7 @@ void TextBox::draw(SDL_Renderer *renderer)
 
 void TextBox::HandleResizeEvent(const SDL_FRect &space)
 {
+  m_rect = space;
   m_x = space.x + space.w / 2;
   m_y = space.y + space.h / 2;
 

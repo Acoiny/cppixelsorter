@@ -11,6 +11,7 @@ namespace UI
 class TextBox : public BaseElement
 {
 public:
+  TextBox(const std::string &text, float fontsize = 12);
   TextBox(float x, float y, const std::string &text, float fontsize = 12);
 
   ~TextBox() override;
@@ -24,6 +25,7 @@ public:
   void HandleResizeEvent(const SDL_FRect &space) override;
 
 private:
+  SDL_FRect m_rect = {0};
   float m_x, m_y;
 
   std::string m_string;
