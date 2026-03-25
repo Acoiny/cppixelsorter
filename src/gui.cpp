@@ -179,7 +179,7 @@ void Gui::RunSort()
 
   if (!m_sorted)
   {
-    UI::Logger::Error("Unable to copy surface: {}", SDL_GetError());
+    UI::Logger::Error("Unable to duplicate surface: {}", SDL_GetError());
     return;
   }
 
