@@ -48,15 +48,15 @@ all: debug
 install: release
 	mv $(BINARY) $(INSTALL_DIR)
 
-release: embeds $(BINARY)
+release: $(BINARY)
 release: CFLAGS += $(RELEASE_FLAGS)
 
-debug: embeds $(BINARY_DEBUG)
+debug: $(BINARY_DEBUG)
 debug: CFLAGS += $(DEBUG_FLAGS)
 
 embeds:
 	xxd -i assets/icon.png > src/embed_data.cpp
-	xxd -i assets/Archivo-Regular.ttf >> src/font_data.cpp
+	xxd -i assets/Archivo-Regular.ttf >> src/embed_data.cpp
 
 # rule for building and running debug build
 run: $(BINARY_DEBUG)

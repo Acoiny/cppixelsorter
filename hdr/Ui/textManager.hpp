@@ -27,7 +27,9 @@ private:
   TextManager(SDL_Renderer *renderer);
   ~TextManager();
 
-  const std::string getDefaultFont() const;
+  TTF_Font *getDefaultFont() const;
+
+  TTF_Font *loadBuiltinFont() const;
 
 private:
   TTF_TextEngine *m_engine = nullptr;

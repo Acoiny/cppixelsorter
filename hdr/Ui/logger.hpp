@@ -70,7 +70,7 @@ public:
   }
 
   template <typename... Args>
-  static void Fatal(FormatString<Args...> msg, Args &&...args)
+  [[noreturn]] static void Fatal(FormatString<Args...> msg, Args &&...args)
   {
     LogWithLabel("FATAL", kMagenta, msg, std::forward<Args>(args)...);
     std::terminate();

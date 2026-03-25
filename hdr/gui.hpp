@@ -21,9 +21,16 @@ public:
   void LoadImage(const std::string &path);
 
 private:
+  /**
+   * Unloads the currently loaded image.
+   * Does nothing, if no image is loaded.
+   */
+  void UnloadImage();
+
   void PickFile();
   void RunSort();
   void SaveFile();
+  void SliderChanged(int value);
 
 private:
   std::string m_currentFile;
@@ -32,13 +39,18 @@ private:
   SDL_Window *m_window = nullptr;
   SDL_Renderer *m_renderer = nullptr;
 
-  SDL_Surface *m_surface = nullptr;
+  SDL_Surface *m_sorted = nullptr;
+  SDL_Surface *m_original = nullptr;
 
   bool m_isRunning = false;
 
+  int m_slider_value = 0;
+
   std::unique_ptr<UI::UiManager> m_uiManager;
 
+  // textboxes that change frequently
   std::shared_ptr<UI::TextBox> m_infoText;
+  std::shared_ptr<UI::TextBox> m_sliderText;
 
   std::shared_ptr<TextureRect> m_texturerect;
 };

@@ -1,6 +1,9 @@
 #include "Ui/textManager.hpp"
 #include "Ui/logger.hpp"
+#include "embed_data.hpp"
 
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_iostream.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include <cassert>
@@ -13,7 +16,8 @@ TextManager *TextManager::m_instance = nullptr;
 TextManager::TextManager(SDL_Renderer *renderer)
 {
   m_engine = TTF_CreateRendererTextEngine(renderer);
-  m_font = TTF_OpenFont(getDefaultFont().c_str(), FONT_SIZE);
+  // currently only using the default font
+  m_font = loadBuiltinFont(); // getDefaultFont();
 }
 
 TextManager::~TextManager()
@@ -46,24 +50,49 @@ TTF_Text *TextManager::createText(const std::string &text)
   return txt;
 }
 
-const std::string TextManager::getDefaultFont() const
+TTF_Font *TextManager::getDefaultFont() const
 {
   namespace fs = std::filesystem;
 
-  const auto defaultFonts = {"./assets/Archivo-Regular.ttf",
-                             "/usr/share/fonts/truetype/DejaVuSans.ttf",
-                             "/usr/share/fonts/open-sans/OpenSans-Regular.ttf"};
+  const char *defaultFonts[] = {
+      "/usr/share/fonts/truetype/DejaVuSans.ttf",
+      "/usr/share/fonts/open-sans/OpenSans-Regular.ttf",
+  };
 
   for (auto f : defaultFonts)
   {
     if (fs::exists(f))
     {
-      Logger::Debug("Loaded font {}", f);
-      return f;
+      TTF_Font *font = TTF_OpenFont(f, FONT_SIZE);
+      if (!font)
+      {
+        Logger::Error("Error trying to load font \"{}\": {}", f,
+                      SDL_GetError());
+        // just continue iterating
+      }
+      else
+      {
+        Logger::Debug("Loaded font {}", f);
+      }
     }
   }
 
-  Logger::Error("None of the set fonts found");
+  return loadBuiltinFont();
+}
 
-  return "";
+TTF_Font *TextManager::loadBuiltinFont() const
+{
+  Logger::Debug("Loading builtin font");
+
+  TTF_Font *font =
+      TTF_OpenFontIO(SDL_IOFromConstMem(assets_Archivo_Regular_ttf,
+                                        assets_Archivo_Regular_ttf_len),
+                     true, FONT_SIZE);
+
+  if (!font)
+  {
+    // if we can't even load that... what can we do?
+    Logger::Fatal("Unable to load builtin font: {}", SDL_GetError());
+  }
+  return font;
 }

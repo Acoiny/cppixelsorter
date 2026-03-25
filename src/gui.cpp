@@ -3,6 +3,7 @@
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
 #include "Ui/logger.hpp"
+#include "Ui/slider.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
 #include "filepicker.hpp"
@@ -14,6 +15,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_surface.h>
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
@@ -51,9 +54,13 @@ Gui::Gui(int width, int height, const std::string &title)
         std::bind(&Gui::RunSort, this);
     vb->addElement<UI::TextButton>("Save")->onLeftClick =
         std::bind(&Gui::SaveFile, this);
+    m_sliderText = vb->addElement<UI::TextBox>("1");
+
+    vb->addElement<UI::Slider<int>>(0, 360)->onValueChange =
+        std::bind(&Gui::SliderChanged, this, std::placeholders::_1); // WTF???
 
     // spacer
-    vb->addElementFrac<UI::TextBox>(10, "");
+    vb->addElementFrac<UI::TextBox>(9, "");
 
     m_infoText = vb->addElementFrac<UI::TextBox>(1, "");
   }
@@ -67,33 +74,12 @@ Gui::Gui(int width, int height, const std::string &title)
     fake_event.window.data2 = height;
     m_uiManager->handleEvent(fake_event);
   }
-  // // corner coordinates
-  // float c_x = 10, c_y = 10;
-  //
-  // // add text box to show current path
-  // m_fileName = m_uiManager->addElement<UI::TextBox>(c_x, c_y, "Path here");
-  //
-  // // add load button
-  // m_uiManager->addElement<UI::TextButton>(c_x, c_y + 40, 100, 30, "Load")
-  //     ->onLeftClick = std::bind(&Gui::PickFile, this);
-  //
-  // // add "sort"-button
-  // m_uiManager->addElement<UI::TextButton>(c_x, c_y + 80, 100, 30, "Sort")
-  //     ->onLeftClick = std::bind(&Gui::RunSort, this);
-  //
-  // // add "save"-button
-  // m_uiManager->addElement<UI::TextButton>(c_x, c_y + 120, 100, 30, "Save")
-  //     ->onLeftClick = std::bind(&Gui::SaveFile, this);
 }
 
 Gui::~Gui()
 {
-  if (m_surface)
-  {
-    uint8_t *pixels = (uint8_t *)m_surface->pixels;
-    SDL_DestroySurface(m_surface);
-    stbi_image_free(pixels);
-  }
+  // unload original image
+  UnloadImage();
   m_uiManager.reset();
 
   SDL_Quit();
@@ -127,23 +113,35 @@ void Gui::Update()
 
 void Gui::LoadImage(const std::string &path)
 {
+  UnloadImage();
   // Loading the surface with stb_image
   int w, h, channels;
   uint8_t *img = stbi_load(path.c_str(), &w, &h, &channels, 3);
 
   UI::Logger::Debug("Image: {} {} - channels {}", w, h, channels);
 
-  m_surface = SDL_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_RGB24, img, w * 3);
+  m_original = SDL_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_RGB24, img, w * 3);
   // m_surface = IMG_Load(path.c_str());
 
-  if (m_surface)
+  if (m_original)
   {
-    m_texturerect->setTexture(m_renderer, m_surface);
-    // LoadTextureFromSurface(m_surface);
+    m_texturerect->setTexture(m_renderer, m_original);
   }
   else
   {
     UI::Logger::Error("Unable to load image {}!", path);
+  }
+}
+
+void Gui::UnloadImage()
+{
+  // unload original image
+  if (m_original)
+  {
+    uint8_t *pixels = (uint8_t *)m_original->pixels;
+    SDL_DestroySurface(m_original);
+    stbi_image_free(pixels);
+    m_original = nullptr;
   }
 }
 
@@ -167,25 +165,36 @@ void Gui::PickFile()
 
 void Gui::RunSort()
 {
-  if (!m_surface)
+  if (!m_original)
   {
     UI::Logger::Warn("Load an image before sorting!");
     return;
   }
 
-  ImageSorter sorter(m_surface);
+  // passing NULL is fine
+  SDL_DestroySurface(m_sorted);
+
+  m_sorted = SDL_ConvertSurface(m_original, SDL_PIXELFORMAT_RGB24);
+
+  if (!m_sorted)
+  {
+    UI::Logger::Error("Unable to copy surface: {}", SDL_GetError());
+    return;
+  }
+
+  ImageSorter sorter(m_sorted);
   Timer t;
-  sorter.sort_vertical(0);
+  sorter.sort_vertical(m_slider_value);
   auto msg = std::format("Sorting took {}", t.get());
   UI::Logger::Info("{}", msg);
   m_infoText->setText(msg);
 
-  m_texturerect->setTexture(m_renderer, m_surface);
+  m_texturerect->setTexture(m_renderer, m_sorted);
 }
 
 void Gui::SaveFile()
 {
-  ImageSorter sorter(m_surface);
+  ImageSorter sorter(m_sorted);
   Filepicker fp;
   if (fp.open(true))
   {
@@ -204,4 +213,13 @@ void Gui::SaveFile()
   {
     UI::Logger::Error("Unable to save file!");
   }
+}
+
+void Gui::SliderChanged(int value)
+{
+  m_sliderText->setText(std::to_string(value));
+
+  m_slider_value = value;
+
+  RunSort();
 }
