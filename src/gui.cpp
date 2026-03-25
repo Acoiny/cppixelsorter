@@ -18,7 +18,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include "icon_data.hpp"
+#include "embed_data.hpp"
 
 Gui::Gui(int width, int height, const std::string &title)
 {

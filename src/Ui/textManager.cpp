@@ -50,13 +50,15 @@ const std::string TextManager::getDefaultFont() const
 {
   namespace fs = std::filesystem;
 
-  const auto defaultFonts = {"/usr/share/fonts/truetype/DejaVuSans.ttf",
+  const auto defaultFonts = {"./assets/Archivo-Regular.ttf",
+                             "/usr/share/fonts/truetype/DejaVuSans.ttf",
                              "/usr/share/fonts/open-sans/OpenSans-Regular.ttf"};
 
   for (auto f : defaultFonts)
   {
     if (fs::exists(f))
     {
+      Logger::Debug("Loaded font {}", f);
       return f;
     }
   }

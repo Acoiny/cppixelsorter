@@ -19,7 +19,6 @@ TextButton::TextButton(float x, float y, float w, float h,
     : Button(x, y, w, h), m_text(TextManager::getInstance().createText(text)),
       m_data(text)
 {
-  const char txt[] = "Button";
 }
 
 TextButton::~TextButton() { TTF_DestroyText(m_text); }

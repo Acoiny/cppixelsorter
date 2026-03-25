@@ -48,15 +48,15 @@ all: debug
 install: release
 	mv $(BINARY) $(INSTALL_DIR)
 
-release: icon $(BINARY)
+release: embeds $(BINARY)
 release: CFLAGS += $(RELEASE_FLAGS)
 
-debug: icon $(BINARY_DEBUG)
+debug: embeds $(BINARY_DEBUG)
 debug: CFLAGS += $(DEBUG_FLAGS)
 
-icon: hdr/icon_data.hpp
-	echo "#pragma once" > hdr/icon_data.hpp
-	xxd -i assets/icon.png >> hdr/icon_data.hpp
+embeds:
+	xxd -i assets/icon.png > src/embed_data.cpp
+	xxd -i assets/Archivo-Regular.ttf >> src/font_data.cpp
 
 # rule for building and running debug build
 run: $(BINARY_DEBUG)
