@@ -16,6 +16,7 @@
 #include <SDL3/SDL.h>
 
 #include <SDL3/SDL_error.h>
+#include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_surface.h>
 #include <cstdint>
 #include <memory>
@@ -174,7 +175,7 @@ void Gui::RunSort()
   // passing NULL is fine
   SDL_DestroySurface(m_sorted);
 
-  m_sorted = SDL_ConvertSurface(m_original, SDL_PIXELFORMAT_RGB24);
+  m_sorted = SDL_DuplicateSurface(m_original);
 
   if (!m_sorted)
   {
@@ -221,5 +222,5 @@ void Gui::SliderChanged(int value)
 
   m_slider_value = value;
 
-  RunSort();
+  // RunSort();
 }
