@@ -14,4 +14,7 @@ bool CheckBox::HandleMouseEvent(SDL_Event &event)
   if (isIntersecting(m_x, m_y))
   {
   }
+  return false;
 }
+
+void CheckBox::HandleResizeEvent(const SDL_FRect &space) {}

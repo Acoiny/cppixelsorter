@@ -55,7 +55,7 @@ Gui::Gui(int width, int height, const std::string &title)
         std::bind(&Gui::RunSort, this);
     vb->addElement<UI::TextButton>("Save")->onLeftClick =
         std::bind(&Gui::SaveFile, this);
-    m_sliderText = vb->addElement<UI::TextBox>("1");
+    m_sliderText = vb->addElement<UI::TextBox>("0");
 
     vb->addElement<UI::Slider<int>>(0, 360)->onValueChange =
         std::bind(&Gui::SliderChanged, this, std::placeholders::_1); // WTF???
