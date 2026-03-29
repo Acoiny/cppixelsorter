@@ -19,7 +19,7 @@ template <typename T> class Slider : public BaseElement
   // TODO: clean up these magic values!
   static constexpr float MARGIN_SIDE = 10;
   static constexpr float HEIGHT = 5;
-  static constexpr float SELECTOR_RADIUS = 15;
+  static constexpr float SELECTOR_RADIUS = 10;
   static constexpr T CHANGE_THRESHOLD = 1;
 
   enum class State
@@ -30,8 +30,7 @@ template <typename T> class Slider : public BaseElement
   };
 
 public:
-  Slider(float min, float max)
-      : m_min(min), m_max(max), m_value(min), m_lastChange(min)
+  Slider(T min, T max) : m_min(min), m_max(max), m_value(min), m_lastChange(min)
   {
   }
 
@@ -46,10 +45,10 @@ public:
 
     const auto [x_begin, y_value] = getSelectorCenter();
 
-    SDL_FRect m_selector = {.x = x_begin - SELECTOR_RADIUS / 2,
-                            .y = y_value - SELECTOR_RADIUS / 2,
-                            .w = SELECTOR_RADIUS,
-                            .h = SELECTOR_RADIUS};
+    SDL_FRect m_selector = {.x = x_begin - SELECTOR_RADIUS,
+                            .y = y_value - SELECTOR_RADIUS,
+                            .w = SELECTOR_RADIUS * 2,
+                            .h = SELECTOR_RADIUS * 2};
 
     switch (m_state)
     {
@@ -100,7 +99,6 @@ public:
         float mx = event.motion.x;
         // the moving of the selector
         m_value = xToValue(mx);
-        ;
 
         if (std::abs(m_value - m_lastChange) >= CHANGE_THRESHOLD)
         {
@@ -163,8 +161,8 @@ private:
   inline bool isIntersecting(float x, float y)
   {
     const auto [sel_x, sel_y] = getSelectorCenter();
-    return std::abs(sel_x - x) < (SELECTOR_RADIUS / 2) &&
-           std::abs(sel_y - y) < (SELECTOR_RADIUS / 2);
+    return std::abs(sel_x - x) < (SELECTOR_RADIUS) &&
+           std::abs(sel_y - y) < (SELECTOR_RADIUS);
   }
 
   /**
@@ -175,7 +173,7 @@ private:
     float min_x = m_bar.x;
     float max_x = min_x + m_bar.w;
     return std::lerp(min_x, max_x,
-                     static_cast<float>(value) /
+                     static_cast<float>(value - m_min) /
                          static_cast<float>(m_max - m_min));
   }
 
@@ -184,8 +182,8 @@ private:
     float min_x = m_bar.x;
     float max_x = min_x + m_bar.w;
     return std::clamp(
-        static_cast<int>(std::lerp(m_min, m_max, x / (max_x - min_x))), m_min,
-        m_max);
+        static_cast<T>(std::lerp(m_min, m_max, (x - min_x) / (max_x - min_x))),
+        m_min, m_max);
   }
 
   /**
