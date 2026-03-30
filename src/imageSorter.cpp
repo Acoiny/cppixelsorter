@@ -1,6 +1,6 @@
 #include "imageSorter.hpp"
-#include <algorithm>
 #include <cstdint>
+#include <numeric>
 #include <print>
 #include <vector>
 
@@ -12,14 +12,18 @@
 #include <format>
 #include <stdexcept>
 
+#include <algorithm>
+#include <execution>
+#include <ranges>
+
 constexpr auto CHANNELS = 3;
 
 int get_hue(uint8_t r, uint8_t g, uint8_t b);
 
 ImageSorter::ImageSorter(const std::string &filename)
-    : m_filename(filename),
-      m_image(stbi_load(filename.c_str(), &m_width, &m_height, &m_channels,
-                        CHANNELS)) // for now only RGB
+    : m_image(stbi_load(filename.c_str(), &m_width, &m_height, &m_channels,
+                        CHANNELS)),
+      m_filename(filename) // for now only RGB
 {
   if (!m_image)
   {
@@ -81,54 +85,64 @@ void ImageSorter::sort_vertical(int hue_value)
 {
   std::array<int, 360> counts = {0};
 
-  for (int w = 0; w < m_width; w++)
-  {
-    int path_start = -1;
+  auto indices = std::views::iota(0);
 
-    for (int h = 0; h < m_height; h++)
-    {
-      uint8_t *pixel = m_image + (h * m_width + w) * CHANNELS; // 3 channels
-      uint8_t r = pixel[0], g = pixel[1], b = pixel[2];
+  // get begin iterator and a matching end iterator by advancing begin
+  auto b = indices.begin();
+  auto e = std::next(b, m_width); // e has same iterator type as b
 
-      int hue = get_hue(r, g, b);
+  std::for_each(std::execution::par_unseq, b, e,
+                [&](int w)
 
-      if (hue >= hue_value)
-      {
-        // if NOT in path
-        if (path_start == -1)
-        {
-          // start path
-          path_start = h;
-        }
-        counts[hue]++;
-      }
-      // pixel is NOT valid anymore
-      else
-      {
-        // we have a path!
-        if (path_start != -1)
-        {
-          int path_end = h;
+                // for (int w = 0; w < m_width; w++)
+                {
+                  int path_start = -1;
 
-          sort_column(w, path_start, path_end, counts);
-          counts.fill(0);
+                  for (int h = 0; h < m_height; h++)
+                  {
+                    uint8_t *pixel =
+                        m_image + (h * m_width + w) * CHANNELS; // 3 channels
+                    uint8_t r = pixel[0], g = pixel[1], b = pixel[2];
 
-          path_start = -1;
-        }
-      }
-    }
-    if (path_start != -1)
-    {
-      // we have a path!
-      int path_end = m_height;
+                    int hue = get_hue(r, g, b);
 
-      sort_column(w, path_start, path_end, counts);
+                    if (hue >= hue_value)
+                    {
+                      // if NOT in path
+                      if (path_start == -1)
+                      {
+                        // start path
+                        path_start = h;
+                      }
+                      counts[hue]++;
+                    }
+                    // pixel is NOT valid anymore
+                    else
+                    {
+                      // we have a path!
+                      if (path_start != -1)
+                      {
+                        int path_end = h;
 
-      counts.fill(0);
+                        sort_column(w, path_start, path_end, counts);
+                        counts.fill(0);
 
-      path_start = -1;
-    }
-  }
+                        path_start = -1;
+                      }
+                    }
+                  }
+                  if (path_start != -1)
+                  {
+                    // we have a path!
+                    int path_end = m_height;
+
+                    sort_column(w, path_start, path_end, counts);
+
+                    counts.fill(0);
+
+                    path_start = -1;
+                  }
+                });
 }
 
 void ImageSorter::write_to_file(const std::string &filename)
