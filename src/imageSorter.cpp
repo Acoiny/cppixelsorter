@@ -83,19 +83,19 @@ void ImageSorter::sort_column(int column_index, int start, int end,
 
 void ImageSorter::sort_vertical(int hue_value)
 {
-  std::array<int, 360> counts = {0};
-
   auto indices = std::views::iota(0);
 
   // get begin iterator and a matching end iterator by advancing begin
   auto b = indices.begin();
   auto e = std::next(b, m_width); // e has same iterator type as b
 
-  std::for_each(std::execution::par_unseq, b, e,
+  std::for_each(std::execution::par, b, e,
                 [&](int w)
 
                 // for (int w = 0; w < m_width; w++)
                 {
+                  std::array<int, 360> counts = {0};
+
                   int path_start = -1;
 
                   for (int h = 0; h < m_height; h++)
@@ -137,8 +137,6 @@ void ImageSorter::sort_vertical(int hue_value)
                     int path_end = m_height;
 
                     sort_column(w, path_start, path_end, counts);
-
-                    counts.fill(0);
 
                     path_start = -1;
                   }
