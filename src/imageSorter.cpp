@@ -49,7 +49,7 @@ void ImageSorter::sort_column(int column_index, int start, int end,
 {
   std::vector<std::array<uint8_t, 3>> sorted_pixels;
 
-  for (int i = 1; i < hues.size(); i++)
+  for (std::size_t i = 1; i < hues.size(); i++)
   {
     hues[i] += hues[i - 1];
   }
@@ -69,7 +69,7 @@ void ImageSorter::sort_column(int column_index, int start, int end,
   }
 
   // write pixels back
-  for (int i = 0; i < sorted_pixels.size(); i += 1)
+  for (std::size_t i = 0; i < sorted_pixels.size(); i += 1)
   {
     int pixel_height = start + i;
     uint8_t *pixel = m_image + (pixel_height * m_width + column_index) *
@@ -83,64 +83,56 @@ void ImageSorter::sort_column(int column_index, int start, int end,
 
 void ImageSorter::sort_vertical(int hue_value)
 {
-  auto indices = std::views::iota(0);
+  // paralellizing the for loop :)
+#pragma omp parallel for
+  for (int w = 0; w < m_width; w++)
+  {
+    std::array<int, 360> counts = {0};
 
-  // get begin iterator and a matching end iterator by advancing begin
-  auto b = indices.begin();
-  auto e = std::next(b, m_width); // e has same iterator type as b
+    int path_start = -1;
 
-  std::for_each(std::execution::par, b, e,
-                [&](int w)
+    for (int h = 0; h < m_height; h++)
+    {
+      uint8_t *pixel = m_image + (h * m_width + w) * CHANNELS; // 3 channels
+      uint8_t r = pixel[0], g = pixel[1], b = pixel[2];
 
-                // for (int w = 0; w < m_width; w++)
-                {
-                  std::array<int, 360> counts = {0};
+      int hue = get_hue(r, g, b);
 
-                  int path_start = -1;
+      if (hue >= hue_value)
+      {
+        // if NOT in path
+        if (path_start == -1)
+        {
+          // start path
+          path_start = h;
+        }
+        counts[hue]++;
+      }
+      // pixel is NOT valid anymore
+      else
+      {
+        // we have a path!
+        if (path_start != -1)
+        {
+          int path_end = h;
 
-                  for (int h = 0; h < m_height; h++)
-                  {
-                    uint8_t *pixel =
-                        m_image + (h * m_width + w) * CHANNELS; // 3 channels
-                    uint8_t r = pixel[0], g = pixel[1], b = pixel[2];
+          sort_column(w, path_start, path_end, counts);
+          counts.fill(0);
 
-                    int hue = get_hue(r, g, b);
+          path_start = -1;
+        }
+      }
+    }
+    if (path_start != -1)
+    {
+      // we have a path!
+      int path_end = m_height;
 
-                    if (hue >= hue_value)
-                    {
-                      // if NOT in path
-                      if (path_start == -1)
-                      {
-                        // start path
-                        path_start = h;
-                      }
-                      counts[hue]++;
-                    }
-                    // pixel is NOT valid anymore
-                    else
-                    {
-                      // we have a path!
-                      if (path_start != -1)
-                      {
-                        int path_end = h;
+      sort_column(w, path_start, path_end, counts);
 
-                        sort_column(w, path_start, path_end, counts);
-                        counts.fill(0);
-
-                        path_start = -1;
-                      }
-                    }
-                  }
-                  if (path_start != -1)
-                  {
-                    // we have a path!
-                    int path_end = m_height;
-
-                    sort_column(w, path_start, path_end, counts);
-
-                    path_start = -1;
-                  }
-                });
+      path_start = -1;
+    }
+  }
 }
 
 void ImageSorter::write_to_file(const std::string &filename)
