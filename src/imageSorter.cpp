@@ -1,6 +1,5 @@
 #include "imageSorter.hpp"
 #include <cstdint>
-#include <numeric>
 #include <print>
 #include <vector>
 
@@ -13,8 +12,6 @@
 #include <stdexcept>
 
 #include <algorithm>
-#include <execution>
-#include <ranges>
 
 constexpr auto CHANNELS = 3;
 
