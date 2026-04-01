@@ -19,8 +19,10 @@ template <typename T> class Slider : public BaseElement
   // TODO: clean up these magic values!
   static constexpr float MARGIN_SIDE = 10;
   static constexpr float HEIGHT = 5;
-  static constexpr float SELECTOR_RADIUS = 10;
+  static constexpr float SELECTOR_RADIUS = 5;
   static constexpr T CHANGE_THRESHOLD = 1;
+  static constexpr SDL_Color COLOR_IDLE = {0x83, 0x3d, 0xb4, 255};
+  static constexpr SDL_Color COLOR_ACTIVE = {0xc3, 0x75, 0xf9, 255};
 
   enum class State
   {
@@ -39,7 +41,7 @@ public:
     // drawing bar in black for now
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     // DEBUG
-    SDL_RenderRect(renderer, &m_space);
+    // SDL_RenderRect(renderer, &m_space);
     // END DEBUG
     SDL_RenderFillRect(renderer, &m_bar);
 
@@ -53,12 +55,18 @@ public:
     switch (m_state)
     {
     case State::IDLE:
-      SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    {
+      auto [r, g, b, a] = COLOR_IDLE;
+      SDL_SetRenderDrawColor(renderer, r, g, b, a);
       break;
+    }
     case State::HOVER:
     case State::HELD:
-      SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    {
+      auto [r, g, b, a] = COLOR_ACTIVE;
+      SDL_SetRenderDrawColor(renderer, r, g, b, a);
       break;
+    }
     }
     SDL_RenderFillRect(renderer, &m_selector);
   }
