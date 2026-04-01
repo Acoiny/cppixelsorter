@@ -1,5 +1,4 @@
 #include "imageSorter.hpp"
-#include <algorithm>
 #include <cstdint>
 #include <print>
 #include <vector>
@@ -12,14 +11,16 @@
 #include <format>
 #include <stdexcept>
 
+#include <algorithm>
+
 constexpr auto CHANNELS = 3;
 
 int get_hue(uint8_t r, uint8_t g, uint8_t b);
 
 ImageSorter::ImageSorter(const std::string &filename)
-    : m_filename(filename),
-      m_image(stbi_load(filename.c_str(), &m_width, &m_height, &m_channels,
-                        CHANNELS)) // for now only RGB
+    : m_image(stbi_load(filename.c_str(), &m_width, &m_height, &m_channels,
+                        CHANNELS)),
+      m_filename(filename) // for now only RGB
 {
   if (!m_image)
   {
@@ -45,7 +46,7 @@ void ImageSorter::sort_column(int column_index, int start, int end,
 {
   std::vector<std::array<uint8_t, 3>> sorted_pixels;
 
-  for (int i = 1; i < hues.size(); i++)
+  for (std::size_t i = 1; i < hues.size(); i++)
   {
     hues[i] += hues[i - 1];
   }
@@ -65,7 +66,7 @@ void ImageSorter::sort_column(int column_index, int start, int end,
   }
 
   // write pixels back
-  for (int i = 0; i < sorted_pixels.size(); i += 1)
+  for (std::size_t i = 0; i < sorted_pixels.size(); i += 1)
   {
     int pixel_height = start + i;
     uint8_t *pixel = m_image + (pixel_height * m_width + column_index) *
@@ -79,10 +80,12 @@ void ImageSorter::sort_column(int column_index, int start, int end,
 
 void ImageSorter::sort_vertical(int hue_value)
 {
-  std::array<int, 360> counts = {0};
-
+  // paralellizing the for loop :)
+#pragma omp parallel for
   for (int w = 0; w < m_width; w++)
   {
+    std::array<int, 360> counts = {0};
+
     int path_start = -1;
 
     for (int h = 0; h < m_height; h++)
@@ -123,8 +126,6 @@ void ImageSorter::sort_vertical(int hue_value)
       int path_end = m_height;
 
       sort_column(w, path_start, path_end, counts);
-
-      counts.fill(0);
 
       path_start = -1;
     }

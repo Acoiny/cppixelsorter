@@ -15,9 +15,6 @@
 
 #include <SDL3/SDL.h>
 
-#include <SDL3/SDL_error.h>
-#include <SDL3/SDL_pixels.h>
-#include <SDL3/SDL_surface.h>
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
