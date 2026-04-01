@@ -58,7 +58,7 @@ Gui::Gui(int width, int height, const std::string &title)
     m_sliderText = vb->addElement<UI::TextBox>("0");
 
     vb->addElement<UI::Slider<int>>(0, 360)->onValueChange =
-        std::bind(&Gui::SliderChanged, this, std::placeholders::_1); // WTF???
+        std::bind_front(&Gui::SliderChanged, this); // WTF???
 
     // spacer
     vb->addElementFrac<UI::TextBox>(9, "");
