@@ -141,6 +141,9 @@ void Gui::UnloadImage()
     stbi_image_free(pixels);
     m_original = nullptr;
   }
+
+  // destroy (if not null)
+  SDL_DestroySurface(m_sorted);
 }
 
 void Gui::PickFile()
@@ -192,7 +195,14 @@ void Gui::RunSort()
 
 void Gui::SaveFile()
 {
-  ImageSorter sorter(m_sorted);
+  if (m_sorted == nullptr && m_original == nullptr)
+  {
+    UI::Logger::Warn("No image to save!");
+    return;
+  }
+
+  // save original, if not sorted yet
+  ImageSorter sorter(m_sorted == nullptr ? m_original : m_sorted);
   Filepicker fp;
   if (fp.open(true))
   {
