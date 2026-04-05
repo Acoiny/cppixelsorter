@@ -26,7 +26,7 @@ private:
    * Unloads the currently loaded image.
    * Does nothing, if no image is loaded.
    */
-  void UnloadImage();
+  // void UnloadImage();
 
   void PickFile();
   void RunSort();

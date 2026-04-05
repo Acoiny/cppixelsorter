@@ -7,7 +7,6 @@
 #include "Ui/slider.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
-#include "baseImageSorter.hpp"
 #include "filepicker.hpp"
 
 #include "imageData.hpp"
@@ -84,7 +83,7 @@ Gui::Gui(int width, int height, const std::string &title)
 Gui::~Gui()
 {
   // unload original image
-  UnloadImage();
+  // UnloadImage();
   m_uiManager.reset();
 
   SDL_Quit();
@@ -118,7 +117,7 @@ void Gui::Update()
 
 void Gui::LoadImage(const std::string &path)
 {
-  UnloadImage();
+  // UnloadImage();
   // Loading the surface with stb_image
   // int w, h, channels;
   // uint8_t *img = stbi_load(path.c_str(), &w, &h, &channels, 3);
@@ -190,7 +189,7 @@ void Gui::RunSort()
 
 void Gui::SaveFile()
 {
-  if (m_sorted_image == nullptr && m_original_image == nullptr)
+  if (m_sorted_image.pixels == nullptr && m_original_image.pixels == nullptr)
   {
     UI::Logger::Warn("No image to save!");
     return;
@@ -204,7 +203,7 @@ void Gui::SaveFile()
 
     try
     {
-      m_sorted_image->write_to_file(name);
+      m_sorted_image.write_to_file(name);
     }
     catch (std::runtime_error &e)
     {

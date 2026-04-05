@@ -1,5 +1,7 @@
 #include "textureRect.hpp"
 #include <SDL3/SDL_render.h>
+#include <SDL3/SDL_surface.h>
+#include <print>
 
 void TextureRect::draw(SDL_Renderer *renderer)
 {
@@ -11,6 +13,9 @@ TextureRect::~TextureRect()
 {
   if (m_texture)
     SDL_DestroyTexture(m_texture);
+
+  // passing NULL is fine
+  SDL_DestroySurface(m_surface);
 }
 
 void TextureRect::HandleResizeEvent(const SDL_FRect &space)
@@ -47,6 +52,11 @@ void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface)
 {
   if (m_texture)
     SDL_DestroyTexture(m_texture);
+
+  SDL_DestroySurface(m_surface);
+
+  m_surface = surface;
+
   m_texture = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST);
   HandleResizeEvent(m_available_space);

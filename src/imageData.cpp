@@ -1,8 +1,13 @@
 #include "imageData.hpp"
 
 #include "Ui/logger.hpp"
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_pixels.h>
+#include <SDL3/SDL_surface.h>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -35,7 +40,6 @@ ImageData &ImageData::operator=(const ImageData &other)
 {
   std::size_t curr_len = width * height * channels;
   std::size_t other_len = other.width * other.height * other.channels;
-
   // we need more memory
   if (curr_len < other_len)
   {
@@ -78,6 +82,7 @@ void ImageData::free()
 
 bool ImageData::write_to_file(const std::string &filepath)
 {
+  std::println("writing to {}", filepath);
   if (filepath.ends_with(".jpg") || filepath.ends_with(".jpeg"))
   {
     UI::Logger::Info("Writing to file: {}", filepath);
@@ -95,4 +100,18 @@ bool ImageData::write_to_file(const std::string &filepath)
   return false;
 }
 
-SDL_Surface *ImageData::toSurface() {}
+SDL_Surface *ImageData::toSurface()
+{
+  // TODO: check if "pitch" is correct
+  SDL_Surface *surface = SDL_CreateSurfaceFrom(
+      width, height, SDL_PIXELFORMAT_RGB24, pixels, width * 3);
+
+  std::println("creating surface");
+  if (!surface)
+  {
+    throw std::runtime_error(
+        std::format("Unable to create surface: {}", SDL_GetError()));
+  }
+
+  return surface;
+}

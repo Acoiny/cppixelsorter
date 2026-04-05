@@ -26,7 +26,7 @@ enum class SORT_DIRECTION
  */
 struct SortTask
 {
-  ImageData image;
+  ImageData &image;
 
   struct
   {
