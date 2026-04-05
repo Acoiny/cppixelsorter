@@ -6,8 +6,8 @@
 #include "Ui/slider.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
+#include "cliImageSorter.hpp"
 #include "filepicker.hpp"
-#include "imageSorter.hpp"
 
 #include "stb_image.h"
 #include "textureRect.hpp"
@@ -182,7 +182,7 @@ void Gui::RunSort()
     return;
   }
 
-  ImageSorter sorter(m_sorted);
+  CliImageSorter sorter(m_sorted);
   Timer t;
   sorter.sort_vertical(m_slider_value);
   auto msg = std::format("Sorting took {}", t.get());
@@ -194,7 +194,14 @@ void Gui::RunSort()
 
 void Gui::SaveFile()
 {
-  ImageSorter sorter(m_sorted);
+  if (m_sorted == nullptr && m_original == nullptr)
+  {
+    UI::Logger::Warn("No image to save!");
+    return;
+  }
+
+  // save original, if not sorted yet
+  CliImageSorter sorter(m_sorted == nullptr ? m_original : m_sorted);
   Filepicker fp;
   if (fp.open(true))
   {

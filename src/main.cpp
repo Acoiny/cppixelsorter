@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  ImageSorter img(infile);
+  CliImageSorter img(infile);
 
   Timer t = Timer();
 
