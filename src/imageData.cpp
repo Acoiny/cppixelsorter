@@ -106,7 +106,6 @@ SDL_Surface *ImageData::toSurface()
   SDL_Surface *surface = SDL_CreateSurfaceFrom(
       width, height, SDL_PIXELFORMAT_RGB24, pixels, width * 3);
 
-  std::println("creating surface");
   if (!surface)
   {
     throw std::runtime_error(
