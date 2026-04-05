@@ -138,6 +138,7 @@ void Gui::LoadImage(const std::string &path)
   // }
 
   m_original_image = ImageData(path);
+  m_texturerect->setTexture(m_renderer, m_original_image.toSurface());
 }
 
 void Gui::PickFile()
