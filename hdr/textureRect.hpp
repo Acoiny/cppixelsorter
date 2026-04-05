@@ -18,6 +18,7 @@ public:
 
 private:
   SDL_Texture *m_texture = nullptr;
+  SDL_Surface *m_surface = nullptr;
 
   SDL_FRect m_texture_space = {0};
   SDL_FRect m_available_space = {0};

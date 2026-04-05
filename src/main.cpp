@@ -1,5 +1,6 @@
+#include "Sorters/baseImageSorter.hpp"
 #include "Ui/logger.hpp"
-#include "imageSorter.hpp"
+#include "imageData.hpp"
 #include "stb_image.h"
 
 #include "gui.hpp"
@@ -115,11 +116,14 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  ImageSorter img(infile);
+  ImageData image(infile);
+  SortTask task{.image = image, .hue_values = {.min = hue_value}};
+  BaseImageSorter sorter(task);
 
   Timer t = Timer();
 
-  img.sort_vertical(hue_value);
+  // img.sort_vertical_ttb(hue_value);
+  sorter.RunTask();
 
   auto duration = t.get();
 
@@ -127,7 +131,19 @@ int main(int argc, char *argv[])
 
   try
   {
-    img.write_to_file(outfile);
+    if (outfile.size() == 0)
+    {
+      std::string f(infile);
+      auto idx = f.find_last_of('.');
+      if (idx == std::string::npos)
+        throw std::runtime_error("Unable to determine infile type!");
+      auto file_ending = f.substr(idx);
+
+      outfile = "outfile" + file_ending;
+    }
+
+    if (!image.write_to_file(outfile))
+      throw std::runtime_error("Unable to save file!");
   }
   catch (std::runtime_error &e)
   {
