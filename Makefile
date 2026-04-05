@@ -18,7 +18,7 @@ DEBUG_FLAGS = -g3 -O0 -ggdb
 RELEASE_FLAGS := -O3
 
 # CFLAGS = -Wall -Wextra -Werror -std=gnu++23 -march=native -Wno-unused-parameter
-CFLAGS = -std=gnu++23 -Wall -Wno-unused-parameter # -finline-functions -fno-exceptions
+CFLAGS = -std=gnu++23 -fopenmp -Wall -Wno-unused-parameter # -finline-functions -fno-exceptions
 
 CFLAGS += $(shell pkg-config --cflags --libs dbus-1)
 

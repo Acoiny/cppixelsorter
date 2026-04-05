@@ -1,4 +1,5 @@
 #include "gui.hpp"
+#include "Sorters/verticalSorter.hpp"
 #include "Ui/UiManager.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
@@ -6,7 +7,6 @@
 #include "Ui/slider.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
-#include "cliImageSorter.hpp"
 #include "filepicker.hpp"
 
 #include "stb_image.h"
@@ -25,9 +25,12 @@
 
 Gui::Gui(int width, int height, const std::string &title)
 {
+  if (!SDL_SetAppMetadata(title.c_str(), "0.0.1", "com.cpp.pixelsorter"))
+    throw std::runtime_error(
+        std::format("Unable to set metadata: {}", SDL_GetError()));
+
   SDL_Init(SDL_INIT_VIDEO);
   TTF_Init();
-  SDL_SetAppMetadata(title.c_str(), "0.0.1", "com.cpp.pixelsorter");
   SDL_CreateWindowAndRenderer(title.c_str(), width, height,
                               SDL_WINDOW_RESIZABLE, &m_window, &m_renderer);
 
@@ -182,9 +185,9 @@ void Gui::RunSort()
     return;
   }
 
-  CliImageSorter sorter(m_sorted);
+  VerticalSorter sorter(m_sorted);
   Timer t;
-  sorter.sort_vertical(m_slider_value);
+  sorter.sort_vertical_ttb(m_slider_value);
   auto msg = std::format("Sorting took {}", t.get());
   UI::Logger::Info("{}", msg);
   m_infoText->setText(msg);
@@ -201,7 +204,7 @@ void Gui::SaveFile()
   }
 
   // save original, if not sorted yet
-  CliImageSorter sorter(m_sorted == nullptr ? m_original : m_sorted);
+  VerticalSorter sorter(m_sorted == nullptr ? m_original : m_sorted);
   Filepicker fp;
   if (fp.open(true))
   {

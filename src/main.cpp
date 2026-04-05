@@ -1,5 +1,5 @@
+#include "Sorters/verticalSorter.hpp"
 #include "Ui/logger.hpp"
-#include "imageSorter.hpp"
 #include "stb_image.h"
 
 #include "gui.hpp"
@@ -115,11 +115,11 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  CliImageSorter img(infile);
+  VerticalSorter img(infile);
 
   Timer t = Timer();
 
-  img.sort_vertical(hue_value);
+  img.sort_vertical_ttb(hue_value);
 
   auto duration = t.get();
 

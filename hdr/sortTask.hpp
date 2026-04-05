@@ -23,5 +23,5 @@ struct SortTask
   // criterion, by which spans get created
   PIXEL_CRITERIA selection_criterion = PIXEL_CRITERIA::HUE;
   // criterion, by which spans get sorted
-  PIXEL_CRITERIA sort_criterion PIXEL_CRITERIA::BRIGHTNESS;
+  PIXEL_CRITERIA sort_criterion = PIXEL_CRITERIA::BRIGHTNESS;
 };
