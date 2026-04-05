@@ -4,7 +4,6 @@
 // #include <array>
 // #include <string>
 
-#include "imageData.hpp"
 #include "sortTask.hpp"
 
 /**
@@ -13,18 +12,20 @@
 class BaseImageSorter
 {
 public:
-  BaseImageSorter() = default;
-  BaseImageSorter(ImageData image);
+  BaseImageSorter(SortTask task);
 
   // virtual void sort_vertical(int min_hue, int max_hue) = 0;
   //
   // virtual void write_to_file(const std::string &filename) = 0;
+  void RunTask();
 
-  virtual ~BaseImageSorter() = default;
+  ~BaseImageSorter() = default;
 
 protected: // methods
-  // void sort_column(int column_index, int start, int end,
-  //                  std::array<int, 360> &hues);
+  void sort_vertical_ttb(int min_hue, int max_hue);
+
+  void sort_column(int column_index, int start, int end,
+                   std::array<int, 360> &hues);
 
   /**
    * Returns the hue of a rgb value
@@ -40,5 +41,5 @@ protected: // methods
   }
 
 protected:
-  ImageData m_image;
+  SortTask m_task;
 };

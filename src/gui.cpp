@@ -1,5 +1,5 @@
 #include "gui.hpp"
-#include "Sorters/verticalSorter.hpp"
+#include "Sorters/baseImageSorter.hpp"
 #include "Ui/UiManager.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
@@ -7,9 +7,11 @@
 #include "Ui/slider.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
-#include "Ui/textManager.hpp"
+#include "baseImageSorter.hpp"
 #include "filepicker.hpp"
 
+#include "imageData.hpp"
+#include "sortTask.hpp"
 #include "stb_image.h"
 #include "textureRect.hpp"
 #include "timer.hpp"
@@ -18,7 +20,6 @@
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_surface.h>
-#include <cstdint>
 #include <memory>
 #include <stdexcept>
 
@@ -119,35 +120,25 @@ void Gui::LoadImage(const std::string &path)
 {
   UnloadImage();
   // Loading the surface with stb_image
-  int w, h, channels;
-  uint8_t *img = stbi_load(path.c_str(), &w, &h, &channels, 3);
+  // int w, h, channels;
+  // uint8_t *img = stbi_load(path.c_str(), &w, &h, &channels, 3);
+  //
+  // UI::Logger::Debug("Image: {} {} - channels {}", w, h, channels);
+  //
+  // m_original = SDL_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_RGB24, img, w *
+  // 3);
+  // // m_surface = IMG_Load(path.c_str());
+  //
+  // if (m_original)
+  // {
+  //   m_texturerect->setTexture(m_renderer, m_original);
+  // }
+  // else
+  // {
+  //   UI::Logger::Error("Unable to load image {}!", path);
+  // }
 
-  UI::Logger::Debug("Image: {} {} - channels {}", w, h, channels);
-
-  m_original = SDL_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_RGB24, img, w * 3);
-  // m_surface = IMG_Load(path.c_str());
-
-  if (m_original)
-  {
-    m_texturerect->setTexture(m_renderer, m_original);
-  }
-  else
-  {
-    UI::Logger::Error("Unable to load image {}!", path);
-  }
-}
-
-void Gui::UnloadImage()
-{
-  // unload original image
-  if (m_original)
-  {
-    uint8_t *pixels = (uint8_t *)m_original->pixels;
-    SDL_DestroySurface(m_original);
-    stbi_image_free(pixels);
-    m_original = nullptr;
-  }
-  SDL_DestroySurface(m_sorted);
+  m_original_image = ImageData(path);
 }
 
 void Gui::PickFile()
@@ -170,43 +161,42 @@ void Gui::PickFile()
 
 void Gui::RunSort()
 {
-  if (!m_original)
+  if (!m_original_image.pixels)
   {
     UI::Logger::Warn("Load an image before sorting!");
     return;
   }
 
   // passing NULL is fine
-  SDL_DestroySurface(m_sorted);
+  m_sorted_image = m_original_image;
 
-  m_sorted = SDL_ConvertSurface(m_original, SDL_PIXELFORMAT_RGB24);
-
-  if (!m_sorted)
+  if (!m_sorted_image.pixels)
   {
-    UI::Logger::Error("Unable to copy surface: {}", SDL_GetError());
+    UI::Logger::Error("Unable to copy image");
     return;
   }
 
-  VerticalSorter sorter(m_sorted);
+  SortTask task{.image = m_sorted_image, .hue_values = {.min = m_slider_value}};
+
+  BaseImageSorter sorter(task);
   Timer t;
-  sorter.sort_vertical_ttb(m_slider_value);
+  sorter.RunTask();
   auto msg = std::format("Sorting took {}", t.get());
   UI::Logger::Info("{}", msg);
   m_infoText->setText(msg);
 
-  m_texturerect->setTexture(m_renderer, m_sorted);
+  m_texturerect->setTexture(m_renderer, m_sorted_image.toSurface());
 }
 
 void Gui::SaveFile()
 {
-  if (m_sorted == nullptr && m_original == nullptr)
+  if (m_sorted_image == nullptr && m_original_image == nullptr)
   {
     UI::Logger::Warn("No image to save!");
     return;
   }
 
   // save original, if not sorted yet
-  VerticalSorter sorter(m_sorted == nullptr ? m_original : m_sorted);
   Filepicker fp;
   if (fp.open(true))
   {
@@ -214,7 +204,7 @@ void Gui::SaveFile()
 
     try
     {
-      sorter.write_to_file(name);
+      m_sorted_image->write_to_file(name);
     }
     catch (std::runtime_error &e)
     {

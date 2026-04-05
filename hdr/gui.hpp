@@ -2,6 +2,7 @@
 
 #include "Ui/UiManager.hpp"
 #include "Ui/textBox.hpp"
+#include "imageData.hpp"
 #include "textureRect.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
@@ -39,8 +40,10 @@ private:
   SDL_Window *m_window = nullptr;
   SDL_Renderer *m_renderer = nullptr;
 
-  SDL_Surface *m_sorted = nullptr;
-  SDL_Surface *m_original = nullptr;
+  // SDL_Surface *m_sorted = nullptr;
+  // SDL_Surface *m_original = nullptr;
+  ImageData m_original_image;
+  ImageData m_sorted_image;
 
   bool m_isRunning = false;
 
