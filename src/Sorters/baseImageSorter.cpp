@@ -25,8 +25,8 @@ void BaseImageSorter::RunTask()
 void BaseImageSorter::sort_vertical_ttb(int min_hue, int max_hue)
 {
   ImageData &image = m_task.image;
-// paralellizing the for loop :)
-#pragma omp parallel for
+  // paralellizing the for loop :)
+  // #pragma omp parallel for
   for (int w = 0; w < image.width; w++)
   {
     std::array<int, 360> brightnesses = {0};

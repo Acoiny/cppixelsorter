@@ -7,6 +7,7 @@
 #include <SDL3/SDL.h>
 #include <memory>
 #include <string>
+#include <thread>
 
 class Gui
 {
@@ -30,10 +31,25 @@ private:
 
   void PickFile();
   void RunSort();
+
+  void ThreadedSort();
+
   void SaveFile();
   void SliderChanged(int value);
 
 private:
+  enum class State
+  {
+    IDLE,
+    RUNNING,
+    DONE,
+  };
+  struct
+  {
+    State state = State::IDLE;
+    ImageData result_image;
+  } m_thread_data;
+
   std::string m_currentFile;
   std::shared_ptr<UI::TextBox> m_fileName;
 
@@ -56,4 +72,6 @@ private:
   std::shared_ptr<UI::TextBox> m_sliderText;
 
   std::shared_ptr<TextureRect> m_texturerect;
+
+  std::jthread m_thread;
 };

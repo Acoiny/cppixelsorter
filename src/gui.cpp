@@ -17,11 +17,9 @@
 
 #include <SDL3/SDL.h>
 
-#include <SDL3/SDL_error.h>
-#include <SDL3/SDL_surface.h>
-#include <cstdint>
 #include <memory>
 #include <stdexcept>
+#include <thread>
 
 #include "embed_data.hpp"
 
@@ -56,7 +54,7 @@ Gui::Gui(int width, int height, const std::string &title)
     vb->addElement<UI::TextButton>("Load")->onLeftClick =
         std::bind(&Gui::PickFile, this);
     vb->addElement<UI::TextButton>("Sort")->onLeftClick =
-        std::bind(&Gui::RunSort, this);
+        std::bind(&Gui::ThreadedSort, this);
     vb->addElement<UI::TextButton>("Save")->onLeftClick =
         std::bind(&Gui::SaveFile, this);
     m_sliderText = vb->addElement<UI::TextBox>("0");
@@ -93,6 +91,14 @@ Gui::~Gui()
 
 void Gui::Update()
 {
+  // get thread result
+  if (m_thread_data.state == State::DONE)
+  {
+    m_thread_data.state = State::IDLE;
+    m_sorted_image = m_thread_data.result_image;
+    m_texturerect->setTexture(m_renderer, m_sorted_image.toSurface());
+  }
+
   SDL_Event event;
   while (SDL_PollEvent(&event))
   {
@@ -189,6 +195,45 @@ void Gui::RunSort()
   m_texturerect->setTexture(m_renderer, m_sorted_image.toSurface());
 }
 
+void Gui::ThreadedSort()
+{
+  // join thread before starting new
+  if (m_thread_data.state != State::IDLE)
+    return;
+
+  m_thread_data.state = State::RUNNING;
+
+  m_thread = std::jthread(
+      [this]()
+      {
+        if (!m_original_image.pixels)
+        {
+          UI::Logger::Warn("Load an image before sorting!");
+          return;
+        }
+
+        // passing NULL is fine
+        ImageData sorted = m_original_image;
+
+        if (!sorted.pixels)
+        {
+          UI::Logger::Error("Unable to copy image");
+          return;
+        }
+
+        SortTask task{.image = sorted, .hue_values = {.min = m_slider_value}};
+
+        BaseImageSorter sorter(task);
+        Timer t;
+        sorter.RunTask();
+        auto msg = std::format("Sorting took {}", t.get());
+        UI::Logger::Info("{}", msg);
+
+        m_thread_data.result_image = sorted;
+        m_thread_data.state = State::DONE;
+      });
+}
+
 void Gui::SaveFile()
 {
   if (m_sorted_image.pixels == nullptr && m_original_image.pixels == nullptr)
@@ -225,4 +270,5 @@ void Gui::SliderChanged(int value)
   m_slider_value = value;
 
   // RunSort();
+  ThreadedSort();
 }

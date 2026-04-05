@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
   int hue_value = 0;
 
-  APP_MODE mode = APP_MODE::CLI;
+  APP_MODE mode = APP_MODE::GUI;
 
   while ((c = getopt_long(argc, argv, "gh:o:l:v", long_options, nullptr)) != -1)
   {
