@@ -7,6 +7,7 @@
 #include "Ui/slider.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
+#include "Ui/textManager.hpp"
 #include "filepicker.hpp"
 
 #include "stb_image.h"
@@ -146,6 +147,7 @@ void Gui::UnloadImage()
     stbi_image_free(pixels);
     m_original = nullptr;
   }
+  SDL_DestroySurface(m_sorted);
 }
 
 void Gui::PickFile()
@@ -231,5 +233,5 @@ void Gui::SliderChanged(int value)
 
   m_slider_value = value;
 
-  RunSort();
+  // RunSort();
 }
