@@ -36,8 +36,21 @@ ImageData::ImageData(const ImageData &other)
   m_owns_data = true;
 }
 
+ImageData::ImageData(ImageData &&other)
+    : pixels(other.pixels), width(other.width), height(other.height),
+      channels(other.channels), m_owns_data(other.m_owns_data)
+{
+  // reset other to default
+  other.pixels = nullptr;
+  other.width = other.height = other.channels = 0;
+  other.m_owns_data = true;
+}
+
 ImageData &ImageData::operator=(const ImageData &other)
 {
+  if (this == &other)
+    return *this;
+
   std::size_t curr_len = width * height * channels;
   std::size_t other_len = other.width * other.height * other.channels;
   // we need more memory
@@ -58,6 +71,26 @@ ImageData &ImageData::operator=(const ImageData &other)
   channels = other.channels;
   m_owns_data = true;
 
+  return *this;
+}
+
+ImageData &ImageData::operator=(ImageData &&other)
+{
+  if (this == &other)
+    return *this;
+
+  if (m_owns_data && pixels)
+    free();
+
+  pixels = other.pixels;
+  width = other.width;
+  channels = other.channels;
+  m_owns_data = other.m_owns_data;
+
+  // reset other to default
+  other.pixels = nullptr;
+  other.width = other.height = other.channels = 0;
+  other.m_owns_data = true;
   return *this;
 }
 

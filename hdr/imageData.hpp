@@ -11,9 +11,13 @@
 struct ImageData
 {
   ImageData() = default;
-  ImageData(const ImageData &other);
-  ImageData &operator=(const ImageData &other);
   ImageData(const std::string &filepath, int requested_channels = 3);
+
+  ImageData(const ImageData &other);
+  ImageData(ImageData &&other);
+  ImageData &operator=(const ImageData &other);
+  ImageData &operator=(ImageData &&other);
+
   /**
    * The ImageData doesn't own the data, when created
    * using this constructor
