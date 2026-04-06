@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <vector>
 
-BaseImageSorter::BaseImageSorter(SortTask task) : m_task(task) {}
+BaseImageSorter::BaseImageSorter(SortTask &task) : m_task(task) {}
 
 void BaseImageSorter::RunTask()
 {

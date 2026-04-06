@@ -12,7 +12,7 @@
 class BaseImageSorter
 {
 public:
-  BaseImageSorter(SortTask task);
+  BaseImageSorter(SortTask &task);
 
   // virtual void sort_vertical(int min_hue, int max_hue) = 0;
   //
@@ -41,5 +41,5 @@ protected: // methods
   }
 
 protected:
-  SortTask m_task;
+  SortTask &m_task;
 };
