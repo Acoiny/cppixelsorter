@@ -18,6 +18,7 @@
 #include <SDL3/SDL.h>
 
 #include <memory>
+#include <mutex>
 #include <stdexcept>
 #include <thread>
 
@@ -77,6 +78,38 @@ Gui::Gui(int width, int height, const std::string &title)
     fake_event.window.data2 = height;
     m_uiManager->handleEvent(fake_event);
   }
+
+  m_thread = std::jthread(
+      [this](std::stop_token token)
+      {
+        // run, until stop is requested
+        while (!token.stop_requested())
+        {
+          std::unique_lock lock(m_thread_data.mutex);
+          // wait, until the main thread signals sorting task, or ending
+          m_thread_data.cv.wait(lock,
+                                [this, &token]()
+                                {
+                                  return m_thread_data.task != nullptr ||
+                                         token.stop_requested();
+                                });
+
+          // if stop is requested, we quit
+          if (token.stop_requested())
+            return;
+
+          std::unique_ptr<SortTask> task(std::move(m_thread_data.task));
+          lock.unlock();
+
+          BaseImageSorter sorter(*task); // yes yes, that's illegal... TODO: fix
+          sorter.RunTask();
+
+          lock.lock();
+          m_thread_data.result_image = std::move(task->image);
+          m_thread_data.state = State::DONE;
+          lock.unlock();
+        }
+      });
 }
 
 Gui::~Gui()
@@ -87,6 +120,9 @@ Gui::~Gui()
 
   SDL_Quit();
   TTF_Quit();
+
+  m_thread.request_stop();
+  m_thread_data.cv.notify_one();
 }
 
 void Gui::Update()
@@ -94,8 +130,11 @@ void Gui::Update()
   // get thread result
   if (m_thread_data.state == State::DONE)
   {
-    m_thread_data.state = State::IDLE;
-    m_sorted_image = m_thread_data.result_image;
+    {
+      std::lock_guard lock(m_thread_data.mutex);
+      m_thread_data.state = State::IDLE;
+      m_sorted_image = std::move(m_thread_data.result_image);
+    }
     m_texturerect->setTexture(m_renderer, m_sorted_image.toSurface());
   }
 
@@ -124,26 +163,6 @@ void Gui::Update()
 
 void Gui::LoadImage(const std::string &path)
 {
-  // UnloadImage();
-  // Loading the surface with stb_image
-  // int w, h, channels;
-  // uint8_t *img = stbi_load(path.c_str(), &w, &h, &channels, 3);
-  //
-  // UI::Logger::Debug("Image: {} {} - channels {}", w, h, channels);
-  //
-  // m_original = SDL_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_RGB24, img, w *
-  // 3);
-  // // m_surface = IMG_Load(path.c_str());
-  //
-  // if (m_original)
-  // {
-  //   m_texturerect->setTexture(m_renderer, m_original);
-  // }
-  // else
-  // {
-  //   UI::Logger::Error("Unable to load image {}!", path);
-  // }
-
   m_original_image = ImageData(path);
   m_texturerect->setTexture(m_renderer, m_original_image.toSurface());
 }
@@ -197,41 +216,15 @@ void Gui::RunSort()
 
 void Gui::ThreadedSort()
 {
-  // join thread before starting new
-  if (m_thread_data.state != State::IDLE)
-    return;
+  // first, set new task using the mutex
+  {
+    std::lock_guard lock(m_thread_data.mutex);
+    m_thread_data.task = std::make_unique<SortTask>(SortTask{
+        .image = m_original_image, .hue_values = {.min = m_slider_value}});
+  }
 
-  m_thread_data.state = State::RUNNING;
-
-  m_thread = std::jthread(
-      [this]()
-      {
-        if (!m_original_image.pixels)
-        {
-          UI::Logger::Warn("Load an image before sorting!");
-          return;
-        }
-
-        // passing NULL is fine
-        ImageData sorted = m_original_image;
-
-        if (!sorted.pixels)
-        {
-          UI::Logger::Error("Unable to copy image");
-          return;
-        }
-
-        SortTask task{.image = sorted, .hue_values = {.min = m_slider_value}};
-
-        BaseImageSorter sorter(task);
-        Timer t;
-        sorter.RunTask();
-        auto msg = std::format("Sorting took {}", t.get());
-        UI::Logger::Info("{}", msg);
-
-        m_thread_data.result_image = sorted;
-        m_thread_data.state = State::DONE;
-      });
+  // now wake up thread
+  m_thread_data.cv.notify_one();
 }
 
 void Gui::SaveFile()

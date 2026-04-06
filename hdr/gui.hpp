@@ -3,8 +3,10 @@
 #include "Ui/UiManager.hpp"
 #include "Ui/textBox.hpp"
 #include "imageData.hpp"
+#include "sortTask.hpp"
 #include "textureRect.hpp"
 #include <SDL3/SDL.h>
+#include <condition_variable>
 #include <memory>
 #include <string>
 #include <thread>
@@ -48,6 +50,11 @@ private:
   {
     State state = State::IDLE;
     ImageData result_image;
+
+    std::unique_ptr<SortTask> task;
+
+    std::mutex mutex;
+    std::condition_variable cv;
   } m_thread_data;
 
   std::string m_currentFile;
