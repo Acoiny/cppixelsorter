@@ -105,8 +105,8 @@ int main(int argc, char *argv[])
   // setting input file to positional argument (or null)
   infile = argv[optind];
 
-  // GUI
-  if (mode == APP_MODE::GUI)
+  // GUI mode (automatically, if no arguments given)
+  if (mode == APP_MODE::GUI || argc == 1)
     return gui_mode(infile, log_levels);
   // END GUI
 
