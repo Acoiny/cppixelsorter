@@ -84,6 +84,7 @@ ImageData &ImageData::operator=(ImageData &&other)
 
   pixels = other.pixels;
   width = other.width;
+  height = other.height;
   channels = other.channels;
   m_owns_data = other.m_owns_data;
 
