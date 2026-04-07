@@ -27,7 +27,7 @@ enum class SORT_DIRECTION
 struct SortTask
 {
   // owns the image, as long as it's being worked on
-  ImageData image;
+  ImageData &image;
 
   struct
   {

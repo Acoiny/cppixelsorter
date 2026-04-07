@@ -8,23 +8,27 @@
 #include <sys/types.h>
 #include <vector>
 
-BaseImageSorter::BaseImageSorter(SortTask &task) : m_task(task) {}
+BaseImageSorter::BaseImageSorter(const SortTask &task) : m_task(task) {}
 
-void BaseImageSorter::RunTask()
+ImageData BaseImageSorter::RunTask()
 {
+  ImageData newImage = m_task.image;
+
   switch (m_task.sort_direction)
   {
   case SORT_DIRECTION::VERTICAL_TTB:
-    sort_vertical_ttb(m_task.hue_values.min, m_task.hue_values.max);
+    sort_vertical_ttb(newImage, m_task.hue_values.min, m_task.hue_values.max);
     break;
   default:
     throw std::runtime_error("Unsupported sort option!");
   }
+
+  return newImage;
 }
 
-void BaseImageSorter::sort_vertical_ttb(int min_hue, int max_hue)
+void BaseImageSorter::sort_vertical_ttb(ImageData &image, int min_hue,
+                                        int max_hue)
 {
-  ImageData &image = m_task.image;
 // paralellizing the for loop :)
 #pragma omp parallel for
   for (int w = 0; w < image.width; w++)
@@ -59,7 +63,7 @@ void BaseImageSorter::sort_vertical_ttb(int min_hue, int max_hue)
         {
           int path_end = h;
 
-          sort_column(w, path_start, path_end, brightnesses);
+          sort_column(image, w, path_start, path_end, brightnesses);
           brightnesses.fill(0);
 
           path_start = -1;
@@ -71,17 +75,15 @@ void BaseImageSorter::sort_vertical_ttb(int min_hue, int max_hue)
       // we have a path!
       int path_end = image.height;
 
-      sort_column(w, path_start, path_end, brightnesses);
+      sort_column(image, w, path_start, path_end, brightnesses);
 
       path_start = -1;
     }
   }
 }
-void BaseImageSorter::sort_column(int column_index, int start, int end,
-                                  std::array<int, 360> &brights)
+void BaseImageSorter::sort_column(ImageData &image, int column_index, int start,
+                                  int end, std::array<int, 360> &brights)
 {
-  ImageData &image = m_task.image;
-
   std::vector<std::array<uint8_t, 3>> sorted_pixels;
 
   for (std::size_t i = 1; i < brights.size(); i++)

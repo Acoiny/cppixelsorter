@@ -102,10 +102,10 @@ Gui::Gui(int width, int height, const std::string &title)
           lock.unlock();
 
           BaseImageSorter sorter(*task); // yes yes, that's illegal... TODO: fix
-          sorter.RunTask();
+          ImageData result = sorter.RunTask();
 
           lock.lock();
-          m_thread_data.result_image = std::move(task->image);
+          m_thread_data.result_image = std::move(result);
           m_thread_data.state = State::DONE;
           lock.unlock();
         }

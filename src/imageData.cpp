@@ -34,6 +34,8 @@ ImageData::ImageData(const ImageData &other)
   height = other.height;
   channels = other.channels;
   m_owns_data = true;
+
+  // std::println("& COPY CONSTRUCTOR");
 }
 
 ImageData::ImageData(ImageData &&other)
@@ -44,6 +46,8 @@ ImageData::ImageData(ImageData &&other)
   other.pixels = nullptr;
   other.width = other.height = other.channels = 0;
   other.m_owns_data = true;
+
+  // std::println("&& MOVE CONSTRUCTOR");
 }
 
 ImageData &ImageData::operator=(const ImageData &other)
@@ -71,6 +75,8 @@ ImageData &ImageData::operator=(const ImageData &other)
   channels = other.channels;
   m_owns_data = true;
 
+  // std::println("=& COPY ASSIGNMENT");
+
   return *this;
 }
 
@@ -92,6 +98,7 @@ ImageData &ImageData::operator=(ImageData &&other)
   other.pixels = nullptr;
   other.width = other.height = other.channels = 0;
   other.m_owns_data = true;
+  // std::println("=&& MOVE ASSIGNMENT");
   return *this;
 }
 
@@ -116,7 +123,7 @@ void ImageData::free()
 
 bool ImageData::write_to_file(const std::string &filepath)
 {
-  std::println("writing to {}", filepath);
+  UI::Logger::Info("writing to {}", filepath);
   if (filepath.ends_with(".jpg") || filepath.ends_with(".jpeg"))
   {
     UI::Logger::Info("Writing to file: {}", filepath);
