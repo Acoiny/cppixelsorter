@@ -17,8 +17,8 @@ was inspired by [ASDFPixelSort](https://github.com/kimasendorf/ASDFPixelSort).
 
 ### GUI
 `cppixelsorter` now includes a GUI! 🥳
-It is completely handwritten using SDL3.
-To start it, pass the `-g` or `--gui` flag to the program.
+It is completely handwritten using SDL3. To start it, pass the `-g` or `--gui`
+flag to the program or just start it without any arguments.
 
 ## Building
 To build the program a few libraries are required.
