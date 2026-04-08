@@ -72,13 +72,17 @@ private:
 
   bool m_autosort = false;
 
-  int m_slider_value = 0;
+  struct
+  {
+    int min = 0;
+    int max = 360;
+  } m_slider_value;
 
   std::unique_ptr<UI::UiManager> m_uiManager;
 
   // textboxes that change frequently
   std::shared_ptr<UI::TextBox> m_infoText;
-  std::shared_ptr<UI::TextBox> m_sliderText;
+  // std::shared_ptr<UI::TextBox> m_sliderText;
 
   std::shared_ptr<TextureRect> m_texturerect;
 

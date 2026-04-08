@@ -36,6 +36,11 @@ public:
   {
   }
 
+  Slider(T min, T max, T value)
+      : m_min(min), m_max(max), m_value(value), m_lastChange(value)
+  {
+  }
+
   void draw(SDL_Renderer *renderer) override
   {
     // drawing bar in black for now
@@ -160,6 +165,15 @@ public:
     // calculating the middle
     m_bar.y += m_bar.h / 2 - HEIGHT / 2;
     m_bar.h = HEIGHT;
+  }
+
+  T GetValue() const { return m_value; }
+
+  void SetValue(T value, bool triggerEvent = false)
+  {
+    m_value = value;
+    if (triggerEvent && onValueChange)
+      onValueChange(m_value);
   }
 
   // the callback for value change events

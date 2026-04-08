@@ -59,10 +59,61 @@ Gui::Gui(int width, int height, const std::string &title)
         std::bind(&Gui::ThreadedSort, this);
     vb->addElement<UI::TextButton>("Save")->onLeftClick =
         std::bind(&Gui::SaveFile, this);
-    m_sliderText = vb->addElement<UI::TextBox>("0");
 
-    vb->addElement<UI::Slider<int>>(0, 360)->onValueChange =
-        std::bind_front(&Gui::SliderChanged, this);
+    // hue-sliders
+    {
+      auto minSliderBox = vb->addElement<UI::HBox>();
+
+      // min slider elements
+      auto minSlider = minSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360);
+      auto minSliderText = minSliderBox->addElement<UI::TextBox>("0");
+
+      auto maxSliderBox = vb->addElement<UI::HBox>();
+      auto maxSlider =
+          maxSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360, 360);
+      auto maxSliderText = maxSliderBox->addElement<UI::TextBox>("360");
+
+      std::weak_ptr<UI::TextBox> w_minSliderText = minSliderText;
+      std::weak_ptr<UI::Slider<int>> w_maxSlider = maxSlider;
+
+      // capturing weak pointers
+      minSlider->onValueChange = [this, w_minSliderText, w_maxSlider](int value)
+      {
+        if (auto text = w_minSliderText.lock())
+          text->setText(std::to_string(value));
+
+        m_slider_value.min = value;
+
+        if (m_slider_value.min > m_slider_value.max)
+        {
+          if (auto ms = w_maxSlider.lock())
+            ms->SetValue(value, true);
+        }
+
+        if (m_autosort)
+          ThreadedSort();
+      }; // std::bind_front(&Gui::SliderChanged, this);
+
+      std::weak_ptr<UI::TextBox> w_maxSliderText = maxSliderText;
+      std::weak_ptr<UI::Slider<int>> w_minSlider = minSlider;
+
+      maxSlider->onValueChange = [this, w_maxSliderText, w_minSlider](int value)
+      {
+        if (auto text = w_maxSliderText.lock())
+          text->setText(std::to_string(value));
+
+        m_slider_value.max = value;
+
+        if (m_slider_value.max < m_slider_value.min)
+        {
+          if (auto ms = w_minSlider.lock())
+            ms->SetValue(value, true);
+        }
+
+        if (m_autosort)
+          ThreadedSort();
+      };
+    }
 
     // spacer
     vb->addElementFrac<UI::TextBox>(9, "");
@@ -212,7 +263,9 @@ void Gui::RunSort()
     return;
   }
 
-  SortTask task{.image = m_sorted_image, .hue_values = {.min = m_slider_value}};
+  SortTask task{
+      .image = m_sorted_image,
+      .hue_values = {.min = m_slider_value.min, .max = m_slider_value.max}};
 
   BaseImageSorter sorter(task);
   Timer t;
@@ -230,7 +283,8 @@ void Gui::ThreadedSort()
   {
     std::lock_guard lock(m_thread_data.mutex);
     m_thread_data.task = std::make_unique<SortTask>(SortTask{
-        .image = m_original_image, .hue_values = {.min = m_slider_value}});
+        .image = m_original_image,
+        .hue_values = {.min = m_slider_value.min, .max = m_slider_value.max}});
   }
 
   // now wake up thread
@@ -264,15 +318,4 @@ void Gui::SaveFile()
   {
     UI::Logger::Error("Unable to save file!");
   }
-}
-
-void Gui::SliderChanged(int value)
-{
-  m_sliderText->setText(std::to_string(value));
-
-  m_slider_value = value;
-
-  // RunSort();
-  if (m_autosort)
-    ThreadedSort();
 }
