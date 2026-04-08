@@ -66,12 +66,12 @@ Gui::Gui(int width, int height, const std::string &title)
 
       // min slider elements
       auto minSlider = minSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360);
-      auto minSliderText = minSliderBox->addElement<UI::TextBox>("0");
+      auto minSliderText = minSliderBox->addElement<UI::TextBox>("Min: 0°");
 
       auto maxSliderBox = vb->addElement<UI::HBox>();
       auto maxSlider =
           maxSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360, 360);
-      auto maxSliderText = maxSliderBox->addElement<UI::TextBox>("360");
+      auto maxSliderText = maxSliderBox->addElement<UI::TextBox>("Max: 360°");
 
       std::weak_ptr<UI::TextBox> w_minSliderText = minSliderText;
       std::weak_ptr<UI::Slider<int>> w_maxSlider = maxSlider;
@@ -80,7 +80,7 @@ Gui::Gui(int width, int height, const std::string &title)
       minSlider->onValueChange = [this, w_minSliderText, w_maxSlider](int value)
       {
         if (auto text = w_minSliderText.lock())
-          text->setText(std::to_string(value));
+          text->setText(std::format("Min: {:>3}°", value));
 
         m_slider_value.min = value;
 
@@ -100,7 +100,7 @@ Gui::Gui(int width, int height, const std::string &title)
       maxSlider->onValueChange = [this, w_maxSliderText, w_minSlider](int value)
       {
         if (auto text = w_maxSliderText.lock())
-          text->setText(std::to_string(value));
+          text->setText(std::format("Max: {:>3}°", value));
 
         m_slider_value.max = value;
 
