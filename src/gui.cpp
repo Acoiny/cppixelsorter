@@ -1,6 +1,7 @@
 #include "gui.hpp"
 #include "Sorters/baseImageSorter.hpp"
 #include "Ui/UiManager.hpp"
+#include "Ui/checkbox.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
 #include "Ui/logger.hpp"
@@ -61,12 +62,21 @@ Gui::Gui(int width, int height, const std::string &title)
     m_sliderText = vb->addElement<UI::TextBox>("0");
 
     vb->addElement<UI::Slider<int>>(0, 360)->onValueChange =
-        std::bind_front(&Gui::SliderChanged, this); // WTF???
+        std::bind_front(&Gui::SliderChanged, this);
 
     // spacer
     vb->addElementFrac<UI::TextBox>(9, "");
 
     m_infoText = vb->addElementFrac<UI::TextBox>(1, "");
+
+    // autosorting checkbox
+    {
+      auto hb = vb->addElementFrac<UI::HBox>(1);
+      hb->addElementFrac<UI::CheckBox>(1, false)->onChange = [this](bool value)
+      { m_autosort = value; };
+
+      hb->addElementFrac<UI::TextBox>(3, "Autosort");
+    }
   }
 
   m_texturerect = hb->addElementFrac<TextureRect>(5);
@@ -263,5 +273,6 @@ void Gui::SliderChanged(int value)
   m_slider_value = value;
 
   // RunSort();
-  ThreadedSort();
+  if (m_autosort)
+    ThreadedSort();
 }

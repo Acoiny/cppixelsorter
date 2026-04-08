@@ -2,6 +2,7 @@
 
 #include "Ui/baseElement.hpp"
 #include <SDL3/SDL_rect.h>
+#include <functional>
 
 namespace UI
 {
@@ -20,6 +21,8 @@ public:
 
   void HandleResizeEvent(const SDL_FRect &space) override;
 
+  std::function<void(bool)> onChange;
+
 private:
   inline bool isIntersecting(float x, float y)
   {
@@ -31,5 +34,8 @@ private:
   bool m_value;
 
   SDL_FRect m_rect;
+
+  SDL_Color m_color_checked = {0, 255, 0, 255};
+  SDL_Color m_color_unchecked = {255, 0, 0, 255};
 };
 } // namespace UI

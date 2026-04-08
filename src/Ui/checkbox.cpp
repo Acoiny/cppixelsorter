@@ -1,10 +1,16 @@
 #include "Ui/checkbox.hpp"
+#include <SDL3/SDL_render.h>
 
 using namespace UI;
 
 CheckBox::CheckBox(bool value) : m_value(value) {}
 
-void CheckBox::draw(SDL_Renderer *renderer) {}
+void CheckBox::draw(SDL_Renderer *renderer)
+{
+  auto [r, g, b, a] = m_value ? m_color_checked : m_color_unchecked;
+  SDL_SetRenderDrawColor(renderer, r, g, b, a);
+  SDL_RenderFillRect(renderer, &m_rect);
+}
 
 bool CheckBox::HandleMouseEvent(SDL_Event &event)
 {
@@ -13,8 +19,23 @@ bool CheckBox::HandleMouseEvent(SDL_Event &event)
 
   if (isIntersecting(m_x, m_y))
   {
+    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+    {
+      m_value = !m_value;
+      if (onChange)
+        onChange(m_value);
+    }
+
+    return true;
   }
   return false;
 }
 
-void CheckBox::HandleResizeEvent(const SDL_FRect &space) {}
+void CheckBox::HandleResizeEvent(const SDL_FRect &space)
+{
+  m_rect = space;
+  m_rect.x += VERTICAL_MARGIN;
+  m_rect.y += VERTICAL_MARGIN;
+  m_rect.w -= 2 * VERTICAL_MARGIN;
+  m_rect.h -= 2 * VERTICAL_MARGIN;
+}

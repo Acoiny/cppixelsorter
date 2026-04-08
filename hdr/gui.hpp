@@ -70,6 +70,8 @@ private:
 
   bool m_isRunning = false;
 
+  bool m_autosort = false;
+
   int m_slider_value = 0;
 
   std::unique_ptr<UI::UiManager> m_uiManager;
