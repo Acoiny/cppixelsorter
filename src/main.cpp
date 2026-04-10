@@ -1,5 +1,6 @@
 #include "Sorters/baseImageSorter.hpp"
 #include "Ui/logger.hpp"
+#include "cli.hpp"
 #include "imageData.hpp"
 #include "stb_image.h"
 
@@ -17,7 +18,7 @@ void usage(const std::string &progname)
 {
   std::println(stderr, R"(Usage: {} <infile> [OPTIONS]
     OPTIONAL:
-        --hue       | -h <value>        Hue threshold.
+        --hue       | -h <min>[:<max>]        Hue threshold.
 
         --outfile   | -o <file>         Output file name. Ending specifies filetype.
 
@@ -60,7 +61,8 @@ int main(int argc, char *argv[])
   std::string outfile = "";
   std::string log_levels = "";
 
-  int hue_value = 0;
+  int hue_min = 0;
+  int hue_max = 360;
 
   APP_MODE mode = APP_MODE::CLI;
 
@@ -78,13 +80,9 @@ int main(int argc, char *argv[])
       break;
     case 'h':
     {
-      int v = (std::atoi(optarg));
-      if (v < 0 || v > 360)
-      {
-        std::println(stderr, "Hue value must be between 0 and 360");
-        return 1;
-      }
-      hue_value = v;
+      auto res = parseHue(optarg);
+      hue_min = res.first;
+      hue_max = res.second;
       break;
     }
     case 'o':
@@ -117,13 +115,13 @@ int main(int argc, char *argv[])
   }
 
   ImageData image(infile);
-  SortTask task{.image = image, .hue_values = {.min = hue_value}};
+  SortTask task{.image = image, .hue_values = {.min = hue_min, .max = hue_max}};
   BaseImageSorter sorter(task);
 
   Timer t = Timer();
 
   // img.sort_vertical_ttb(hue_value);
-  sorter.RunTask();
+  image = sorter.RunTask();
 
   auto duration = t.get();
 
@@ -139,7 +137,7 @@ int main(int argc, char *argv[])
         throw std::runtime_error("Unable to determine infile type!");
       auto file_ending = f.substr(idx);
 
-      outfile = "outfile" + file_ending;
+      outfile = "output" + file_ending;
     }
 
     if (!image.write_to_file(outfile))
