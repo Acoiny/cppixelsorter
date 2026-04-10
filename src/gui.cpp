@@ -18,6 +18,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <SDL3/SDL_iostream.h>
+#include <SDL3/SDL_surface.h>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -67,6 +69,15 @@ Gui::Gui(int width, int height, const std::string &title)
       // min slider elements
       auto minSlider = minSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360);
       auto minSliderText = minSliderBox->addElement<UI::TextBox>("Min: 0°");
+
+      {
+        auto huebar_texture = vb->addElement<TextureRect>();
+
+        auto stream = SDL_IOFromConstMem(assets_huebar, assets_huebar_len);
+        auto surf = SDL_LoadSurface_IO(stream, true);
+
+        huebar_texture->setTexture(m_renderer, surf);
+      }
 
       auto maxSliderBox = vb->addElement<UI::HBox>();
       auto maxSlider =

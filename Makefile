@@ -57,6 +57,8 @@ debug: CFLAGS += $(DEBUG_FLAGS)
 embeds:
 	xxd -i assets/icon.png > src/embed_data.cpp
 	xxd -i assets/Archivo-Regular.ttf >> src/embed_data.cpp
+	# generating the huebar on the fly :)
+	python scripts/huebar.py | xxd -i -n assets_huebar >> src/embed_data.cpp
 
 # rule for building and running debug build
 run: $(BINARY_DEBUG)
