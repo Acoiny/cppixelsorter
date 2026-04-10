@@ -34,8 +34,5 @@ bool CheckBox::HandleMouseEvent(SDL_Event &event)
 void CheckBox::HandleResizeEvent(const SDL_FRect &space)
 {
   m_rect = space;
-  m_rect.x += VERTICAL_MARGIN;
-  m_rect.y += VERTICAL_MARGIN;
-  m_rect.w -= 2 * VERTICAL_MARGIN;
-  m_rect.h -= 2 * VERTICAL_MARGIN;
+  applyMargin(m_rect);
 }

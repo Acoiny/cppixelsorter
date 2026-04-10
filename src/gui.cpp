@@ -1,6 +1,7 @@
 #include "gui.hpp"
 #include "Sorters/baseImageSorter.hpp"
 #include "Ui/UiManager.hpp"
+#include "Ui/baseElement.hpp"
 #include "Ui/checkbox.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
@@ -53,14 +54,20 @@ Gui::Gui(int width, int height, const std::string &title)
   // TODO: properly construct elements!
   auto hb = m_uiManager->addElement<UI::HBox>();
   {
+    constexpr float DEFAULT_MARGIN = 5;
     auto vb = hb->addElement<UI::VBox>();
 
-    vb->addElement<UI::TextButton>("Load")->onLeftClick =
-        std::bind(&Gui::PickFile, this);
-    vb->addElement<UI::TextButton>("Sort")->onLeftClick =
-        std::bind(&Gui::ThreadedSort, this);
-    vb->addElement<UI::TextButton>("Save")->onLeftClick =
-        std::bind(&Gui::SaveFile, this);
+    auto load_btn = vb->addElement<UI::TextButton>("Load");
+    load_btn->onLeftClick = std::bind(&Gui::PickFile, this);
+    load_btn->SetMargin(DEFAULT_MARGIN);
+
+    auto sort_btn = vb->addElement<UI::TextButton>("Sort");
+    sort_btn->onLeftClick = std::bind(&Gui::ThreadedSort, this);
+    sort_btn->SetMargin(DEFAULT_MARGIN);
+
+    auto save_btn = vb->addElement<UI::TextButton>("Save");
+    save_btn->onLeftClick = std::bind(&Gui::SaveFile, this);
+    save_btn->SetMargin(DEFAULT_MARGIN);
 
     // hue-sliders
     {
@@ -68,20 +75,26 @@ Gui::Gui(int width, int height, const std::string &title)
 
       // min slider elements
       auto minSlider = minSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360);
+      minSlider->SetMargin({.right = 10, .left = 10});
       auto minSliderText = minSliderBox->addElement<UI::TextBox>("Min: 0°");
 
+      // hue texture
       {
-        auto huebar_texture = vb->addElement<TextureRect>();
+        auto hue_box = vb->addElement<UI::HBox>();
+        auto huebar_texture = hue_box->addElementFrac<TextureRect>(3);
+        hue_box->addElementFrac<UI::TextBox>(1, "");
 
         auto stream = SDL_IOFromConstMem(assets_huebar, assets_huebar_len);
         auto surf = SDL_LoadSurface_IO(stream, true);
 
         huebar_texture->setTexture(m_renderer, surf);
+        huebar_texture->SetMargin({.right = 10, .left = 10});
       }
 
       auto maxSliderBox = vb->addElement<UI::HBox>();
       auto maxSlider =
           maxSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360, 360);
+      maxSlider->SetMargin({.right = 10, .left = 10});
       auto maxSliderText = maxSliderBox->addElement<UI::TextBox>("Max: 360°");
 
       std::weak_ptr<UI::TextBox> w_minSliderText = minSliderText;
@@ -134,8 +147,9 @@ Gui::Gui(int width, int height, const std::string &title)
     // autosorting checkbox
     {
       auto hb = vb->addElementFrac<UI::HBox>(1);
-      hb->addElementFrac<UI::CheckBox>(1, false)->onChange = [this](bool value)
-      { m_autosort = value; };
+      auto chBox = hb->addElementFrac<UI::CheckBox>(1, false);
+      chBox->onChange = [this](bool value) { m_autosort = value; };
+      chBox->SetMargin(DEFAULT_MARGIN);
 
       hb->addElementFrac<UI::TextBox>(3, "Autosort");
     }
