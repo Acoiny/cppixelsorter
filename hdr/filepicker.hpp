@@ -1,13 +1,11 @@
 #pragma once
 
-#include <dbus/dbus.h>
 #include <string>
 #include <vector>
 
 class Filepicker
 {
-  friend DBusHandlerResult
-  response_filter(DBusConnection *conn, DBusMessage *message, void *user_data);
+  friend void callback(void *userdata, const char *const *filelist, int filter);
 
 public:
   Filepicker() = default;
@@ -21,4 +19,6 @@ public:
 
 private:
   std::vector<std::string> m_filenames;
+
+  bool m_isOpen = false;
 };

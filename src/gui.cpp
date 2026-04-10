@@ -58,7 +58,7 @@ Gui::Gui(int width, int height, const std::string &title)
     auto vb = hb->addElement<UI::VBox>();
 
     auto load_btn = vb->addElement<UI::TextButton>("Load");
-    load_btn->onLeftClick = std::bind(&Gui::PickFile, this);
+    load_btn->onLeftClick = [this]() { m_filepicker.open(); };
     load_btn->SetMargin(DEFAULT_MARGIN);
 
     auto sort_btn = vb->addElement<UI::TextButton>("Sort");
@@ -213,7 +213,7 @@ Gui::~Gui()
 
 void Gui::Update()
 {
-  // get thread result
+  // if sorting is done, get the thread's result
   if (m_thread_data.state == State::DONE)
   {
     {
@@ -259,9 +259,6 @@ void Gui::PickFile()
   if (fp.open(false))
   {
     auto name = fp.getFile();
-
-    if (m_fileName)
-      m_fileName->setText(name);
 
     LoadImage(name);
   }
