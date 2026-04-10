@@ -5,6 +5,7 @@
 - [ ] add textures for buttons and hue slider
 - [ ] finish checkbox's look
 - [ ] add dropdown picker
+- [ ] add editable text box (for hue)
 
 ## Features
 - [ ] Add zooming functionality
