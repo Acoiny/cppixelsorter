@@ -12,7 +12,6 @@ void SDLCALL callback(void *userdata, const char *const *filelist, int filter)
 {
   std::println("userdata: {}", userdata);
   Filepicker *fp = (Filepicker *)userdata;
-
   fp->m_isOpen = false;
 
   if (!filelist)
@@ -29,20 +28,26 @@ void SDLCALL callback(void *userdata, const char *const *filelist, int filter)
   while (*filelist)
   {
     UI::Logger::Info("Full path to selected file: '{}'", *filelist);
-    fp->m_filenames.emplace_back(*filelist);
-    UI::Logger::Info("emplacing");
+
+    if (fp->onSelect)
+      fp->onSelect(*filelist, fp->m_isSaving);
+
     filelist++;
   }
 }
 
 bool Filepicker::open(bool saving)
 {
-  std::println("this: {}", (void *)this);
+  if (m_isOpen)
+    return false;
+
+  m_isSaving = saving;
   if (saving)
     SDL_ShowSaveFileDialog(callback, this, nullptr, filters, 4, nullptr);
   else
     SDL_ShowOpenFileDialog(callback, this, nullptr, filters, 4, nullptr, false);
 
   m_isOpen = true;
+
   return true;
 }

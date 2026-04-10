@@ -32,12 +32,11 @@ private:
    */
   // void UnloadImage();
 
-  void PickFile();
   void RunSort();
 
   void ThreadedSort();
 
-  void SaveFile();
+  void SaveImage(const std::string &filename);
   void SliderChanged(int value);
 
 private:

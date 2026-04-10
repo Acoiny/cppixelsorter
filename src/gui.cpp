@@ -51,6 +51,15 @@ Gui::Gui(int width, int height, const std::string &title)
 
   m_uiManager = std::make_unique<UI::UiManager>(m_renderer);
 
+  // setting up filepicker callback
+  m_filepicker.onSelect = [this](const std::string &filename, bool saving)
+  {
+    if (saving)
+      SaveImage(filename);
+    else
+      LoadImage(filename);
+  };
+
   // TODO: properly construct elements!
   auto hb = m_uiManager->addElement<UI::HBox>();
   {
@@ -66,7 +75,7 @@ Gui::Gui(int width, int height, const std::string &title)
     sort_btn->SetMargin(DEFAULT_MARGIN);
 
     auto save_btn = vb->addElement<UI::TextButton>("Save");
-    save_btn->onLeftClick = std::bind(&Gui::SaveFile, this);
+    save_btn->onLeftClick = [this]() { m_filepicker.open(true); };
     save_btn->SetMargin(DEFAULT_MARGIN);
 
     // hue-sliders
@@ -253,21 +262,6 @@ void Gui::LoadImage(const std::string &path)
   m_texturerect->setTexture(m_renderer, m_original_image.toSurface());
 }
 
-void Gui::PickFile()
-{
-  Filepicker fp;
-  if (fp.open(false))
-  {
-    auto name = fp.getFile();
-
-    LoadImage(name);
-  }
-  else
-  {
-    UI::Logger::Error("Unable to open file!");
-  }
-}
-
 void Gui::RunSort()
 {
   if (!m_original_image.pixels)
@@ -313,7 +307,7 @@ void Gui::ThreadedSort()
   m_thread_data.cv.notify_one();
 }
 
-void Gui::SaveFile()
+void Gui::SaveImage(const std::string &filename)
 {
   if (m_sorted_image.pixels == nullptr && m_original_image.pixels == nullptr)
   {
@@ -322,22 +316,12 @@ void Gui::SaveFile()
   }
 
   // save original, if not sorted yet
-  Filepicker fp;
-  if (fp.open(true))
+  try
   {
-    auto name = fp.getFile();
-
-    try
-    {
-      m_sorted_image.write_to_file(name);
-    }
-    catch (std::runtime_error &e)
-    {
-      UI::Logger::Error("{}", e.what());
-    }
+    m_sorted_image.write_to_file(filename);
   }
-  else
+  catch (std::runtime_error &e)
   {
-    UI::Logger::Error("Unable to save file!");
+    UI::Logger::Error("{}", e.what());
   }
 }

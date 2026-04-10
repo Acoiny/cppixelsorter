@@ -1,7 +1,7 @@
 #pragma once
 
+#include <functional>
 #include <string>
-#include <vector>
 
 class Filepicker
 {
@@ -15,10 +15,10 @@ public:
    */
   bool open(bool saving = false);
 
-  std::string getFile() { return m_filenames.size() > 0 ? m_filenames[0] : ""; }
+  std::function<void(const std::string &, bool)> onSelect;
 
 private:
-  std::vector<std::string> m_filenames;
+  bool m_isSaving = false;
 
   bool m_isOpen = false;
 };
