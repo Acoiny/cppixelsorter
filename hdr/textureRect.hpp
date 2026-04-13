@@ -14,7 +14,8 @@ public:
 
   void HandleResizeEvent(const SDL_FRect &space) override;
 
-  void setTexture(SDL_Renderer *renderer, SDL_Surface *surface);
+  void setTexture(SDL_Renderer *renderer, SDL_Surface *surface,
+                  SDL_ScaleMode scaleMode = SDL_SCALEMODE_NEAREST);
 
   TextureRect &setKeepRatio(bool value)
   {

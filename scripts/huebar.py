@@ -5,8 +5,8 @@
 from PIL import Image
 from sys import stdout
 
-HEIGHT = 100
-WIDTH = 800
+HEIGHT = 1
+WIDTH = 10
 
 
 img = Image.new("HSV", (WIDTH, HEIGHT))

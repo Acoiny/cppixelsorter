@@ -91,14 +91,15 @@ Gui::Gui(int width, int height, const std::string &title)
       {
         auto hue_box = vb->addElement<UI::HBox>();
         auto huebar_texture = hue_box->addElementFrac<TextureRect>(3);
-        huebar_texture->setKeepRatio(false);
+        huebar_texture->setKeepRatio(false).SetMargin(
+            {.top = 10, .bottom = 100});
 
         hue_box->addElementFrac<UI::TextBox>(1, "");
 
         auto stream = SDL_IOFromConstMem(assets_huebar, assets_huebar_len);
         auto surf = SDL_LoadSurface_IO(stream, true);
 
-        huebar_texture->setTexture(m_renderer, surf);
+        huebar_texture->setTexture(m_renderer, surf, SDL_SCALEMODE_LINEAR);
         huebar_texture->SetMargin({.right = 10, .left = 10});
       }
 
