@@ -32,6 +32,13 @@ void TextureRect::HandleResizeEvent(const SDL_FRect &space)
   const float viewport_aspect_ratio =
       static_cast<float>(space.w) / static_cast<float>(space.h);
 
+  // don't do aspect ratio calculation
+  if (!m_keep_ratio)
+  {
+    m_texture_space = m_available_space;
+    return;
+  }
+
   // setting the corner
   m_texture_space.x = m_available_space.x;
   m_texture_space.y = m_available_space.y;
