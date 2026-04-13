@@ -9,7 +9,7 @@ namespace UI
 {
 class IBox : public BaseElement
 {
-  using ColumnElement = std::pair<std::shared_ptr<BaseElement>, uint8_t>;
+  using ColumnElement = std::pair<std::shared_ptr<BaseElement>, int>;
 
 public:
   virtual ~IBox() = default;
@@ -33,7 +33,7 @@ public:
   template <typename T, typename... Args>
   typename std::enable_if<std::is_base_of<BaseElement, T>::value,
                           std::shared_ptr<T>>::type
-  addElementFrac(uint8_t frac, Args &&...args)
+  addElementFrac(int frac, Args &&...args)
   {
     auto el = std::make_shared<T>(std::forward<Args>(args)...);
     m_elements.emplace_back(ColumnElement(el, frac));
