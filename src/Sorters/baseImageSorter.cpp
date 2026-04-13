@@ -128,8 +128,12 @@ int BaseImageSorter::get_hue(uint8_t r, uint8_t g, uint8_t b)
 
   float hue;
 
+  if (diff == 0)
+  {
+    return 0;
+  }
   // r is max: (g-b)/diff
-  if (rf == max)
+  else if (rf == max)
   {
     hue = (gf - bf) / diff;
   }
