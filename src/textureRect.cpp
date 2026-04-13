@@ -26,18 +26,18 @@ void TextureRect::HandleResizeEvent(const SDL_FRect &space)
   if (!m_texture)
     return;
 
-  const float image_aspect_ratio =
-      static_cast<float>(m_texture->w) / static_cast<float>(m_texture->h);
-
-  const float viewport_aspect_ratio =
-      static_cast<float>(space.w) / static_cast<float>(space.h);
-
   // don't do aspect ratio calculation
   if (!m_keep_ratio)
   {
     m_texture_space = m_available_space;
     return;
   }
+
+  const float image_aspect_ratio =
+      static_cast<float>(m_texture->w) / static_cast<float>(m_texture->h);
+
+  const float viewport_aspect_ratio =
+      static_cast<float>(space.w) / static_cast<float>(space.h);
 
   // setting the corner
   m_texture_space.x = m_available_space.x;
@@ -56,7 +56,8 @@ void TextureRect::HandleResizeEvent(const SDL_FRect &space)
   }
 }
 
-void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface)
+void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface,
+                             SDL_ScaleMode scaleMode)
 {
   if (m_texture)
     SDL_DestroyTexture(m_texture);
@@ -66,6 +67,6 @@ void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface)
   m_surface = surface;
 
   m_texture = SDL_CreateTextureFromSurface(renderer, surface);
-  SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST);
+  SDL_SetTextureScaleMode(m_texture, scaleMode);
   HandleResizeEvent(m_available_space);
 }
