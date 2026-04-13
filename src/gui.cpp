@@ -91,6 +91,8 @@ Gui::Gui(int width, int height, const std::string &title)
       {
         auto hue_box = vb->addElement<UI::HBox>();
         auto huebar_texture = hue_box->addElementFrac<TextureRect>(3);
+        huebar_texture->setKeepRatio(false);
+
         hue_box->addElementFrac<UI::TextBox>(1, "");
 
         auto stream = SDL_IOFromConstMem(assets_huebar, assets_huebar_len);
