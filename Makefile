@@ -26,19 +26,23 @@ CFLAGS += -I hdr
 
 SRCDIR := src
 
+OUTDIR := bin
+
 SOURCE_FILES = $(wildcard src/*.cpp)
 SOURCE_FILES += $(wildcard src/*/*.cpp)
 SOURCE_FILES += $(wildcard src/*/*/*.cpp)
 
-OBJECT_FILES = $(patsubst %.cpp,bin/release/%.o,$(shell basename -a $(SOURCE_FILES)))
+OBJECT_FILES = $(patsubst %.cpp,$(OUTDIR)/release/%.o,$(shell basename -a $(SOURCE_FILES)))
 
-DOBJECT_FILES = $(patsubst %.cpp,bin/debug/%.o,$(shell basename -a $(SOURCE_FILES)))
+DOBJECT_FILES = $(patsubst %.cpp,$(OUTDIR)/debug/%.o,$(shell basename -a $(SOURCE_FILES)))
 
-ASSEMBLY_FILES = $(DOBJECT_FILES:bin/debug/%.o=bin/assembly/%.s)
+ASSEMBLY_FILES = $(DOBJECT_FILES:$(OUTDIR)/debug/%.o=$(OUTDIR)/assembly/%.s)
 
+$(shell mkdir -p $(OUTDIR)/release)
+$(shell mkdir -p $(OUTDIR)/debug)
 
 # LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
-LDFLAGS=-lSDL3 -lSDL3_ttf
+LDFLAGS +=-lSDL3 -lSDL3_ttf
 # LDFLAGS=-lraylib
 
 .PHONY := all debug release clean
@@ -72,25 +76,25 @@ $(BINARY_DEBUG): $(DOBJECT_FILES)
 
 ## Release objects
 # rule for all object files directly in the src folder
-bin/release/%.o: $(SRCDIR)/%.cpp
+$(OUTDIR)/release/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 # rule for all subfolders
-bin/release/%.o: $(SRCDIR)/*/%.cpp
+$(OUTDIR)/release/%.o: $(SRCDIR)/*/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
-bin/release/%.o: $(SRCDIR)/*/*/%.cpp
+$(OUTDIR)/release/%.o: $(SRCDIR)/*/*/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 ## --
 
 ## Debug objects
-bin/debug/%.o: $(SRCDIR)/%.cpp
+$(OUTDIR)/debug/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
-bin/debug/%.o: $(SRCDIR)/*/%.cpp
+$(OUTDIR)/debug/%.o: $(SRCDIR)/*/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
-bin/debug/%.o: $(SRCDIR)/*/*/%.cpp
+$(OUTDIR)/debug/%.o: $(SRCDIR)/*/*/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 ## --
 
@@ -99,7 +103,7 @@ assembly: $(ASSEMBLY_FILES)
 assembly: CFLAGS += $(DEBUG_FLAGS)
 
 $(ASSEMBLY_FILES): $(DOBJECT_FILES)
-	$(shell mkdir -p bin/assembly)
+	$(shell mkdir -p $(OUTDIR)/assembly)
 	objdump -d -S $< > $@
 
 clean:

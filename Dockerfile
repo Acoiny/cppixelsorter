@@ -1,4 +1,4 @@
-FROM archlinux:base-devel
+FROM archlinux:base-devel as sdl3-cross-compile
 
 # Update and install dependencies
 RUN pacman -Syu --noconfirm && \
@@ -29,9 +29,4 @@ RUN wget --timeout=30 https://github.com/libsdl-org/SDL_ttf/releases/download/re
 
 WORKDIR /app
 
-COPY hdr/ ./hdr/
-COPY src/ ./src/
-COPY Makefile ./
-COPY assets/ ./assets/
-
-CMD ["sh", "-c", "make clean && make embeds && make release CXX=x86_64-w64-mingw32-g++ BINARY=cppixelsorter.exe && cp /usr/x86_64-w64-mingw32/bin/*.dll ."]
+# CMD ["sh", "-c", "make clean && make embeds && make release CXX=x86_64-w64-mingw32-g++ BINARY=cppixelsorter.exe && cp /usr/x86_64-w64-mingw32/bin/*.dll ."]
