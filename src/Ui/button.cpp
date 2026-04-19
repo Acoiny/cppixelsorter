@@ -98,8 +98,5 @@ bool Button::HandleMouseEvent(SDL_Event &event)
 void Button::HandleResizeEvent(const SDL_FRect &space)
 {
   m_rect = space;
-  m_rect.x += m_margin;
-  m_rect.y += m_margin;
-  m_rect.w -= 2 * m_margin;
-  m_rect.h -= 2 * m_margin;
+  applyMargin(m_rect);
 }

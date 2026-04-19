@@ -8,8 +8,6 @@ namespace UI
 {
 class CheckBox : public BaseElement
 {
-  static constexpr float VERTICAL_MARGIN = 10;
-
 public:
   CheckBox(bool value = false);
 

@@ -1,9 +1,11 @@
 # Todo's
 ## UI
+- [ ] add margin into baseelement and make it set-able
 - [ ] adjust button sizes, maybe absolute?
 - [ ] add textures for buttons and hue slider
 - [ ] finish checkbox's look
 - [ ] add dropdown picker
+- [ ] add editable text box (for hue)
 
 ## Features
 - [ ] Add zooming functionality

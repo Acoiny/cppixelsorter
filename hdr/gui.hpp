@@ -2,6 +2,7 @@
 
 #include "Ui/UiManager.hpp"
 #include "Ui/textBox.hpp"
+#include "filepicker.hpp"
 #include "imageData.hpp"
 #include "sortTask.hpp"
 #include "textureRect.hpp"
@@ -31,12 +32,11 @@ private:
    */
   // void UnloadImage();
 
-  void PickFile();
   void RunSort();
 
   void ThreadedSort();
 
-  void SaveFile();
+  void SaveImage(const std::string &filename);
   void SliderChanged(int value);
 
 private:
@@ -58,7 +58,6 @@ private:
   } m_thread_data;
 
   std::string m_currentFile;
-  std::shared_ptr<UI::TextBox> m_fileName;
 
   SDL_Window *m_window = nullptr;
   SDL_Renderer *m_renderer = nullptr;
@@ -67,6 +66,8 @@ private:
   // SDL_Surface *m_original = nullptr;
   ImageData m_original_image;
   ImageData m_sorted_image;
+
+  Filepicker m_filepicker;
 
   bool m_isRunning = false;
 

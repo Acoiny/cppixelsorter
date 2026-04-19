@@ -1,6 +1,7 @@
 #include "gui.hpp"
 #include "Sorters/baseImageSorter.hpp"
 #include "Ui/UiManager.hpp"
+#include "Ui/baseElement.hpp"
 #include "Ui/checkbox.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
@@ -18,6 +19,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <SDL3/SDL_iostream.h>
+#include <SDL3/SDL_surface.h>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -48,17 +51,32 @@ Gui::Gui(int width, int height, const std::string &title)
 
   m_uiManager = std::make_unique<UI::UiManager>(m_renderer);
 
+  // setting up filepicker callback
+  m_filepicker.onSelect = [this](const std::string &filename, bool saving)
+  {
+    if (saving)
+      SaveImage(filename);
+    else
+      LoadImage(filename);
+  };
+
   // TODO: properly construct elements!
   auto hb = m_uiManager->addElement<UI::HBox>();
   {
+    constexpr float DEFAULT_MARGIN = 5;
     auto vb = hb->addElement<UI::VBox>();
 
-    vb->addElement<UI::TextButton>("Load")->onLeftClick =
-        std::bind(&Gui::PickFile, this);
-    vb->addElement<UI::TextButton>("Sort")->onLeftClick =
-        std::bind(&Gui::ThreadedSort, this);
-    vb->addElement<UI::TextButton>("Save")->onLeftClick =
-        std::bind(&Gui::SaveFile, this);
+    auto load_btn = vb->addElement<UI::TextButton>("Load");
+    load_btn->onLeftClick = [this]() { m_filepicker.open(); };
+    load_btn->SetMargin(DEFAULT_MARGIN);
+
+    auto sort_btn = vb->addElement<UI::TextButton>("Sort");
+    sort_btn->onLeftClick = std::bind(&Gui::ThreadedSort, this);
+    sort_btn->SetMargin(DEFAULT_MARGIN);
+
+    auto save_btn = vb->addElement<UI::TextButton>("Save");
+    save_btn->onLeftClick = [this]() { m_filepicker.open(true); };
+    save_btn->SetMargin(DEFAULT_MARGIN);
 
     // hue-sliders
     {
@@ -66,11 +84,26 @@ Gui::Gui(int width, int height, const std::string &title)
 
       // min slider elements
       auto minSlider = minSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360);
+      minSlider->SetMargin({.right = 10, .left = 10});
       auto minSliderText = minSliderBox->addElement<UI::TextBox>("Min: 0°");
+
+      // hue texture
+      {
+        auto hue_box = vb->addElement<UI::HBox>();
+        auto huebar_texture = hue_box->addElementFrac<TextureRect>(3);
+        hue_box->addElementFrac<UI::TextBox>(1, "");
+
+        auto stream = SDL_IOFromConstMem(assets_huebar, assets_huebar_len);
+        auto surf = SDL_LoadSurface_IO(stream, true);
+
+        huebar_texture->setTexture(m_renderer, surf);
+        huebar_texture->SetMargin({.right = 10, .left = 10});
+      }
 
       auto maxSliderBox = vb->addElement<UI::HBox>();
       auto maxSlider =
           maxSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360, 360);
+      maxSlider->SetMargin({.right = 10, .left = 10});
       auto maxSliderText = maxSliderBox->addElement<UI::TextBox>("Max: 360°");
 
       std::weak_ptr<UI::TextBox> w_minSliderText = minSliderText;
@@ -123,8 +156,9 @@ Gui::Gui(int width, int height, const std::string &title)
     // autosorting checkbox
     {
       auto hb = vb->addElementFrac<UI::HBox>(1);
-      hb->addElementFrac<UI::CheckBox>(1, false)->onChange = [this](bool value)
-      { m_autosort = value; };
+      auto chBox = hb->addElementFrac<UI::CheckBox>(1, false);
+      chBox->onChange = [this](bool value) { m_autosort = value; };
+      chBox->SetMargin(DEFAULT_MARGIN);
 
       hb->addElementFrac<UI::TextBox>(3, "Autosort");
     }
@@ -188,7 +222,7 @@ Gui::~Gui()
 
 void Gui::Update()
 {
-  // get thread result
+  // if sorting is done, get the thread's result
   if (m_thread_data.state == State::DONE)
   {
     {
@@ -226,24 +260,6 @@ void Gui::LoadImage(const std::string &path)
 {
   m_original_image = ImageData(path);
   m_texturerect->setTexture(m_renderer, m_original_image.toSurface());
-}
-
-void Gui::PickFile()
-{
-  Filepicker fp;
-  if (fp.open(false))
-  {
-    auto name = fp.getFile();
-
-    if (m_fileName)
-      m_fileName->setText(name);
-
-    LoadImage(name);
-  }
-  else
-  {
-    UI::Logger::Error("Unable to open file!");
-  }
 }
 
 void Gui::RunSort()
@@ -291,7 +307,7 @@ void Gui::ThreadedSort()
   m_thread_data.cv.notify_one();
 }
 
-void Gui::SaveFile()
+void Gui::SaveImage(const std::string &filename)
 {
   if (m_sorted_image.pixels == nullptr && m_original_image.pixels == nullptr)
   {
@@ -300,22 +316,12 @@ void Gui::SaveFile()
   }
 
   // save original, if not sorted yet
-  Filepicker fp;
-  if (fp.open(true))
+  try
   {
-    auto name = fp.getFile();
-
-    try
-    {
-      m_sorted_image.write_to_file(name);
-    }
-    catch (std::runtime_error &e)
-    {
-      UI::Logger::Error("{}", e.what());
-    }
+    m_sorted_image.write_to_file(filename);
   }
-  else
+  catch (std::runtime_error &e)
   {
-    UI::Logger::Error("Unable to save file!");
+    UI::Logger::Error("{}", e.what());
   }
 }

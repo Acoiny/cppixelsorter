@@ -1,0 +1,10 @@
+
+services:
+  cross_compile:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/app:z
+    working_dir: /app/windows_build
+    command: make

@@ -1,197 +1,53 @@
 #include "filepicker.hpp"
 #include "Ui/logger.hpp"
 
-#include <dbus/dbus.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <SDL3/SDL.h>
 
-typedef struct
+static const SDL_DialogFileFilter filters[] = {{"All images", "png;jpg;jpeg"},
+                                               {"PNG images", "png"},
+                                               {"JPEG images", "jpg;jpeg"},
+                                               {"All files", "*"}};
+
+void SDLCALL callback(void *userdata, const char *const *filelist, int filter)
 {
-  int done;
-  const char *request_path;
-} FilterData;
+  std::println("userdata: {}", userdata);
+  Filepicker *fp = (Filepicker *)userdata;
+  fp->m_isOpen = false;
 
-static bool g_success = false;
-static Filepicker *g_handle = nullptr;
-
-DBusHandlerResult response_filter(DBusConnection *conn, DBusMessage *message,
-                                  void *user_data)
-{
-  (void)conn;
-  FilterData *data = (FilterData *)user_data;
-
-  if (!dbus_message_is_signal(message, "org.freedesktop.portal.Request",
-                              "Response"))
-    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-
-  if (strcmp(dbus_message_get_path(message), data->request_path) != 0)
-    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-
-  DBusMessageIter sig_iter;
-  dbus_message_iter_init(message, &sig_iter);
-
-  dbus_uint32_t response;
-  dbus_message_iter_get_basic(&sig_iter, &response);
-
-  if (response == 0)
+  if (!filelist)
   {
-    dbus_message_iter_next(&sig_iter);
-    DBusMessageIter results_iter;
-    dbus_message_iter_recurse(&sig_iter, &results_iter);
-
-    while (dbus_message_iter_get_arg_type(&results_iter) ==
-           DBUS_TYPE_DICT_ENTRY)
-    {
-      DBusMessageIter entry_iter, variant_iter;
-      const char *key;
-
-      dbus_message_iter_recurse(&results_iter, &entry_iter);
-      dbus_message_iter_get_basic(&entry_iter, &key);
-
-      if (strcmp(key, "uris") == 0)
-      {
-        dbus_message_iter_next(&entry_iter);
-        dbus_message_iter_recurse(&entry_iter, &variant_iter);
-
-        DBusMessageIter array_iter;
-        dbus_message_iter_recurse(&variant_iter, &array_iter);
-
-        while (dbus_message_iter_get_arg_type(&array_iter) == DBUS_TYPE_STRING)
-        {
-          const char *uri;
-          dbus_message_iter_get_basic(&array_iter, &uri);
-          UI::Logger::Debug("Selected file: {}", uri);
-          if (g_handle)
-          {
-            std::string str(uri);
-            if (str.starts_with("file://"))
-            {
-              str = str.substr(7);
-            }
-            g_handle->m_filenames.push_back(str);
-            g_success = true;
-          }
-          dbus_message_iter_next(&array_iter);
-        }
-        break;
-      }
-      dbus_message_iter_next(&results_iter);
-    }
+    UI::Logger::Error("An error occured: {}", SDL_GetError());
+    return;
   }
-  else if (response == 1)
+  else if (!*filelist)
   {
-    UI::Logger::Info("File selection cancelled");
-  }
-  else
-  {
-    UI::Logger::Error("File selection failed (response: {}).", response);
+    UI::Logger::Debug("File dialog cancelled");
+    return;
   }
 
-  data->done = 1;
-  return DBUS_HANDLER_RESULT_HANDLED;
+  while (*filelist)
+  {
+    UI::Logger::Info("Full path to selected file: '{}'", *filelist);
+
+    if (fp->onSelect)
+      fp->onSelect(*filelist, fp->m_isSaving);
+
+    filelist++;
+  }
 }
 
 bool Filepicker::open(bool saving)
 {
-  g_success = false;
-
-  DBusConnection *conn;
-  DBusError err;
-  DBusMessage *msg, *reply;
-  DBusMessageIter args, dict;
-
-  dbus_error_init(&err);
-
-  conn = dbus_bus_get(DBUS_BUS_SESSION, &err);
-  if (dbus_error_is_set(&err))
-  {
-    UI::Logger::Error("Connection Error ({})", err.message);
-    dbus_error_free(&err);
+  if (m_isOpen)
     return false;
-  }
 
-  msg = dbus_message_new_method_call(
-      "org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop",
-      "org.freedesktop.portal.FileChooser", saving ? "SaveFile" : "OpenFile");
-  if (msg == NULL)
-  {
-    UI::Logger::Error("Message Null");
-    dbus_connection_unref(conn);
-    return false;
-  }
+  m_isSaving = saving;
+  if (saving)
+    SDL_ShowSaveFileDialog(callback, this, nullptr, filters, 4, nullptr);
+  else
+    SDL_ShowOpenFileDialog(callback, this, nullptr, filters, 4, nullptr, false);
 
-  dbus_message_iter_init_append(msg, &args);
+  m_isOpen = true;
 
-  const char *parent_window = "";
-  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &parent_window);
-
-  const char *title = "Select a File";
-  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &title);
-
-  dbus_message_iter_open_container(&args, DBUS_TYPE_ARRAY, "{sv}", &dict);
-  dbus_message_iter_close_container(&args, &dict);
-
-  reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
-  dbus_message_unref(msg);
-
-  if (dbus_error_is_set(&err))
-  {
-    UI::Logger::Error("Error sending message ({})", err.message);
-    dbus_error_free(&err);
-    dbus_connection_unref(conn);
-    return false;
-  }
-
-  const char *request_path;
-  if (!dbus_message_get_args(reply, &err, DBUS_TYPE_OBJECT_PATH, &request_path,
-                             DBUS_TYPE_INVALID))
-  {
-    UI::Logger::Error("Error getting request path ({})", err.message);
-    dbus_error_free(&err);
-    dbus_message_unref(reply);
-    dbus_connection_unref(conn);
-    return false;
-  }
-
-  // Copy the path since reply will be freed
-  char *req_path = strdup(request_path);
-  dbus_message_unref(reply);
-
-  char match_rule[512];
-  snprintf(match_rule, sizeof(match_rule),
-           "type='signal',interface='org.freedesktop.portal.Request',"
-           "member='Response',path='%s'",
-           req_path);
-
-  dbus_bus_add_match(conn, match_rule, &err);
-  dbus_connection_flush(conn);
-  if (dbus_error_is_set(&err))
-  {
-    UI::Logger::Error("Match Error ({})", err.message);
-    dbus_error_free(&err);
-    free(req_path);
-    dbus_connection_unref(conn);
-    return false;
-  }
-
-  // Install a filter to catch the Response signal during dispatch
-  FilterData filter_data = {.done = 0, .request_path = req_path};
-  dbus_connection_add_filter(conn, response_filter, &filter_data, NULL);
-  g_handle = this;
-
-  // Dispatch loop — read_write_dispatch handles internal messages properly
-  while (!filter_data.done)
-  {
-    dbus_connection_read_write_dispatch(conn, -1);
-  }
-
-  dbus_connection_remove_filter(conn, response_filter, &filter_data);
-  g_handle = nullptr;
-
-  dbus_bus_remove_match(conn, match_rule, NULL);
-  free(req_path);
-  dbus_connection_unref(conn);
-
-  return g_success;
+  return true;
 }

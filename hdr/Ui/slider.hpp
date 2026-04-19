@@ -156,11 +156,12 @@ public:
   void HandleResizeEvent(const SDL_FRect &space) override
   {
     m_space = space;
-    m_bar = space;
+    applyMargin(m_space);
+    m_bar = m_space;
 
     // margin left and right
-    m_bar.x += MARGIN_SIDE;
-    m_bar.w -= MARGIN_SIDE * 2;
+    // m_bar.x += MARGIN_SIDE;
+    // m_bar.w -= MARGIN_SIDE * 2;
 
     // calculating the middle
     m_bar.y += m_bar.h / 2 - HEIGHT / 2;

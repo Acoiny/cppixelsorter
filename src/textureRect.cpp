@@ -1,7 +1,6 @@
 #include "textureRect.hpp"
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_surface.h>
-#include <print>
 
 void TextureRect::draw(SDL_Renderer *renderer)
 {
@@ -22,6 +21,8 @@ void TextureRect::HandleResizeEvent(const SDL_FRect &space)
 {
   m_available_space = space;
 
+  applyMargin(m_available_space);
+
   if (!m_texture)
     return;
 
@@ -32,19 +33,19 @@ void TextureRect::HandleResizeEvent(const SDL_FRect &space)
       static_cast<float>(space.w) / static_cast<float>(space.h);
 
   // setting the corner
-  m_texture_space.x = space.x;
-  m_texture_space.y = space.y;
+  m_texture_space.x = m_available_space.x;
+  m_texture_space.y = m_available_space.y;
 
   // if image aspect ratio is BIGGER than viewport -> adjust to width
   if (image_aspect_ratio >= viewport_aspect_ratio)
   {
-    m_texture_space.w = space.w;
-    m_texture_space.h = space.w / image_aspect_ratio;
+    m_texture_space.w = m_available_space.w;
+    m_texture_space.h = m_available_space.w / image_aspect_ratio;
   }
   else
   {
-    m_texture_space.w = space.h * image_aspect_ratio;
-    m_texture_space.h = space.h;
+    m_texture_space.w = m_available_space.h * image_aspect_ratio;
+    m_texture_space.h = m_available_space.h;
   }
 }
 
