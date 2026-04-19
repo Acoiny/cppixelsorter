@@ -5,6 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:/app:z
+      - ..:/app:z
     working_dir: /app/windows_build
     command: make
