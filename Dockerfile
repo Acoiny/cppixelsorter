@@ -18,4 +18,7 @@ RUN wget --timeout=30 https://github.com/libsdl-org/SDL_ttf/releases/download/re
     cp SDL3_ttf-3.2.2/x86_64-w64-mingw32/lib/libSDL3_ttf.* /usr/x86_64-w64-mingw32/lib/ && \
     cp SDL3_ttf-3.2.2/x86_64-w64-mingw32/bin/*.dll /usr/x86_64-w64-mingw32/bin/
 
+ENV CC=x86_64-w64-mingw32-gcc
+ENV CXX=x86_64-w64-mingw32-g++
+
 WORKDIR /app
