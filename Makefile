@@ -20,8 +20,6 @@ RELEASE_FLAGS := -O3
 # CFLAGS = -Wall -Wextra -Werror -std=gnu++23 -march=native -Wno-unused-parameter
 CFLAGS = -std=gnu++23 -fopenmp -Wall -Wno-unused-parameter # -finline-functions -fno-exceptions
 
-# CFLAGS += $(shell pkg-config --cflags --libs dbus-1)
-
 CFLAGS += -I hdr
 
 SRCDIR := src
@@ -41,9 +39,7 @@ ASSEMBLY_FILES = $(DOBJECT_FILES:$(OUTDIR)/debug/%.o=$(OUTDIR)/assembly/%.s)
 $(shell mkdir -p $(OUTDIR)/release)
 $(shell mkdir -p $(OUTDIR)/debug)
 
-# LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 LDFLAGS +=-lSDL3 -lSDL3_ttf
-# LDFLAGS=-lraylib
 
 .PHONY := all debug release clean
 
