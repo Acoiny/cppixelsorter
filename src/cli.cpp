@@ -75,7 +75,5 @@ uint8_t parseLoggerFlags(const std::string &arg)
     }
   }
 
-  std::println("Loggerflags: {}", res);
-
   return res;
 }
