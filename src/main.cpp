@@ -153,29 +153,9 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-uint8_t get_logger_flags(const std::string &log_levels)
-{
-  uint8_t res = 0;
-  auto lower = log_levels;
-  std::transform(lower.begin(), lower.end(), lower.begin(),
-                 [](unsigned char c) { return std::tolower(c); });
-
-  if (lower.contains("info"))
-    res |= 0b1;
-  if (lower.contains("warn"))
-    res |= 0b10;
-  if (lower.contains("error"))
-    res |= 0b100;
-  if (lower.contains("debug"))
-    res |= 0b1000;
-  if (lower.contains("all"))
-    res |= 0b1111;
-  return res;
-}
-
 int gui_mode(const char *infile, const std::string &log_levels)
 {
-  uint8_t log_flags = get_logger_flags(log_levels);
+  uint8_t log_flags = parseLoggerFlags(log_levels);
 
   UI::Logger::SetMode((UI::Logger::Mode)log_flags);
 
