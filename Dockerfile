@@ -1,15 +1,17 @@
-FROM archlinux:base-devel as sdl3-cross-compile
+FROM alpine:latest as sdl3-cross-compile
 
 # Update and install dependencies
-RUN pacman -Syu --noconfirm && \
-    pacman -S --noconfirm \
-    mingw-w64-gcc \
-    make \
-    wget \
-    unzip \
-    xxd \
-    python && \
-    pacman -Scc --noconfirm
+# RUN pacman -Syu --noconfirm && \
+#     pacman -S --noconfirm \
+#     mingw-w64-gcc \
+#     make \
+#     wget \
+#     unzip \
+#     xxd \
+#     python && \
+#     pacman -Scc --noconfirm
+
+RUN apk add mingw-w64-gcc make
 
 WORKDIR /deps
 
@@ -26,6 +28,11 @@ RUN wget --timeout=30 https://github.com/libsdl-org/SDL_ttf/releases/download/re
     cp -r SDL3_ttf-3.2.2/x86_64-w64-mingw32/include/SDL3_ttf /usr/x86_64-w64-mingw32/include/ && \
     cp SDL3_ttf-3.2.2/x86_64-w64-mingw32/lib/libSDL3_ttf.* /usr/x86_64-w64-mingw32/lib/ && \
     cp SDL3_ttf-3.2.2/x86_64-w64-mingw32/bin/*.dll /usr/x86_64-w64-mingw32/bin/
+
+RUN addgroup -g 1000 appgroup && \
+    adduser -u 1000 -G appgroup -D appuser
+
+USER appuser
 
 WORKDIR /app
 
