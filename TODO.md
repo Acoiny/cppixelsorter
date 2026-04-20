@@ -15,6 +15,7 @@
 - [x] Add zooming functionality
 - [x] make file-picker async
 - [ ] sorting for other directions (after dropdown)
+- [ ] save sorting of one image and apply to different image
 
 ## Crazier features
 - [ ] drawing on the image with the mouse :O
