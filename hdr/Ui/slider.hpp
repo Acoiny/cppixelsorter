@@ -104,7 +104,7 @@ public:
       {
         if (!intersects)
         {
-          CursorManager::SetCursor(CursorManager::CursorStyle::DEFAULT);
+          CursorManager::SetCursor();
           m_state = State::IDLE;
           handled = true;
         }
@@ -145,6 +145,7 @@ public:
     {
       if (m_state == State::HELD)
       {
+        CursorManager::SetCursor();
         float mx = event.motion.x, my = event.motion.y;
         m_state = isIntersecting(mx, my) ? State::HOVER : State::IDLE;
         handled = true;

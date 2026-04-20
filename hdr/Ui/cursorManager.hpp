@@ -24,7 +24,7 @@ public:
     WAIT,
   };
 
-  static void SetCursor(CursorStyle style);
+  static void SetCursor(CursorStyle style = CursorStyle::DEFAULT);
 
 private:
   SDL_Cursor *m_cursors[5] = {0};
