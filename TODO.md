@@ -6,7 +6,7 @@
 - [ ] finish checkbox's look
 - [ ] add dropdown picker
 - [ ] add editable text box (for hue)
-- [ ] Cursor styles
+- [ ] Cursor styles -> buttons don't change it, slider only when over
 
 ## Features
 - [ ] Add zooming functionality
