@@ -1,4 +1,5 @@
 #include "Sorters/baseImageSorter.hpp"
+#include "Ui/cursorManager.hpp"
 #include "Ui/logger.hpp"
 #include "cli.hpp"
 #include "imageData.hpp"

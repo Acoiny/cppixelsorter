@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ui/baseElement.hpp"
+#include "Ui/cursorManager.hpp"
 #include <SDL3/SDL_rect.h>
 #include <algorithm>
 #include <cmath>
@@ -93,6 +94,7 @@ public:
       {
         if (intersects)
         {
+          CursorManager::SetCursor(CursorManager::CursorStyle::POINT);
           m_state = State::HOVER;
           handled = true;
         }
@@ -102,6 +104,7 @@ public:
       {
         if (!intersects)
         {
+          CursorManager::SetCursor(CursorManager::CursorStyle::DEFAULT);
           m_state = State::IDLE;
           handled = true;
         }
