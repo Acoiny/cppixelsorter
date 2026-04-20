@@ -10,7 +10,7 @@
 
 ## Features
 - [ ] Add zooming functionality
-- [ ] make file-picker async
+- [x] make file-picker async
 - [ ] sorting for other directions (after dropdown)
 
 ## Crazier features
