@@ -19,6 +19,7 @@
 
 #include <SDL3/SDL.h>
 
+#include <SDL3/SDL_error.h>
 #include <SDL3/SDL_iostream.h>
 #include <SDL3/SDL_surface.h>
 #include <memory>
@@ -28,14 +29,25 @@
 
 #include "embed_data.hpp"
 
+static void Error(const std::string &msg)
+{
+  UI::Logger::Fatal("Error: {} - {}", msg, SDL_GetError());
+};
+
 Gui::Gui(int width, int height, const std::string &title)
 {
   if (!SDL_SetAppMetadata(title.c_str(), "0.0.1", "com.cpp.pixelsorter"))
     throw std::runtime_error(
         std::format("Unable to set metadata: {}", SDL_GetError()));
 
-  SDL_Init(SDL_INIT_VIDEO);
-  TTF_Init();
+  if (!SDL_Init(SDL_INIT_VIDEO))
+  {
+    Error("Unable to initialize SDL3");
+  }
+  if (!TTF_Init())
+  {
+    Error("Unable to initialize SDL3_ttf");
+  }
   SDL_CreateWindowAndRenderer(title.c_str(), width, height,
                               SDL_WINDOW_RESIZABLE, &m_window, &m_renderer);
 
