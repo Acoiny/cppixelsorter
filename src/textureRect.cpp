@@ -1,11 +1,27 @@
 #include "textureRect.hpp"
+#include "Ui/logger.hpp"
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_surface.h>
 
 void TextureRect::draw(SDL_Renderer *renderer)
 {
   // if (m_texture)
-  SDL_RenderTexture(renderer, m_texture, nullptr, &m_texture_space);
+  if (m_texture)
+  {
+    m_render_rect = {
+        .x = 0,
+        .y = 0,
+        .w = (float)m_texture->w * m_zoom_factor,
+        .h = (float)m_texture->h * m_zoom_factor,
+    };
+    SDL_RenderTexture(renderer, m_texture, &m_render_rect, &m_texture_space);
+  }
+  else
+  {
+    SDL_RenderTexture(renderer, m_texture, nullptr, &m_texture_space);
+  }
 }
 
 TextureRect::~TextureRect()
@@ -15,6 +31,72 @@ TextureRect::~TextureRect()
 
   // passing NULL is fine
   SDL_DestroySurface(m_surface);
+}
+
+bool TextureRect::HandleMouseEvent(SDL_Event &event)
+{
+  switch (event.type)
+  {
+  case SDL_EVENT_MOUSE_MOTION:
+  {
+    float mx = event.motion.x;
+    float my = event.motion.y;
+    bool intersects = mx >= m_texture_space.x &&
+                      mx <= (m_texture_space.x + m_texture_space.w) &&
+                      my >= m_texture_space.y &&
+                      my <= (m_texture_space.y + m_texture_space.h);
+
+    // if previously focused, check if focus is lost
+    if (m_focused)
+    {
+      // focus is lost
+      if (!intersects)
+      {
+        m_focused = false;
+      }
+      // event is always, whether focus is lost or nothing happens
+      return true;
+    }
+    // if not focused previously
+    else
+    {
+      // AND now intersecting
+      if (intersects)
+      {
+        // it is in focus
+        m_focused = true;
+        // and the event is handled
+        return true;
+      }
+    }
+    break;
+  }
+  case SDL_EVENT_MOUSE_WHEEL:
+  {
+    // if not focused, ignore
+    if (!m_focused)
+      break;
+    // TODO: check mouse position and zoom there
+    // event.wheel.mouse_x
+    if (event.wheel.integer_y > 0)
+    {
+      m_zoom_factor *= 0.9;
+      if (m_zoom_factor < 0.1)
+        m_zoom_factor = 0.1;
+    }
+    else
+    {
+      m_zoom_factor *= 1.1;
+      if (m_zoom_factor > 1.0)
+        m_zoom_factor = 1.0;
+    }
+    UI::Logger::Debug("Zoom: {}", m_zoom_factor);
+    return true;
+  }
+  default:
+    break;
+  }
+  return false;
 }
 
 void TextureRect::HandleResizeEvent(const SDL_FRect &space)

@@ -1,6 +1,7 @@
 #include "Ui/UiManager.hpp"
 #include "Ui/textManager.hpp"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_events.h>
 
 using namespace UI;
 
@@ -33,7 +34,8 @@ void UiManager::handleEvent(SDL_Event &event)
   if (event.type == SDL_EVENT_MOUSE_MOTION ||
       event.type == SDL_EVENT_WINDOW_RESIZED ||
       event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
-      event.type == SDL_EVENT_MOUSE_BUTTON_UP)
+      event.type == SDL_EVENT_MOUSE_BUTTON_UP ||
+      event.type == SDL_EVENT_MOUSE_WHEEL)
   {
     for (auto &btn : m_elements)
     {
@@ -56,6 +58,7 @@ bool UiManager::isEventRelevant(SDL_Event &event)
 {
   switch (event.type)
   {
+  case SDL_EVENT_MOUSE_WHEEL:
   case SDL_EVENT_MOUSE_MOTION:
   case SDL_EVENT_WINDOW_RESIZED:
   case SDL_EVENT_MOUSE_BUTTON_DOWN:
