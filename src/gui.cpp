@@ -1,7 +1,6 @@
 #include "gui.hpp"
 #include "Sorters/baseImageSorter.hpp"
 #include "Ui/UiManager.hpp"
-#include "Ui/baseElement.hpp"
 #include "Ui/checkbox.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"

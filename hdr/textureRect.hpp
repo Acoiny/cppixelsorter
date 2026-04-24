@@ -10,7 +10,7 @@ public:
 
   void draw(SDL_Renderer *renderer) override;
 
-  bool HandleMouseEvent(SDL_Event &event) override { return false; }
+  bool HandleMouseEvent(SDL_Event &event) override;
 
   void HandleResizeEvent(const SDL_FRect &space) override;
 
@@ -30,6 +30,15 @@ private:
   // if false, the image get's streched/squished
   bool m_keep_ratio = true;
 
+  // indicates, if the mouse is over this element
+  bool m_focused = false;
+
   SDL_FRect m_texture_space = {0};
   SDL_FRect m_available_space = {0};
+
+  /**
+   * Rectangle of the image that should be rendered (zoom)
+   */
+  SDL_FRect m_render_rect = {0};
+  float m_zoom_factor = 1.f;
 };
