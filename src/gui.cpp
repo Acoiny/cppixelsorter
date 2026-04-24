@@ -248,18 +248,18 @@ void Gui::Update()
     m_texturerect->setTexture(m_renderer, m_sorted_image.toSurface());
   }
 
-  SDL_Event event;
-  while (SDL_PollEvent(&event))
-  {
-    if (event.type == SDL_EVENT_QUIT)
-    {
-      m_isRunning = false;
-    }
-    else if (m_uiManager->isEventRelevant(event))
-    {
-      m_uiManager->handleEvent(event);
-    }
-  }
+  // SDL_Event event;
+  // while (SDL_PollEvent(&event))
+  // {
+  //   if (event.type == SDL_EVENT_QUIT)
+  //   {
+  //     m_isRunning = false;
+  //   }
+  //   else if (m_uiManager->isEventRelevant(event))
+  //   {
+  //     m_uiManager->handleEvent(event);
+  //   }
+  // }
 
   // SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
   SDL_SetRenderDrawColor(m_renderer, 93, 59, 107, 255);

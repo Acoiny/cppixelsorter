@@ -14,6 +14,8 @@
 
 class Gui
 {
+  friend SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event);
+
 public:
   Gui(int width, int height, const std::string &title);
 

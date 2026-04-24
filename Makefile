@@ -1,5 +1,6 @@
 MAKEFLAGS=-j
 
+CXX=em++
 
 BINARY := cppixelsorter
 
@@ -21,6 +22,7 @@ RELEASE_FLAGS := -O3
 CFLAGS = -std=gnu++23 -fopenmp -Wall -Wno-unused-parameter # -finline-functions -fno-exceptions
 
 CFLAGS += -I hdr
+CFLAGS += -I /usr/include/
 
 SRCDIR := src
 
@@ -39,7 +41,8 @@ ASSEMBLY_FILES = $(DOBJECT_FILES:$(OUTDIR)/debug/%.o=$(OUTDIR)/assembly/%.s)
 $(shell mkdir -p $(OUTDIR)/release)
 $(shell mkdir -p $(OUTDIR)/debug)
 
-LDFLAGS +=-lSDL3 -lSDL3_ttf
+# LDFLAGS +=-lSDL3 -lSDL3_ttf
+LDFLAGS += ~/Programming/git_clones/SDL/build/libSDL3.a
 
 .PHONY := all debug release clean
 
