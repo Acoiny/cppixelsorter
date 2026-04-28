@@ -35,6 +35,8 @@ TextureRect::~TextureRect()
 
 bool TextureRect::HandleMouseEvent(SDL_Event &event)
 {
+  using Log = UI::Logger;
+
   switch (event.type)
   {
   case SDL_EVENT_MOUSE_MOTION:
@@ -45,6 +47,12 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
                       mx <= (m_texture_space.x + m_texture_space.w) &&
                       my >= m_texture_space.y &&
                       my <= (m_texture_space.y + m_texture_space.h);
+
+    if (intersects)
+    {
+      m_relative_mouse_pos = {(mx - m_texture_space.x) / m_texture_space.w,
+                              (my - m_texture_space.y) / m_texture_space.h};
+    }
 
     // if previously focused, check if focus is lost
     if (m_focused)
@@ -73,6 +81,9 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
   }
   case SDL_EVENT_MOUSE_WHEEL:
   {
+    auto [mx, my] = m_relative_mouse_pos;
+    Log::Info("Mouse: {} {}", mx, my);
+
     // if not focused, ignore
     if (!m_focused)
       break;
