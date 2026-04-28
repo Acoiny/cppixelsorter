@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ui/baseElement.hpp"
+#include <utility>
 
 class TextureRect : public UI::BaseElement
 {
@@ -32,6 +33,8 @@ private:
 
   // indicates, if the mouse is over this element
   bool m_focused = false;
+  // mouse position from 0.0 to 1.0 relative to the image
+  std::pair<float, float> m_relative_mouse_pos = {0, 0};
 
   SDL_FRect m_texture_space = {0};
   SDL_FRect m_available_space = {0};
