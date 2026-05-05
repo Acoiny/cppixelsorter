@@ -17,18 +17,19 @@ was inspired by [ASDFPixelSort](https://github.com/kimasendorf/ASDFPixelSort).
 
 ### GUI
 `cppixelsorter` now includes a GUI! 🥳
-It is completely handwritten using SDL3. To start it, pass the `-g` or `--gui`
-flag to the program or just start it without any arguments.
+It is completely handwritten using SDL3. To start it simply run the
+program without any arguments.
+If you want to pass an input file you can pass the `-g` or `--gui`
+flag to the program and it will start in GUI mode with the image loaded.
 
 ## Building
 To build the program a few libraries are required.
 
 - `SDL3` and `SDL3-ttf`
-- `libdbus1`
 
 When these libraries are installed, simply run `make` and the project should be
 built.
 
-> [!WARNING]
-> Currently, the project only builds on Linux systems and uses
-> dbus for the file-picker!
+> [!NOTE]
+> The program should compile on windows (there is a branch that does this
+> inside a docker container) but it hasn't been tested much.
