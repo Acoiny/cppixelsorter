@@ -19,12 +19,13 @@ void usage(const std::string &progname)
 {
   std::println(stderr, R"(Usage: {} <infile> [OPTIONS]
     OPTIONAL:
-        --hue       | -h <min>[:<max>]        Hue threshold.
-        --outfile   | -o <file>         Output file name. Ending specifies filetype.
-        --gui       | -g                Activates graphical user interface.
-        --log-level <level>             Takes comma-separated log-levels:
-                                            debug, info, warn, error, all
-        --verbose   | -v                Sets log level to "all"
+        --hue       | -h <min>[:<max>]          Hue threshold.
+        --outfile   | -o <file>                 Output file name. Ending specifies filetype.
+        --gui       | -g                        Activates graphical user interface.
+        --log-level <level>                     Takes comma-separated log-levels:
+                                                    debug, info, warn, error, all
+        --verbose   | -v                        Sets log level to "all"
+        --help                                  Show this help message.
 )",
                progname);
 }
@@ -44,6 +45,7 @@ const struct option long_options[] = {
     {"gui", no_argument, nullptr, 'g'},
     {"log-level", required_argument, nullptr, 'l'},
     {"verbose", no_argument, nullptr, 'v'},
+    {"help", no_argument, nullptr, 'H'},
     // last element
     {nullptr, 0, nullptr, 0},
 };
@@ -91,6 +93,9 @@ int main(int argc, char *argv[])
     case 'v':
       log_levels = "all";
       break;
+    case 'H':
+      usage(argv[0]);
+      return 0;
     default:
       usage(argv[0]);
       return 1;
