@@ -1,6 +1,5 @@
 #include "textureRect.hpp"
 #include "Ui/cursorManager.hpp"
-#include "Ui/logger.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_render.h>
