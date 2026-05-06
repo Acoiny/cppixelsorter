@@ -22,6 +22,7 @@ public:
     DEFAULT,
     POINT,
     WAIT,
+    MOVE,
   };
 
   static void SetCursor(CursorStyle style = CursorStyle::DEFAULT);
