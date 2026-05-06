@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ui/baseElement.hpp"
+#include <SDL3/SDL_rect.h>
 #include <utility>
 
 class TextureRect : public UI::BaseElement
@@ -50,7 +51,7 @@ private:
   /**
    * Rectangle of the image that should be rendered (zoom)
    */
-  std::pair<float, float> m_render_rect_offset{0, 0};
+  SDL_FRect m_render_rect = {0};
 
   float m_zoom_factor = 1.f;
 };

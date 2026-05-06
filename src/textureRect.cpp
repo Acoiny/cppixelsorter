@@ -12,13 +12,7 @@ void TextureRect::draw(SDL_Renderer *renderer)
   // if (m_texture)
   if (m_texture)
   {
-    SDL_FRect render_rect = {
-        .x = m_render_rect_offset.first,
-        .y = m_render_rect_offset.second,
-        .w = (float)m_texture->w * m_zoom_factor,
-        .h = (float)m_texture->h * m_zoom_factor,
-    };
-    SDL_RenderTexture(renderer, m_texture, &render_rect, &m_texture_space);
+    SDL_RenderTexture(renderer, m_texture, &m_render_rect, &m_texture_space);
   }
   else
   {
@@ -134,9 +128,16 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
       auto delta_y =
           (m_mouse_pos.second - new_mouse_pos.second) / m_texture_space.h;
 
-      m_render_rect_offset.first += delta_x * m_texture->w * m_zoom_factor;
+      m_render_rect.x += delta_x * m_texture->w * m_zoom_factor;
 
-      m_render_rect_offset.second += delta_y * m_texture->h * m_zoom_factor;
+      m_render_rect.y += delta_y * m_texture->h * m_zoom_factor;
+
+      // clamping
+      // if (m_render_rect.x < 0)
+      //   m_render_rect.x = 0;
+      // else if ((m_render_rect.x + m_render_rect.w) >
+      //          (m_texture_space.x + m_texture_space.w))
+      //   m_render_rect.x = (m_texture_space.x + m_texture_space.w);
 
       m_mouse_pos = new_mouse_pos;
       break;
@@ -148,7 +149,7 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
   }
   case SDL_EVENT_MOUSE_WHEEL:
   {
-    auto [mx, my] = m_mouse_pos;
+    // auto [mx, my] = m_mouse_pos;
 
     // if not focused, ignore
     if (m_state != State::FOCUSED)
@@ -167,6 +168,9 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
       if (m_zoom_factor > 1.0)
         m_zoom_factor = 1.0;
     }
+
+    m_render_rect.w = m_texture->w * m_zoom_factor;
+    m_render_rect.h = m_texture->h * m_zoom_factor;
     return true;
   }
   default:
