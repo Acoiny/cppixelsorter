@@ -171,8 +171,12 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
     float x_diff = prevDims.first - m_render_rect.w;
     float y_diff = prevDims.second - m_render_rect.h;
 
-    m_render_rect.x += x_diff / 2;
-    m_render_rect.y += y_diff / 2;
+    // now scale by mouse position
+    float m_rel_x = m_mouse_pos.first / m_texture_space.w;
+    float m_rel_y = m_mouse_pos.second / m_texture_space.h;
+
+    m_render_rect.x += x_diff * m_rel_x;
+    m_render_rect.y += y_diff * m_rel_y;
 
     clampRenderRect();
 
