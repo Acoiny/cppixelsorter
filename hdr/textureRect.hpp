@@ -33,6 +33,13 @@ public:
   }
 
 private:
+  /**
+   * Clamps the render rectangle that is used for zooming
+   * and dragging
+   */
+  void clampRenderRect();
+
+private:
   SDL_Texture *m_texture = nullptr;
   SDL_Surface *m_surface = nullptr;
 
@@ -52,6 +59,6 @@ private:
    * Rectangle of the image that should be rendered (zoom)
    */
   SDL_FRect m_render_rect = {0};
-
   float m_zoom_factor = 1.f;
+  float m_min_zoom = 1.f;
 };
