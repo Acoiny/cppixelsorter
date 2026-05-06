@@ -224,7 +224,7 @@ void TextureRect::HandleResizeEvent(const SDL_FRect &space)
 }
 
 void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface,
-                             SDL_ScaleMode scaleMode)
+                             SDL_ScaleMode scaleMode, bool resetZoom)
 {
   if (m_texture)
     SDL_DestroyTexture(m_texture);
@@ -236,13 +236,16 @@ void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface,
   m_texture = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_SetTextureScaleMode(m_texture, scaleMode);
 
-  // initialize render rectangle to full texture
-  m_render_rect = {
-      .x = 0, .y = 0, .w = (float)m_texture->w, .h = (float)m_texture->h};
+  if (resetZoom)
+  {
+    // initialize render rectangle to full texture
+    m_render_rect = {
+        .x = 0, .y = 0, .w = (float)m_texture->w, .h = (float)m_texture->h};
 
-  // initialize zoom factor to 1
-  m_zoom_factor = 1.f;
-  m_min_zoom = 1.f / (m_texture->w / 10.f);
+    // initialize zoom factor to 1
+    m_zoom_factor = 1.f;
+    m_min_zoom = 1.f / (m_texture->w / 10.f);
+  }
 
   HandleResizeEvent(m_available_space);
 }

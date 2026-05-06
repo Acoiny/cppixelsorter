@@ -244,7 +244,8 @@ void Gui::Update()
       m_thread_data.state = State::IDLE;
       m_sorted_image = std::move(m_thread_data.result_image);
     }
-    m_texturerect->setTexture(m_renderer, m_sorted_image.toSurface());
+    m_texturerect->setTexture(m_renderer, m_sorted_image.toSurface(),
+                              SDL_SCALEMODE_NEAREST, false);
   }
 
   SDL_Event event;
