@@ -31,8 +31,6 @@ TextureRect::~TextureRect()
 
 bool TextureRect::HandleMouseEvent(SDL_Event &event)
 {
-  using Log = UI::Logger;
-
   switch (event.type)
   {
   case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -84,7 +82,7 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
                         my >= m_texture_space.y &&
                         my <= (m_texture_space.y + m_texture_space.h);
 
-      // cursor is NOW over the texture
+      // cursor is NO(  over the texture
       if (intersects)
       {
         m_mouse_pos = {(mx - m_texture_space.x), (my - m_texture_space.y)};
@@ -132,12 +130,7 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
 
       m_render_rect.y += delta_y * m_texture->h * m_zoom_factor;
 
-      // clamping
-      // if (m_render_rect.x < 0)
-      //   m_render_rect.x = 0;
-      // else if ((m_render_rect.x + m_render_rect.w) >
-      //          (m_texture_space.x + m_texture_space.w))
-      //   m_render_rect.x = (m_texture_space.x + m_texture_space.w);
+      clampRenderRect();
 
       m_mouse_pos = new_mouse_pos;
       break;
@@ -159,8 +152,8 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
     if (event.wheel.integer_y > 0)
     {
       m_zoom_factor *= 0.9;
-      if (m_zoom_factor < 0.1)
-        m_zoom_factor = 0.1;
+      if (m_zoom_factor < m_min_zoom)
+        m_zoom_factor = m_min_zoom;
     }
     else
     {
@@ -169,8 +162,20 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
         m_zoom_factor = 1.0;
     }
 
+    std::pair<float, float> prevDims = {m_render_rect.w, m_render_rect.h};
+
     m_render_rect.w = m_texture->w * m_zoom_factor;
     m_render_rect.h = m_texture->h * m_zoom_factor;
+
+    // calculate by how much the render rectangle has shrunk/grown
+    float x_diff = prevDims.first - m_render_rect.w;
+    float y_diff = prevDims.second - m_render_rect.h;
+
+    m_render_rect.x += x_diff / 2;
+    m_render_rect.y += y_diff / 2;
+
+    clampRenderRect();
+
     return true;
   }
   default:
@@ -230,5 +235,35 @@ void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface,
 
   m_texture = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_SetTextureScaleMode(m_texture, scaleMode);
+
+  // initialize render rectangle to full texture
+  m_render_rect = {
+      .x = 0, .y = 0, .w = (float)m_texture->w, .h = (float)m_texture->h};
+
+  // initialize zoom factor to 1
+  m_zoom_factor = 1.f;
+  m_min_zoom = 1.f / (m_texture->w / 10.f);
+
   HandleResizeEvent(m_available_space);
+}
+
+void TextureRect::clampRenderRect()
+{
+  if (m_render_rect.x < 0)
+  {
+    m_render_rect.x = 0;
+  }
+  else if ((m_render_rect.x + m_render_rect.w) > m_texture->w)
+  {
+    m_render_rect.x = m_texture->w - m_render_rect.w;
+  }
+
+  if (m_render_rect.y < 0)
+  {
+    m_render_rect.y = 0;
+  }
+  else if ((m_render_rect.y + m_render_rect.h) > m_texture->h)
+  {
+    m_render_rect.y = m_texture->h - m_render_rect.h;
+  }
 }
