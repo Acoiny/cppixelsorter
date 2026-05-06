@@ -5,6 +5,13 @@
 
 class TextureRect : public UI::BaseElement
 {
+  enum class State
+  {
+    IDLE,     // default
+    FOCUSED,  // cursor is over the image
+    DRAGGING, // image is being dragged
+  };
+
 public:
   TextureRect() = default;
   ~TextureRect() override;
@@ -32,7 +39,8 @@ private:
   bool m_keep_ratio = true;
 
   // indicates, if the mouse is over this element
-  bool m_focused = false;
+  State m_state = State::IDLE;
+
   // mouse position from 0.0 to 1.0 relative to the image
   std::pair<float, float> m_relative_mouse_pos = {0, 0};
 

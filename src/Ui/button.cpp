@@ -1,5 +1,4 @@
 #include "Ui/button.hpp"
-#include "Ui/cursorManager.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_render.h>
@@ -47,8 +46,6 @@ bool Button::HandleMouseEvent(SDL_Event &event)
     {
       m_state = ButtonState::MOUSE_HOVER;
 
-      CursorManager::SetCursor(CursorManager::CursorStyle::POINT);
-
       if (onMouseEnter)
         onMouseEnter();
       handled = true;
@@ -56,7 +53,6 @@ bool Button::HandleMouseEvent(SDL_Event &event)
     // mouse is not over button
     else if (!intersects && m_state == ButtonState::MOUSE_HOVER)
     {
-      CursorManager::SetCursor(CursorManager::CursorStyle::DEFAULT);
       m_state = ButtonState::IDLE;
       handled = true;
     }
@@ -86,7 +82,6 @@ bool Button::HandleMouseEvent(SDL_Event &event)
       }
       else
       {
-        CursorManager::SetCursor(CursorManager::CursorStyle::DEFAULT);
         m_state = ButtonState::IDLE;
       }
       break;
