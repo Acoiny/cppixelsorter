@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Ui/baseElement.hpp"
-#include "Ui/cursorManager.hpp"
 #include <SDL3/SDL_rect.h>
 #include <algorithm>
 #include <cmath>
@@ -94,7 +93,6 @@ public:
       {
         if (intersects)
         {
-          CursorManager::SetCursor(CursorManager::CursorStyle::POINT);
           m_state = State::HOVER;
           handled = true;
         }
@@ -104,7 +102,6 @@ public:
       {
         if (!intersects)
         {
-          CursorManager::SetCursor();
           m_state = State::IDLE;
           handled = true;
         }
@@ -145,7 +142,6 @@ public:
     {
       if (m_state == State::HELD)
       {
-        CursorManager::SetCursor();
         float mx = event.motion.x, my = event.motion.y;
         m_state = isIntersecting(mx, my) ? State::HOVER : State::IDLE;
         handled = true;

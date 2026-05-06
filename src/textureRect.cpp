@@ -1,4 +1,5 @@
 #include "textureRect.hpp"
+#include "Ui/cursorManager.hpp"
 #include "Ui/logger.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_mouse.h>
@@ -55,12 +56,13 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
     }
 
     // if previously focused, check if focus is lost
-    if (m_focused)
+    if (m_state == State::FOCUSED)
     {
       // focus is lost
       if (!intersects)
       {
-        m_focused = false;
+        m_state = State::IDLE;
+        UI::CursorManager::SetCursor();
       }
       // event is always, whether focus is lost or nothing happens
       return true;
@@ -72,7 +74,8 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
       if (intersects)
       {
         // it is in focus
-        m_focused = true;
+        m_state = State::FOCUSED;
+        UI::CursorManager::SetCursor(UI::CursorManager::CursorStyle::POINT);
         // and the event is handled
         return true;
       }
@@ -85,7 +88,7 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
     Log::Info("Mouse: {} {}", mx, my);
 
     // if not focused, ignore
-    if (!m_focused)
+    if (m_state != State::FOCUSED)
       break;
     // TODO: check mouse position and zoom there
     // event.wheel.mouse_x
