@@ -9,6 +9,7 @@ CursorManager::CursorManager()
   m_cursors[0] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
   m_cursors[1] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_POINTER);
   m_cursors[2] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
+  m_cursors[3] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_MOVE);
 }
 
 CursorManager::~CursorManager()

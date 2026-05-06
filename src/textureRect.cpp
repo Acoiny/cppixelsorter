@@ -5,19 +5,20 @@
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_surface.h>
+#include <stdexcept>
 
 void TextureRect::draw(SDL_Renderer *renderer)
 {
   // if (m_texture)
   if (m_texture)
   {
-    m_render_rect = {
-        .x = 0,
-        .y = 0,
+    SDL_FRect render_rect = {
+        .x = m_render_rect_offset.first,
+        .y = m_render_rect_offset.second,
         .w = (float)m_texture->w * m_zoom_factor,
         .h = (float)m_texture->h * m_zoom_factor,
     };
-    SDL_RenderTexture(renderer, m_texture, &m_render_rect, &m_texture_space);
+    SDL_RenderTexture(renderer, m_texture, &render_rect, &m_texture_space);
   }
   else
   {
@@ -40,7 +41,17 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
 
   switch (event.type)
   {
-  case SDL_EVENT_MOUSE_MOTION:
+  case SDL_EVENT_MOUSE_BUTTON_DOWN:
+  {
+    if (m_state == State::FOCUSED)
+    {
+      m_state = State::DRAGGING;
+      UI::CursorManager::SetCursor(UI::CursorManager::CursorStyle::MOVE);
+      return true;
+    }
+    break;
+  }
+  case SDL_EVENT_MOUSE_BUTTON_UP:
   {
     float mx = event.motion.x;
     float my = event.motion.y;
@@ -49,43 +60,95 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
                       my >= m_texture_space.y &&
                       my <= (m_texture_space.y + m_texture_space.h);
 
-    if (intersects)
+    if (m_state == State::DRAGGING)
     {
-      m_relative_mouse_pos = {(mx - m_texture_space.x) / m_texture_space.w,
-                              (my - m_texture_space.y) / m_texture_space.h};
-    }
-
-    // if previously focused, check if focus is lost
-    if (m_state == State::FOCUSED)
-    {
-      // focus is lost
-      if (!intersects)
+      if (intersects)
+      {
+        m_state = State::FOCUSED;
+        UI::CursorManager::SetCursor(UI::CursorManager::CursorStyle::POINT);
+        m_mouse_pos = {(mx - m_texture_space.x), (my - m_texture_space.y)};
+        ;
+      }
+      else
       {
         m_state = State::IDLE;
         UI::CursorManager::SetCursor();
       }
-      // event is always, whether focus is lost or nothing happens
       return true;
     }
-    // if not focused previously
-    else
+  }
+  case SDL_EVENT_MOUSE_MOTION:
+  {
+    switch (m_state)
     {
-      // AND now intersecting
+    case State::IDLE:
+    {
+      float mx = event.motion.x;
+      float my = event.motion.y;
+      bool intersects = mx >= m_texture_space.x &&
+                        mx <= (m_texture_space.x + m_texture_space.w) &&
+                        my >= m_texture_space.y &&
+                        my <= (m_texture_space.y + m_texture_space.h);
+
+      // cursor is NOW over the texture
       if (intersects)
       {
-        // it is in focus
+        m_mouse_pos = {(mx - m_texture_space.x), (my - m_texture_space.y)};
         m_state = State::FOCUSED;
         UI::CursorManager::SetCursor(UI::CursorManager::CursorStyle::POINT);
-        // and the event is handled
         return true;
       }
+      break;
+    }
+    case State::FOCUSED:
+    {
+      float mx = event.motion.x;
+      float my = event.motion.y;
+      bool intersects = mx >= m_texture_space.x &&
+                        mx <= (m_texture_space.x + m_texture_space.w) &&
+                        my >= m_texture_space.y &&
+                        my <= (m_texture_space.y + m_texture_space.h);
+
+      // cursor is still above texture -> update position
+      if (intersects)
+      {
+        m_mouse_pos = {(mx - m_texture_space.x), (my - m_texture_space.y)};
+      }
+      else
+      {
+        // cursor left texture -> Idle
+        m_state = State::IDLE;
+        UI::CursorManager::SetCursor();
+      }
+      return true;
+    }
+    case State::DRAGGING:
+    {
+      float mx = event.motion.x;
+      float my = event.motion.y;
+      std::pair<float, float> new_mouse_pos = {(mx - m_texture_space.x),
+                                               (my - m_texture_space.y)};
+
+      auto delta_x =
+          (m_mouse_pos.first - new_mouse_pos.first) / m_texture_space.w;
+      auto delta_y =
+          (m_mouse_pos.second - new_mouse_pos.second) / m_texture_space.h;
+
+      m_render_rect_offset.first += delta_x * m_texture->w * m_zoom_factor;
+
+      m_render_rect_offset.second += delta_y * m_texture->h * m_zoom_factor;
+
+      m_mouse_pos = new_mouse_pos;
+      break;
+    }
+    default:
+      throw std::runtime_error(__FILE__ ": invalid state!");
     }
     break;
   }
   case SDL_EVENT_MOUSE_WHEEL:
   {
-    auto [mx, my] = m_relative_mouse_pos;
-    Log::Info("Mouse: {} {}", mx, my);
+    auto [mx, my] = m_mouse_pos;
 
     // if not focused, ignore
     if (m_state != State::FOCUSED)
@@ -104,7 +167,6 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
       if (m_zoom_factor > 1.0)
         m_zoom_factor = 1.0;
     }
-    UI::Logger::Debug("Zoom: {}", m_zoom_factor);
     return true;
   }
   default:

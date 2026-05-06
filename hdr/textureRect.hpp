@@ -41,8 +41,8 @@ private:
   // indicates, if the mouse is over this element
   State m_state = State::IDLE;
 
-  // mouse position from 0.0 to 1.0 relative to the image
-  std::pair<float, float> m_relative_mouse_pos = {0, 0};
+  // mouse position inside the image
+  std::pair<float, float> m_mouse_pos = {0, 0};
 
   SDL_FRect m_texture_space = {0};
   SDL_FRect m_available_space = {0};
@@ -50,6 +50,7 @@ private:
   /**
    * Rectangle of the image that should be rendered (zoom)
    */
-  SDL_FRect m_render_rect = {0};
+  std::pair<float, float> m_render_rect_offset{0, 0};
+
   float m_zoom_factor = 1.f;
 };
