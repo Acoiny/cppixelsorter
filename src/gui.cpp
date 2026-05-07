@@ -274,7 +274,10 @@ void Gui::Update()
 void Gui::LoadImage(const std::string &path)
 {
   m_original_image = ImageData(path);
-  m_texturerect->setTexture(m_renderer, m_original_image.toSurface());
+  if (m_original_image.pixels)
+  {
+    m_texturerect->setTexture(m_renderer, m_original_image.toSurface());
+  }
 }
 
 void Gui::RunSort()
@@ -310,6 +313,11 @@ void Gui::RunSort()
 
 void Gui::ThreadedSort()
 {
+  if (!m_original_image.pixels)
+  {
+    UI::Logger::Warn("Load an image before sorting!");
+    return;
+  }
   // first, set new task using the mutex
   {
     std::lock_guard lock(m_thread_data.mutex);
