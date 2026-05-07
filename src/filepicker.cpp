@@ -8,9 +8,9 @@ static const SDL_DialogFileFilter filters[] = {{"All images", "png;jpg;jpeg"},
                                                {"JPEG images", "jpg;jpeg"},
                                                {"All files", "*"}};
 
-void SDLCALL callback(void *userdata, const char *const *filelist, int filter)
+void SDLCALL callback(void *userdata, const char *const *filelist,
+                      [[maybe_unused]] int filter)
 {
-  std::println("userdata: {}", userdata);
   Filepicker *fp = (Filepicker *)userdata;
   fp->m_isOpen = false;
 
