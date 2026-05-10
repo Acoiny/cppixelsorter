@@ -5,7 +5,7 @@
 #include "filepicker.hpp"
 #include "imageData.hpp"
 #include "sortTask.hpp"
-#include "textureRect.hpp"
+#include "zoomableTextureRect.hpp"
 #include <SDL3/SDL.h>
 #include <condition_variable>
 #include <memory>
