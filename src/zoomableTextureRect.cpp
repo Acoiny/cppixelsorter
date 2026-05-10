@@ -6,7 +6,7 @@
 #include <SDL3/SDL_surface.h>
 #include <stdexcept>
 
-void TextureRect::draw(SDL_Renderer *renderer)
+void ZoomableTextureRect::draw(SDL_Renderer *renderer)
 {
   if (m_texture)
   {
@@ -18,16 +18,7 @@ void TextureRect::draw(SDL_Renderer *renderer)
   }
 }
 
-TextureRect::~TextureRect()
-{
-  if (m_texture)
-    SDL_DestroyTexture(m_texture);
-
-  // passing NULL is fine
-  SDL_DestroySurface(m_surface);
-}
-
-bool TextureRect::HandleMouseEvent(SDL_Event &event)
+bool ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
 {
   switch (event.type)
   {
@@ -186,47 +177,9 @@ bool TextureRect::HandleMouseEvent(SDL_Event &event)
   return false;
 }
 
-void TextureRect::HandleResizeEvent(const SDL_FRect &space)
-{
-  m_available_space = space;
-
-  applyMargin(m_available_space);
-
-  if (!m_texture)
-    return;
-
-  // don't do aspect ratio calculation
-  if (!m_keep_ratio)
-  {
-    m_texture_space = m_available_space;
-    return;
-  }
-
-  const float image_aspect_ratio =
-      static_cast<float>(m_texture->w) / static_cast<float>(m_texture->h);
-
-  const float viewport_aspect_ratio =
-      static_cast<float>(space.w) / static_cast<float>(space.h);
-
-  // setting the corner
-  m_texture_space.x = m_available_space.x;
-  m_texture_space.y = m_available_space.y;
-
-  // if image aspect ratio is BIGGER than viewport -> adjust to width
-  if (image_aspect_ratio >= viewport_aspect_ratio)
-  {
-    m_texture_space.w = m_available_space.w;
-    m_texture_space.h = m_available_space.w / image_aspect_ratio;
-  }
-  else
-  {
-    m_texture_space.w = m_available_space.h * image_aspect_ratio;
-    m_texture_space.h = m_available_space.h;
-  }
-}
-
-void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface,
-                             SDL_ScaleMode scaleMode, bool resetZoom)
+void ZoomableTextureRect::setTexture(SDL_Renderer *renderer,
+                                     SDL_Surface *surface,
+                                     SDL_ScaleMode scaleMode, bool resetZoom)
 {
   if (m_texture)
     SDL_DestroyTexture(m_texture);
@@ -252,7 +205,7 @@ void TextureRect::setTexture(SDL_Renderer *renderer, SDL_Surface *surface,
   HandleResizeEvent(m_available_space);
 }
 
-void TextureRect::clampRenderRect()
+void ZoomableTextureRect::clampRenderRect()
 {
   if (m_render_rect.x < 0)
   {
