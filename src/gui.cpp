@@ -13,8 +13,8 @@
 #include "imageData.hpp"
 #include "sortTask.hpp"
 #include "stb_image.h"
-#include "textureRect.hpp"
 #include "timer.hpp"
+#include "zoomableTextureRect.hpp"
 
 #include <SDL3/SDL.h>
 

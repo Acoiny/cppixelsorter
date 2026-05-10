@@ -1,4 +1,4 @@
-#include "textureRect.hpp"
+#include "zoomableTextureRect.hpp"
 #include "Ui/cursorManager.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_mouse.h>
@@ -8,7 +8,6 @@
 
 void TextureRect::draw(SDL_Renderer *renderer)
 {
-  // if (m_texture)
   if (m_texture)
   {
     SDL_RenderTexture(renderer, m_texture, &m_render_rect, &m_texture_space);
