@@ -85,7 +85,7 @@ private:
   std::shared_ptr<UI::TextBox> m_infoText;
   // std::shared_ptr<UI::TextBox> m_sliderText;
 
-  std::shared_ptr<TextureRect> m_texturerect;
+  std::shared_ptr<ZoomableTextureRect> m_texturerect;
 
   std::jthread m_thread;
 };

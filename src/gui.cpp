@@ -8,6 +8,7 @@
 #include "Ui/slider.hpp"
 #include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
+#include "basicTextureRect.hpp"
 #include "filepicker.hpp"
 
 #include "imageData.hpp"
@@ -101,7 +102,7 @@ Gui::Gui(int width, int height, const std::string &title)
       // hue texture
       {
         auto hue_box = vb->addElement<UI::HBox>();
-        auto huebar_texture = hue_box->addElementFrac<TextureRect>(3);
+        auto huebar_texture = hue_box->addElementFrac<UI::BasicTextureRect>(3);
         huebar_texture->setKeepRatio(false).SetMargin(
             {.top = 10, .bottom = 100});
 
@@ -178,7 +179,7 @@ Gui::Gui(int width, int height, const std::string &title)
     }
   }
 
-  m_texturerect = hb->addElementFrac<TextureRect>(5);
+  m_texturerect = hb->addElementFrac<ZoomableTextureRect>(5);
   // "sending" a resize event to update UI layout
   {
     SDL_Event fake_event;
