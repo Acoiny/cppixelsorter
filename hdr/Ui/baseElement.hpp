@@ -19,6 +19,12 @@ public:
 
   virtual void draw(SDL_Renderer *renderer) = 0;
 
+  /**
+   * Recursively handles the mouse event. When an object has handled
+   * it, it returns true and no more objects are passed the event
+   * @param SDL_Event& event
+   * @returns true when the event has been handled
+   */
   virtual bool HandleMouseEvent(SDL_Event &event) = 0;
 
   /**
