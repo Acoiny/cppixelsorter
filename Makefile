@@ -66,6 +66,7 @@ run: $(BINARY_DEBUG)
 
 $(BINARY): $(OBJECT_FILES)
 	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	strip $@
 
 $(BINARY_DEBUG): $(DOBJECT_FILES)
 	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS)
