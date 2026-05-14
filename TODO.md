@@ -21,8 +21,8 @@
 
 # Idea for UI refactor
 Specific actions make objects "capture" the mouse state. This means, that they
-get all mouse events FIRST. E.g. when holding a button and moving the mouse
-around, the button gets all coming events before all other ui elements.
+get all mouse events FIRST. E.g. when holding a dropdown menu and moving the
+mouse around, this menu gets all coming events before all other ui elements.
 
 Other approach: Only "captured" element gets mouse events until it releases the
 cursor again. The dropdown menu could work like this, it would capture the
@@ -31,10 +31,13 @@ selection of all it's options. When you move the mouse away from it and click,
 it would still "handle" the event but not act on anything and the mouse pointer
 would be released.
 
-`HandleMouseEvent` would have to get a different return value. It would still
-have to indicate if the event was handled like it does already but it would
-also need to pass up the element that captured the event so the `UiManager` can
-get a hold of it and pass all future events to it. Probably a tuple like
-`std::pair<bool, std::optional<std::shared_ptr<BaseElement>>>`.
-The boolean would function like it has until now but the optional pointer
-would be capture if it was set.
+`HandleMouseEvent` returns a tuple of `EventResult`, which indicates if the
+event hasn't been handled yet, has been handled or has been handled _with a
+focus capture_, and an `std::optional<std::shared_ptr<BaseElement>>` which
+contains the element to capture, if the latter is the case.
+If an element want's to remove itself from caputre, it just sends an empty
+optional with the capture `EventResult`.
+
+**Idea**: Maybe make a new subclass of `BaseElement` which is capturable?
+Then the optional could contain that.
+But why? Cleaner? Benefits?

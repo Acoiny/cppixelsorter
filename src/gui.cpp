@@ -34,7 +34,7 @@
 static void Error(const std::string &msg)
 {
   UI::Logger::Fatal("Error: {} - {}", msg, SDL_GetError());
-};
+}
 
 Gui::Gui(int width, int height, const std::string &title)
 {
