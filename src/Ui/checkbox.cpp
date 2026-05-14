@@ -1,4 +1,5 @@
 #include "Ui/checkbox.hpp"
+#include "Ui/baseElement.hpp"
 #include <SDL3/SDL_render.h>
 
 using namespace UI;
@@ -12,8 +13,11 @@ void CheckBox::draw(SDL_Renderer *renderer)
   SDL_RenderFillRect(renderer, &m_rect);
 }
 
-bool CheckBox::HandleMouseEvent(SDL_Event &event)
+std::pair<EventResult, std::optional<std::shared_ptr<BaseElement>>>
+CheckBox::HandleMouseEvent(SDL_Event &event)
 {
+  EventResult handled = EventResult::UNHANDLED;
+
   float m_x = event.motion.x;
   float m_y = event.motion.y;
 
@@ -26,7 +30,7 @@ bool CheckBox::HandleMouseEvent(SDL_Event &event)
         onChange(m_value);
     }
 
-    return true;
+    handled = EventResult::HANDLED;
   }
   return false;
 }

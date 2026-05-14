@@ -18,8 +18,11 @@ void ZoomableTextureRect::draw(SDL_Renderer *renderer)
   }
 }
 
-bool ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
+std::pair<UI::EventResult, std::optional<std::shared_ptr<UI::BaseElement>>>
+ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
 {
+  UI::EventResult handled = UI::EventResult::UNHANDLED;
+
   switch (event.type)
   {
   case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -28,7 +31,7 @@ bool ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
     {
       m_state = State::DRAGGING;
       UI::CursorManager::SetCursor(UI::CursorManager::CursorStyle::MOVE);
-      return true;
+      handled = UI::EventResult::HANDLED;
     }
     break;
   }
@@ -55,7 +58,7 @@ bool ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
         m_state = State::IDLE;
         UI::CursorManager::SetCursor();
       }
-      return true;
+      handled = UI::EventResult::HANDLED;
     }
   }
   case SDL_EVENT_MOUSE_MOTION:
@@ -101,7 +104,8 @@ bool ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
         m_state = State::IDLE;
         UI::CursorManager::SetCursor();
       }
-      return true;
+      handled = UI::EventResult::HANDLED;
+      break;
     }
     case State::DRAGGING:
     {
@@ -122,6 +126,7 @@ bool ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
       clampRenderRect();
 
       m_mouse_pos = new_mouse_pos;
+      handled = UI::EventResult::HANDLED;
       break;
     }
     default:
@@ -169,7 +174,8 @@ bool ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
 
     clampRenderRect();
 
-    return true;
+    handled = UI::EventResult::HANDLED;
+    break;
   }
   default:
     break;

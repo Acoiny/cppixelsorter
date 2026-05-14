@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Ui/baseElement.hpp"
 #include "basicTextureRect.hpp"
 #include <SDL3/SDL_rect.h>
 #include <utility>
@@ -18,7 +19,8 @@ public:
 
   void draw(SDL_Renderer *renderer) override;
 
-  bool HandleMouseEvent(SDL_Event &event) override;
+  std::pair<UI::EventResult, std::optional<std::shared_ptr<BaseElement>>>
+  HandleMouseEvent(SDL_Event &event) override;
 
   void setTexture(SDL_Renderer *renderer, SDL_Surface *surface,
                   SDL_ScaleMode scaleMode = SDL_SCALEMODE_NEAREST,

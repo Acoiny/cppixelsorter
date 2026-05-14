@@ -20,7 +20,11 @@ public:
 
   void draw(SDL_Renderer *renderer) override;
 
-  bool HandleMouseEvent(SDL_Event &event) override { return false; }
+  std::pair<EventResult, std::optional<std::shared_ptr<BaseElement>>>
+  HandleMouseEvent(SDL_Event &event) override
+  {
+    return {EventResult::UNHANDLED, {}};
+  }
 
   void HandleResizeEvent(const SDL_FRect &space) override;
 
