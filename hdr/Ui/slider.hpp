@@ -76,9 +76,10 @@ public:
     SDL_RenderFillRect(renderer, &m_selector);
   }
 
-  bool HandleMouseEvent(SDL_Event &event) override
+  std::pair<EventResult, std::optional<std::shared_ptr<BaseElement>>>
+  HandleMouseEvent(SDL_Event &event) override
   {
-    bool handled = false;
+    EventResult handled = EventResult::UNHANDLED;
 
     switch (event.type)
     {
@@ -94,7 +95,7 @@ public:
         if (intersects)
         {
           m_state = State::HOVER;
-          handled = true;
+          handled = EventResult::HANDLED;
         }
         break;
       }
@@ -103,7 +104,7 @@ public:
         if (!intersects)
         {
           m_state = State::IDLE;
-          handled = true;
+          handled = EventResult::HANDLED;
         }
         break;
       }
@@ -123,7 +124,7 @@ public:
             onValueChange(m_value);
         }
 
-        handled = true;
+        handled = EventResult::HANDLED;
         break;
       }
       }
@@ -134,7 +135,7 @@ public:
       if (m_state == State::HOVER)
       {
         m_state = State::HELD;
-        handled = true;
+        handled = EventResult::HANDLED;
       }
       break;
     }
@@ -144,7 +145,7 @@ public:
       {
         float mx = event.motion.x, my = event.motion.y;
         m_state = isIntersecting(mx, my) ? State::HOVER : State::IDLE;
-        handled = true;
+        handled = EventResult::HANDLED;
       }
       break;
     }

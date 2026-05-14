@@ -12,7 +12,14 @@ struct Margin
   float left = 0;
 };
 
-class BaseElement
+enum class EventResult
+{
+  UNHANDLED = 0,
+  HANDLED,
+  HANDLED_UPDATE_FOCUS,
+};
+
+class BaseElement : public std::enable_shared_from_this<BaseElement>
 {
 public:
   virtual ~BaseElement() = default;
@@ -25,7 +32,8 @@ public:
    * @param SDL_Event& event
    * @returns true when the event has been handled
    */
-  virtual bool HandleMouseEvent(SDL_Event &event) = 0;
+  virtual std::pair<EventResult, std::optional<std::shared_ptr<BaseElement>>>
+  HandleMouseEvent(SDL_Event &event) = 0;
 
   /**
    * Handles resizing when a resize event occurs.

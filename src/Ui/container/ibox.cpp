@@ -1,4 +1,5 @@
 #include "Ui/container/ibox.hpp"
+#include "Ui/baseElement.hpp"
 #include <numeric>
 
 using namespace UI;
@@ -11,14 +12,18 @@ void IBox::draw(SDL_Renderer *renderer)
   }
 }
 
-bool IBox::HandleMouseEvent(SDL_Event &event)
+std::pair<EventResult, std::optional<std::shared_ptr<BaseElement>>>
+IBox::HandleMouseEvent(SDL_Event &event)
 {
   for (auto el : m_elements)
   {
-    if (el.first->HandleMouseEvent(event))
-      return true;
+    auto [handled, focused] = el.first->HandleMouseEvent(event);
+
+    if (handled != EventResult::UNHANDLED)
+      return {handled, focused};
   }
-  return false;
+
+  return {EventResult::UNHANDLED, {}};
 }
 
 void IBox::updateDivisor()

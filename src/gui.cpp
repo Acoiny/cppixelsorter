@@ -90,6 +90,10 @@ Gui::Gui(int width, int height, const std::string &title)
     save_btn->onLeftClick = [this]() { m_filepicker.open(true); };
     save_btn->SetMargin(DEFAULT_MARGIN);
 
+    auto dropdown = vb->addElement<UI::Dropdown>();
+    dropdown->AddOption("A", []() { std::println("Option A"); });
+    dropdown->AddOption("B", []() {});
+
     // hue-sliders
     {
       auto minSliderBox = vb->addElement<UI::HBox>();

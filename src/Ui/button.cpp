@@ -1,4 +1,5 @@
 #include "Ui/button.hpp"
+#include "Ui/baseElement.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_render.h>
@@ -31,9 +32,10 @@ void Button::draw(SDL_Renderer *renderer)
   SDL_RenderFillRect(renderer, &m_rect);
 }
 
-bool Button::HandleMouseEvent(SDL_Event &event)
+std::pair<EventResult, std::optional<std::shared_ptr<BaseElement>>>
+Button::HandleMouseEvent(SDL_Event &event)
 {
-  bool handled = false;
+  EventResult handled = EventResult::UNHANDLED;
   switch (event.type)
   {
   case SDL_EVENT_MOUSE_MOTION:
@@ -48,13 +50,13 @@ bool Button::HandleMouseEvent(SDL_Event &event)
 
       if (onMouseEnter)
         onMouseEnter();
-      handled = true;
+      handled = EventResult::HANDLED;
     }
     // mouse is not over button
     else if (!intersects && m_state == ButtonState::MOUSE_HOVER)
     {
       m_state = ButtonState::IDLE;
-      handled = true;
+      handled = EventResult::HANDLED;
     }
     break;
   }
@@ -63,7 +65,7 @@ bool Button::HandleMouseEvent(SDL_Event &event)
     if (m_state == ButtonState::MOUSE_HOVER)
     {
       m_state = ButtonState::MOUSE_HELD;
-      handled = true;
+      handled = EventResult::HANDLED;
     }
     break;
   }
@@ -85,7 +87,7 @@ bool Button::HandleMouseEvent(SDL_Event &event)
         m_state = ButtonState::IDLE;
       }
       break;
-      handled = true;
+      handled = EventResult::HANDLED;
     }
     break;
   }
