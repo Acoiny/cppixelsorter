@@ -34,5 +34,7 @@ public:
 
 private:
   std::vector<std::shared_ptr<BaseElement>> m_elements;
+
+  std::optional<std::shared_ptr<BaseElement>> m_focused;
 };
 } // namespace UI

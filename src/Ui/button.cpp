@@ -93,7 +93,7 @@ Button::HandleMouseEvent(SDL_Event &event)
   }
   }
 
-  return handled;
+  return {handled, {}};
 }
 
 void Button::HandleResizeEvent(const SDL_FRect &space)

@@ -4,6 +4,7 @@
 #include "Ui/checkbox.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
+#include "Ui/dropdown.hpp"
 #include "Ui/logger.hpp"
 #include "Ui/slider.hpp"
 #include "Ui/textBox.hpp"

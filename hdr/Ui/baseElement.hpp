@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <memory>
+#include <optional>
 
 namespace UI
 {

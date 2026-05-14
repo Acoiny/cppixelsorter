@@ -151,7 +151,7 @@ public:
     }
     }
 
-    return handled;
+    return {handled, {}};
   }
 
   void HandleResizeEvent(const SDL_FRect &space) override

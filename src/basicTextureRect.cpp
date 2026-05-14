@@ -17,8 +17,6 @@ void BasicTextureRect::draw(SDL_Renderer *renderer)
   SDL_RenderTexture(renderer, m_texture, nullptr, &m_texture_space);
 }
 
-bool BasicTextureRect::HandleMouseEvent(SDL_Event &event) { return false; }
-
 void BasicTextureRect::HandleResizeEvent(const SDL_FRect &space)
 {
   m_available_space = space;
