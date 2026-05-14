@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Ui/Colors.hpp"
 #include "Ui/baseElement.hpp"
 #include <SDL3/SDL_rect.h>
 #include <algorithm>
@@ -21,8 +22,8 @@ template <typename T> class Slider : public BaseElement
   static constexpr float HEIGHT = 5;
   static constexpr float SELECTOR_RADIUS = 5;
   static constexpr T CHANGE_THRESHOLD = 1;
-  static constexpr SDL_Color COLOR_IDLE = {0x83, 0x3d, 0xb4, 255};
-  static constexpr SDL_Color COLOR_ACTIVE = {0xc3, 0x75, 0xf9, 255};
+  SDL_Color COLOR_IDLE = Color::SLIDER_IDLE;
+  SDL_Color COLOR_ACTIVE = Color::SLIDER_ACTIVE;
 
   enum class State
   {

@@ -23,7 +23,5 @@ private:
   TTF_Text *m_text;
 
   std::string m_data;
-
-  SDL_Color m_font_color{0, 0, 0, 255};
 };
 } // namespace UI

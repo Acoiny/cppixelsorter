@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Ui/Colors.hpp"
 #include "Ui/baseElement.hpp"
 #include <SDL3/SDL_rect.h>
 #include <functional>
@@ -34,7 +35,7 @@ private:
 
   SDL_FRect m_rect;
 
-  SDL_Color m_color_checked = {0, 255, 0, 255};
-  SDL_Color m_color_unchecked = {255, 0, 0, 255};
+  SDL_Color m_color_checked = Color::CHECKBOX_CHECKED;
+  SDL_Color m_color_unchecked = Color::CHECKBOX_UNCHECKED;
 };
 } // namespace UI

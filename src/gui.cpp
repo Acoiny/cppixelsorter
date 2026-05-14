@@ -1,5 +1,6 @@
 #include "gui.hpp"
 #include "Sorters/baseImageSorter.hpp"
+#include "Ui/Colors.hpp"
 #include "Ui/UiManager.hpp"
 #include "Ui/checkbox.hpp"
 #include "Ui/container/hbox.hpp"
@@ -92,6 +93,7 @@ Gui::Gui(int width, int height, const std::string &title)
     save_btn->SetMargin(DEFAULT_MARGIN);
 
     auto dropdown = vb->addElement<UI::Dropdown>();
+    dropdown->SetMargin(DEFAULT_MARGIN);
     dropdown->AddOption("A", []() { std::println("Option A"); });
     dropdown->AddOption("B", []() {});
 
@@ -267,8 +269,10 @@ void Gui::Update()
     }
   }
 
-  // SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
-  SDL_SetRenderDrawColor(m_renderer, 93, 59, 107, 255);
+  {
+    auto [r, g, b, a] = UI::Color::CLEAR_COLOR;
+    SDL_SetRenderDrawColor(m_renderer, r, g, b, a);
+  }
   SDL_RenderClear(m_renderer);
 
   m_uiManager->draw(m_renderer);

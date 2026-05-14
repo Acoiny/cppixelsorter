@@ -1,4 +1,5 @@
 #include "Ui/textBox.hpp"
+#include "Ui/Colors.hpp"
 #include "Ui/textManager.hpp"
 #include <SDL3/SDL_error.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -16,6 +17,8 @@ TextBox::TextBox(float x, float y, const std::string &text, float fontsize)
     : m_x(x), m_y(y), m_string(text),
       m_text(TextManager::getInstance().createText(text))
 {
+  auto [r, g, b, a] = Color::FONT;
+  TTF_SetTextColor(m_text, r, g, b, a);
 }
 
 TextBox::~TextBox() { TTF_DestroyText(m_text); }
@@ -29,6 +32,8 @@ void TextBox::setText(const std::string &text)
   else
   {
     m_string = text;
+    auto [r, g, b, a] = Color::FONT;
+    TTF_SetTextColor(m_text, r, g, b, a);
     HandleResizeEvent(m_rect);
   }
 }
