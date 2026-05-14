@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Ui/Colors.hpp"
 #include "Ui/baseElement.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_pixels.h>
@@ -72,9 +73,9 @@ private:
   }
 
 protected:
-  SDL_Color m_idleColor{0x83, 0x3d, 0xb4, 255};
-  SDL_Color m_hoverColor{0xa2, 0x55, 0xd9, 255};
-  SDL_Color m_mouseDownColor{0xc3, 0x75, 0xf9, 255};
+  SDL_Color m_idleColor = UI::Color::BUTTON_BACKGROUND;
+  SDL_Color m_hoverColor = UI::Color::BUTTON_HOVER;
+  SDL_Color m_mouseDownColor = UI::Color::BUTTON_DOWN;
 
   SDL_FRect m_rect;
 

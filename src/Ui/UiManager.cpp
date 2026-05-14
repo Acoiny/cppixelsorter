@@ -1,4 +1,5 @@
 #include "Ui/UiManager.hpp"
+#include "Ui/Colors.hpp"
 #include "Ui/logger.hpp"
 #include "Ui/textManager.hpp"
 #include <SDL3/SDL.h>
@@ -6,7 +7,11 @@
 
 using namespace UI;
 
-UiManager::UiManager(SDL_Renderer *renderer) { TextManager::Init(renderer); }
+UiManager::UiManager(SDL_Renderer *renderer)
+{
+  Color::LoadDefaultColorTheme();
+  TextManager::Init(renderer);
+}
 
 UiManager::~UiManager()
 {

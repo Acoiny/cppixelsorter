@@ -9,7 +9,8 @@ Dropdown::~Dropdown() {}
 
 void Dropdown::draw(SDL_Renderer *renderer)
 {
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+  auto [r, g, b, a] = m_background_color;
+  SDL_SetRenderDrawColor(renderer, r, g, b, a);
   SDL_RenderFillRect(renderer, &m_rect);
 
   if (m_state == State::FOCUSED)

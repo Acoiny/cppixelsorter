@@ -1,8 +1,11 @@
 #pragma once
 
+#include "Ui/Colors.hpp"
 #include "Ui/baseElement.hpp"
+#include "Ui/textBox.hpp"
 #include "Ui/textButton.hpp"
 
+#include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_rect.h>
 #include <string>
 #include <vector>
@@ -45,6 +48,7 @@ private:
 
 private:
   std::vector<std::shared_ptr<TextButton>> m_options;
+  std::shared_ptr<TextBox> m_selected_option;
 
   State m_state = State::COLLAPSED;
 
@@ -54,5 +58,7 @@ private:
    * The space the dropdown menu takes when it is expanded
    */
   SDL_FRect m_expanded_space;
+
+  SDL_Color m_background_color = Color::BUTTON_BACKGROUND;
 };
 }; // namespace UI
