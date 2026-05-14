@@ -80,7 +80,7 @@ ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
         m_mouse_pos = {(mx - m_texture_space.x), (my - m_texture_space.y)};
         m_state = State::FOCUSED;
         UI::CursorManager::SetCursor(UI::CursorManager::CursorStyle::POINT);
-        return true;
+        return {handled, {}};
       }
       break;
     }
@@ -180,7 +180,7 @@ ZoomableTextureRect::HandleMouseEvent(SDL_Event &event)
   default:
     break;
   }
-  return false;
+  return {};
 }
 
 void ZoomableTextureRect::setTexture(SDL_Renderer *renderer,

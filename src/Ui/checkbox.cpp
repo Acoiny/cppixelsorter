@@ -32,7 +32,7 @@ CheckBox::HandleMouseEvent(SDL_Event &event)
 
     handled = EventResult::HANDLED;
   }
-  return false;
+  return {handled, {}};
 }
 
 void CheckBox::HandleResizeEvent(const SDL_FRect &space)

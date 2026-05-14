@@ -65,6 +65,7 @@ Dropdown::HandleMouseEvent(SDL_Event &event)
       // but DON'T say it has been handled, as other
       // elements may still handle it
       m_state = State::COLLAPSED;
+      handled = EventResult::HANDLED_UPDATE_FOCUS;
       break;
     }
     }

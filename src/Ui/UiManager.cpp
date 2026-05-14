@@ -1,4 +1,5 @@
 #include "Ui/UiManager.hpp"
+#include "Ui/logger.hpp"
 #include "Ui/textManager.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
@@ -49,9 +50,12 @@ void UiManager::handleEvent(SDL_Event &event)
         return; // quit trying to handle event
       case UI::EventResult::HANDLED_UPDATE_FOCUS:
         // update focus and then stop
-        UI::Logger::Debug("Updated focus, {}", m_focused == focused
-                                                   ? "same element"
-                                                   : "new element");
+        if (!focused)
+          UI::Logger::Debug("Cleared focus");
+        else
+          UI::Logger::Debug("Updated focus, {}", m_focused == focused
+                                                     ? "same element"
+                                                     : "new element");
         m_focused = focused;
         return;
       }
@@ -70,38 +74,42 @@ void UiManager::handleEvent(SDL_Event &event)
         return; // quit trying to handle event
       case UI::EventResult::HANDLED_UPDATE_FOCUS:
         // update focus and then stop
-        UI::Logger::Debug("Updated focus, {}", m_focused == focused
-                                                   ? "same element"
-                                                   : "new element");
+        if (!focused)
+          UI::Logger::Debug("Cleared focus");
+        else
+          UI::Logger::Debug("Updated focus, {}", m_focused == focused
+                                                     ? "same element"
+                                                     : "new element");
         m_focused = focused;
         return;
       }
     }
   }
+}
 
-  void UiManager::draw(SDL_Renderer * renderer)
+void UiManager::draw(SDL_Renderer *renderer)
+{
+  for (auto &btn : m_elements)
   {
-    for (auto &btn : m_elements)
-    {
-      btn->draw(renderer);
-    }
-
-    // draw the focused element on top
-    if (m_focused.has_value())
-      m_focused->get()->draw(renderer);
+    btn->draw(renderer);
   }
 
-  bool UiManager::isEventRelevant(SDL_Event & event)
+  // draw the focused element on top
+  if (m_focused.has_value())
+    m_focused->get()->draw(renderer);
+}
+
+bool UiManager::isEventRelevant(SDL_Event &event)
+{
+  switch (event.type)
   {
-    switch (event.type)
-    {
-    case SDL_EVENT_MOUSE_WHEEL:
-    case SDL_EVENT_MOUSE_MOTION:
-    case SDL_EVENT_WINDOW_RESIZED:
-    case SDL_EVENT_MOUSE_BUTTON_DOWN:
-    case SDL_EVENT_MOUSE_BUTTON_UP:
-      return true;
-    default:
-      return false;
-    }
+  case SDL_EVENT_MOUSE_WHEEL:
+  case SDL_EVENT_MOUSE_MOTION:
+  case SDL_EVENT_WINDOW_RESIZED:
+  case SDL_EVENT_MOUSE_BUTTON_DOWN:
+  case SDL_EVENT_MOUSE_BUTTON_UP:
+    return true;
+  default:
+    return false;
   }
+}
