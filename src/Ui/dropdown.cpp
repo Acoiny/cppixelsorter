@@ -2,6 +2,7 @@
 #include "Ui/baseElement.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_render.h>
+#include <print>
 
 using namespace UI;
 
@@ -62,11 +63,24 @@ Dropdown::HandleMouseEvent(SDL_Event &event)
     }
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
     {
-      // for a button event, we collapse this element
-      // but DON'T say it has been handled, as other
-      // elements may still handle it
-      m_state = State::COLLAPSED;
-      handled = EventResult::HANDLED_UPDATE_FOCUS;
+      // if NONE of the buttons have handled this event,
+      // we have to collapse this, because the user clicked outside of the
+      // dropdown menu
+      if (handled == EventResult::UNHANDLED)
+      {
+        m_state = State::COLLAPSED;
+        handled = EventResult::HANDLED_UPDATE_FOCUS;
+      }
+      break;
+    }
+    case SDL_EVENT_MOUSE_BUTTON_UP:
+    {
+      // if a button handled the release, unfocus
+      if (handled != EventResult::UNHANDLED)
+      {
+        m_state = State::COLLAPSED;
+        handled = EventResult::HANDLED_UPDATE_FOCUS;
+      }
       break;
     }
     }
@@ -120,6 +134,8 @@ void Dropdown::HandleResizeEvent(const SDL_FRect &space)
 
 Dropdown &Dropdown::AddOption(const std::string &name)
 {
-  m_options.emplace_back(std::make_shared<TextButton>(name));
+  auto ptr = std::make_shared<TextButton>(name);
+  ptr->onLeftClick = [=]() { std::println("Pressed {}", name); };
+  m_options.push_back(ptr);
   return *this;
 }
