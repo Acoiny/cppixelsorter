@@ -2,14 +2,14 @@
 #include "Sorters/baseImageSorter.hpp"
 #include "Ui/Colors.hpp"
 #include "Ui/UiManager.hpp"
-#include "Ui/checkbox.hpp"
+#include "Ui/basic/checkbox.hpp"
+#include "Ui/basic/textBox.hpp"
+#include "Ui/basic/textButton.hpp"
 #include "Ui/container/hbox.hpp"
 #include "Ui/container/vbox.hpp"
 #include "Ui/dropdown.hpp"
 #include "Ui/logger.hpp"
 #include "Ui/slider.hpp"
-#include "Ui/textBox.hpp"
-#include "Ui/textButton.hpp"
 #include "basicTextureRect.hpp"
 #include "filepicker.hpp"
 
@@ -94,8 +94,8 @@ Gui::Gui(int width, int height, const std::string &title)
 
     auto dropdown = vb->addElement<UI::Dropdown>();
     dropdown->SetMargin(DEFAULT_MARGIN);
-    dropdown->AddOption("A", []() { std::println("Option A"); });
-    dropdown->AddOption("B", []() {});
+    dropdown->AddOption("A");
+    dropdown->AddOption("B");
 
     // hue-sliders
     {

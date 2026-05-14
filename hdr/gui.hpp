@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Ui/UiManager.hpp"
-#include "Ui/textBox.hpp"
+#include "Ui/basic/textBox.hpp"
 #include "filepicker.hpp"
 #include "imageData.hpp"
 #include "sortTask.hpp"

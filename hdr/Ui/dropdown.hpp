@@ -2,12 +2,11 @@
 
 #include "Ui/Colors.hpp"
 #include "Ui/baseElement.hpp"
-#include "Ui/textBox.hpp"
-#include "Ui/textButton.hpp"
+#include "Ui/basic/textBox.hpp"
+#include "Ui/basic/textButton.hpp"
 
 #include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_rect.h>
-#include <string>
 #include <vector>
 
 namespace UI
@@ -30,14 +29,17 @@ public:
   std::pair<EventResult, std::optional<std::shared_ptr<BaseElement>>>
   HandleMouseEvent(SDL_Event &event) override;
 
-  /**
-   * Handles resizing when a resize event occurs.
-   * @param space the rectangular region the element may occupy
-   */
   void HandleResizeEvent(const SDL_FRect &space) override;
 
-  Dropdown &AddOption(const std::string &title,
-                      std::optional<std::function<void()>> action = {});
+  /**
+   * Adds a new option to the dropdown menu
+   */
+  Dropdown &AddOption(const std::string &name);
+
+  /**
+   * Gets called with the selected argument and it's index
+   */
+  std::function<void(const std::string &, int)> onSelect;
 
 private:
   inline bool isIntersecting(float x, float y, SDL_FRect rect)

@@ -118,11 +118,8 @@ void Dropdown::HandleResizeEvent(const SDL_FRect &space)
   m_expanded_space = max_space;
 }
 
-Dropdown &Dropdown::AddOption(const std::string &title,
-                              std::optional<std::function<void()>> action)
+Dropdown &Dropdown::AddOption(const std::string &name)
 {
-  m_options.emplace_back(std::make_shared<TextButton>(title));
-  if (action)
-    m_options.back()->onLeftClick = *action;
+  m_options.emplace_back(std::make_shared<TextButton>(name));
   return *this;
 }
