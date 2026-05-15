@@ -1,0 +1,2 @@
+libXScrnSaver-devel
+libXtst-devel
