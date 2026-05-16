@@ -94,8 +94,10 @@ Gui::Gui(int width, int height, const std::string &title)
 
     auto dropdown = vb->addElement<UI::Dropdown>();
     dropdown->SetMargin(DEFAULT_MARGIN);
-    dropdown->AddOption("A");
-    dropdown->AddOption("B");
+    dropdown->AddOption("Top-Down");
+    dropdown->AddOption("Bottom-Up");
+
+    m_dropdown = dropdown;
 
     // hue-sliders
     {
@@ -334,6 +336,17 @@ void Gui::ThreadedSort()
     m_thread_data.task = std::make_unique<SortTask>(SortTask{
         .image = m_original_image,
         .hue_values = {.min = m_slider_value.min, .max = m_slider_value.max}});
+
+    const std::string &option = m_dropdown->getSelected();
+
+    if (option == "Top-Down")
+    {
+      m_thread_data.task->sort_direction = SORT_DIRECTION::VERTICAL_TTB;
+    }
+    else if (option == "Bottom-Up")
+    {
+      m_thread_data.task->sort_direction = SORT_DIRECTION::VERTICAL_BTT;
+    }
   }
 
   // now wake up thread

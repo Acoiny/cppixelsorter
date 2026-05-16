@@ -22,10 +22,14 @@ public:
   ~BaseImageSorter() = default;
 
 protected: // methods
-  void sort_vertical_ttb(ImageData &image, int min_hue, int max_hue);
+  void sort_vertical_ttb(ImageData &image, int min_hue, int max_hue,
+                         bool reverse = false);
 
-  void sort_column(ImageData &image, int column_index, int start, int end,
-                   std::array<int, 360> &hues);
+  void sort_column_ttb(ImageData &image, int column_index, int start, int end,
+                       std::array<int, 360> &hues);
+
+  void sort_column_btt(ImageData &image, int column_index, int start, int end,
+                       std::array<int, 360> &hues);
 
   /**
    * Returns the hue of a rgb value

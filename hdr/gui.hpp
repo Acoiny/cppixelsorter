@@ -2,6 +2,7 @@
 
 #include "Ui/UiManager.hpp"
 #include "Ui/basic/textBox.hpp"
+#include "Ui/dropdown.hpp"
 #include "filepicker.hpp"
 #include "imageData.hpp"
 #include "sortTask.hpp"
@@ -84,6 +85,8 @@ private:
   // textboxes that change frequently
   std::shared_ptr<UI::TextBox> m_infoText;
   // std::shared_ptr<UI::TextBox> m_sliderText;
+
+  std::shared_ptr<UI::Dropdown> m_dropdown;
 
   std::shared_ptr<ZoomableTextureRect> m_texturerect;
 
