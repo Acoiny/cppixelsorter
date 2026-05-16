@@ -2,7 +2,6 @@
 
 #include "Ui/Colors.hpp"
 #include "Ui/baseElement.hpp"
-#include "Ui/basic/textBox.hpp"
 #include "Ui/basic/textButton.hpp"
 
 #include <SDL3/SDL_pixels.h>
@@ -13,14 +12,8 @@ namespace UI
 {
 class Dropdown : public BaseElement
 {
-  enum class State
-  {
-    COLLAPSED,
-    FOCUSED,
-  };
-
 public:
-  Dropdown() = default;
+  Dropdown();
 
   ~Dropdown() override;
 
@@ -36,10 +29,7 @@ public:
    */
   Dropdown &AddOption(const std::string &name);
 
-  /**
-   * Gets called with the selected argument and it's index
-   */
-  std::function<void(const std::string &, int)> onSelect;
+  const std::string &getSelected() const;
 
 private:
   inline bool isIntersecting(float x, float y, SDL_FRect rect)
@@ -49,10 +39,10 @@ private:
   }
 
 private:
+  std::shared_ptr<TextButton> m_main_button;
   std::vector<std::shared_ptr<TextButton>> m_options;
-  std::shared_ptr<TextBox> m_selected_option;
 
-  State m_state = State::COLLAPSED;
+  bool m_expanded = false;
 
   SDL_FRect m_rect;
 
@@ -60,7 +50,5 @@ private:
    * The space the dropdown menu takes when it is expanded
    */
   SDL_FRect m_expanded_space;
-
-  SDL_Color m_background_color = Color::BUTTON_BACKGROUND;
 };
 }; // namespace UI

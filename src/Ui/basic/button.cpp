@@ -86,7 +86,6 @@ Button::HandleMouseEvent(SDL_Event &event)
       {
         m_state = ButtonState::IDLE;
       }
-      break;
       handled = EventResult::HANDLED;
     }
     break;
