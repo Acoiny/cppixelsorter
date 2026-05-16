@@ -47,3 +47,5 @@ void TextButton::setText(const std::string &text)
   TTF_SetTextColor(m_text, r, g, b, a);
   m_data = text;
 }
+
+const std::string &TextButton::getText() const { return m_data; }

@@ -1,20 +1,25 @@
 #include "Ui/dropdown.hpp"
 #include "Ui/baseElement.hpp"
+#include "Ui/logger.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_render.h>
+#include <memory>
 #include <print>
 
 using namespace UI;
+
+Dropdown::Dropdown() : m_main_button(std::make_shared<TextButton>("<empty>"))
+{
+  m_main_button->onLeftClick = [this]() { m_expanded = !m_expanded; };
+}
 
 Dropdown::~Dropdown() {}
 
 void Dropdown::draw(SDL_Renderer *renderer)
 {
-  auto [r, g, b, a] = m_background_color;
-  SDL_SetRenderDrawColor(renderer, r, g, b, a);
-  SDL_RenderFillRect(renderer, &m_rect);
+  m_main_button->draw(renderer);
 
-  if (m_state == State::FOCUSED)
+  if (m_expanded)
   {
     for (auto &btn : m_options)
     {
@@ -29,10 +34,24 @@ Dropdown::HandleMouseEvent(SDL_Event &event)
   EventResult handled = EventResult::UNHANDLED;
   std::optional<std::shared_ptr<BaseElement>> focus;
 
+  {
+    auto [m_handled, m_focus] = m_main_button->HandleMouseEvent(event);
+    if (m_handled != EventResult::UNHANDLED)
+    {
+      if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
+      {
+        m_handled = EventResult::HANDLED_UPDATE_FOCUS;
+        m_focus = this->shared_from_this();
+      }
+
+      return {m_handled, m_focus};
+    }
+  }
+
   // if the dropdown is currently in focus we pass all events down to the
   // elements if none of the elements handled it, we handle it ourselves. But
   // not motions, just the click, because it means "unfocus"
-  if (m_state == State::FOCUSED)
+  if (m_expanded)
   {
     for (auto &el : m_options)
     {
@@ -47,66 +66,16 @@ Dropdown::HandleMouseEvent(SDL_Event &event)
       }
     }
 
+    // none of the buttons have handled the event
     switch (event.type)
     {
-    case SDL_EVENT_MOUSE_MOTION:
-    {
-      // if the mouse moved over this element (or any of it's children)
-      // we say we stop the iteration
-      float mx = event.motion.x;
-      float my = event.motion.y;
-
-      // if the mouse is moved above this element, we stop handling the event
-      if (isIntersecting(mx, my, m_expanded_space))
-        handled = EventResult::HANDLED;
-      break;
-    }
-    case SDL_EVENT_MOUSE_BUTTON_DOWN:
-    {
-      // if NONE of the buttons have handled this event,
-      // we have to collapse this, because the user clicked outside of the
-      // dropdown menu
-      if (handled == EventResult::UNHANDLED)
-      {
-        m_state = State::COLLAPSED;
-        handled = EventResult::HANDLED_UPDATE_FOCUS;
-      }
-      break;
-    }
     case SDL_EVENT_MOUSE_BUTTON_UP:
     {
-      // if a button handled the release, unfocus
-      if (handled != EventResult::UNHANDLED)
-      {
-        m_state = State::COLLAPSED;
-        handled = EventResult::HANDLED_UPDATE_FOCUS;
-      }
+      m_expanded = false;
+      handled = EventResult::HANDLED_UPDATE_FOCUS;
       break;
     }
     }
-
-    return {handled, focus};
-  }
-  switch (event.type)
-  {
-  case SDL_EVENT_MOUSE_BUTTON_DOWN:
-  {
-    float mx = event.motion.x;
-    float my = event.motion.y;
-
-    bool intersects = isIntersecting(mx, my, m_rect);
-
-    if (intersects)
-    {
-      handled = EventResult::HANDLED_UPDATE_FOCUS;
-      m_state = State::FOCUSED;
-      focus = this->shared_from_this();
-    }
-
-    break;
-  }
-  default:
-    break;
   }
 
   return {handled, focus};
@@ -116,6 +85,8 @@ void Dropdown::HandleResizeEvent(const SDL_FRect &space)
 {
   m_rect = space;
   applyMargin(m_rect);
+
+  m_main_button->HandleResizeEvent(m_rect);
 
   // keep track of the maximal space this element has occupied
   SDL_FRect max_space = m_rect;
@@ -135,7 +106,19 @@ void Dropdown::HandleResizeEvent(const SDL_FRect &space)
 Dropdown &Dropdown::AddOption(const std::string &name)
 {
   auto ptr = std::make_shared<TextButton>(name);
-  ptr->onLeftClick = [=]() { std::println("Pressed {}", name); };
+
+  // if this is the first option, select it
+  if (m_options.size() == 0)
+  {
+    m_main_button->setText(name);
+  }
+
+  ptr->onLeftClick = [this, name]() { m_main_button->setText(name); };
   m_options.push_back(ptr);
   return *this;
+}
+
+const std::string &Dropdown::getSelected() const
+{
+  return m_main_button->getText();
 }

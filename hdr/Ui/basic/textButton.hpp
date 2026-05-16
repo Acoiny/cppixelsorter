@@ -19,6 +19,8 @@ public:
 
   void setText(const std::string &text);
 
+  const std::string &getText() const;
+
 private:
   TTF_Text *m_text;
 
