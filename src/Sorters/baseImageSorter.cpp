@@ -68,10 +68,8 @@ void BaseImageSorter::sort_vertical_ttb(ImageData &image, int min_hue,
         {
           int path_end = h;
 
-          if (reverse)
-            sort_column_btt(image, w, path_start, path_end, brightnesses);
-          else
-            sort_column_ttb(image, w, path_start, path_end, brightnesses);
+          sort_column_ttb(image, w, path_start, path_end, brightnesses,
+                          reverse);
           brightnesses.fill(0);
 
           path_start = -1;
@@ -83,10 +81,7 @@ void BaseImageSorter::sort_vertical_ttb(ImageData &image, int min_hue,
       // we have a path!
       int path_end = image.height;
 
-      if (reverse)
-        sort_column_btt(image, w, path_start, path_end, brightnesses);
-      else
-        sort_column_ttb(image, w, path_start, path_end, brightnesses);
+      sort_column_ttb(image, w, path_start, path_end, brightnesses, reverse);
 
       path_start = -1;
     }
@@ -95,7 +90,8 @@ void BaseImageSorter::sort_vertical_ttb(ImageData &image, int min_hue,
 
 void BaseImageSorter::sort_column_ttb(ImageData &image, int column_index,
                                       int start, int end,
-                                      std::array<int, 360> &brights)
+                                      std::array<int, 360> &brights,
+                                      bool reverse)
 {
   std::vector<std::array<uint8_t, 3>> sorted_pixels;
 
@@ -118,44 +114,8 @@ void BaseImageSorter::sort_column_ttb(ImageData &image, int column_index,
     sorted_pixels[brights[brightness]] = {r, g, b};
   }
 
-  // write pixels back
-  for (std::size_t i = 0; i < sorted_pixels.size(); i += 1)
-  {
-    int pixel_height = start + i;
-    uint8_t *pixel =
-        image.pixels + (pixel_height * image.width + column_index) *
-                           image.channels; // 3 channels
-
-    pixel[0] = sorted_pixels[i][0];
-    pixel[1] = sorted_pixels[i][1];
-    pixel[2] = sorted_pixels[i][2];
-  }
-}
-
-void BaseImageSorter::sort_column_btt(ImageData &image, int column_index,
-                                      int start, int end,
-                                      std::array<int, 360> &brights)
-{
-  std::vector<std::array<uint8_t, 3>> sorted_pixels;
-
-  for (std::size_t i = brights.size() - 1; i > 0; i--)
-  {
-    brights[i] += brights[i - 1];
-  }
-
-  sorted_pixels.resize((end - start), {0});
-
-  for (int i = end - 1; i >= start; i--)
-  {
-    uint8_t *pixel = image.pixels + (i * image.width + column_index) *
-                                        image.channels; // 3 channels
-    uint8_t r = pixel[0], g = pixel[1], b = pixel[2];
-
-    int brightness = get_brightness(r, g, b);
-
-    brights[brightness]--;
-    sorted_pixels[brights[brightness]] = {r, g, b};
-  }
+  if (reverse)
+    std::reverse(sorted_pixels.begin(), sorted_pixels.end());
 
   // write pixels back
   for (std::size_t i = 0; i < sorted_pixels.size(); i += 1)
