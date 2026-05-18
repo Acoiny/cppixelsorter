@@ -26,10 +26,7 @@ protected: // methods
                          bool reverse = false);
 
   void sort_column_ttb(ImageData &image, int column_index, int start, int end,
-                       std::array<int, 360> &hues);
-
-  void sort_column_btt(ImageData &image, int column_index, int start, int end,
-                       std::array<int, 360> &hues);
+                       std::array<int, 360> &hues, bool reverse = false);
 
   /**
    * Returns the hue of a rgb value
