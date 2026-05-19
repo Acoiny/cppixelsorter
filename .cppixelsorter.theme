@@ -1,0 +1,13 @@
+clear = #000000
+
+button_background = #fca75d
+button_hover = #fd571b
+button_down = #c15838
+
+font = #1b6f5d
+
+slider_idle = #fd571b
+slider_active = #46f9c7
+
+checkbox_checked = #46f9c7
+checkbox_unchecked = #1b6f5d

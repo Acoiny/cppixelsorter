@@ -9,6 +9,7 @@
 - [ ] add dropdown picker
 - [ ] add editable text box (for hue)
 - [x] Cursor styles
+- [ ] inotify for theme config
 
 ## Features
 - [x] Add zooming functionality

@@ -9,6 +9,7 @@
 #include <string>
 
 #include "Ui/Colors.hpp"
+#include "Ui/logger.hpp"
 
 static bool LoadFromFile(const std::string &filename);
 
@@ -37,6 +38,42 @@ static void trim(std::string &line, const char *avoid = " \n\r")
   line.erase(line.find_last_not_of(avoid) + 1);
 }
 
+static SDL_Color ParseColor(std::string value)
+{
+  if (!value.starts_with('#'))
+  {
+    UI::Logger::Warn("Illegal color value: '{}'", value);
+    return {};
+  }
+
+  value.erase(0, 1);
+
+  bool has_a = value.length() == 8;
+
+  uint32_t col = std::stoi(value, nullptr, 16);
+
+  SDL_Color res;
+
+  if (has_a)
+  {
+    res.a = 0xff & col;
+    col >>= 8;
+  }
+  else
+  {
+    res.a = 0xff;
+  }
+
+  res.b = 0xff & col;
+  col >>= 8;
+  res.g = 0xff & col;
+  col >>= 8;
+  res.r = 0xff & col;
+  col >>= 8;
+
+  return res;
+}
+
 static bool ApplyVariable(std::string variable, std::string value)
 {
   std::transform(variable.begin(), variable.end(), variable.begin(),
@@ -44,11 +81,31 @@ static bool ApplyVariable(std::string variable, std::string value)
   std::transform(value.begin(), value.end(), value.begin(),
                  [](unsigned char c) { return std::tolower(c); });
 
+  UI::Logger::Debug("'{}' = '{}'", variable, value);
+
+#define match(str, var)                                                        \
+  else if (variable == str)                                                    \
+  {                                                                            \
+    UI::Color::var = ParseColor(value);                                        \
+  }
+
   if (variable == "clear")
   {
-    // TODO: continue here
+    UI::Color::CLEAR_COLOR = ParseColor(value);
   }
-  return true;
+  // clang-format off
+  match("button_background", BUTTON_BACKGROUND)
+  match("button_hover", BUTTON_HOVER)
+  match("button_down", BUTTON_DOWN)
+  match("font", FONT)
+  match("text", FONT)
+  match("slider_active", SLIDER_ACTIVE)
+  match("slider_idle", SLIDER_IDLE)
+  match("checkbox_checked", CHECKBOX_CHECKED)
+  match("checkbox_unchecked", CHECKBOX_UNCHECKED)
+  // clang-format on
+#undef match
+                      return true;
 }
 
 static bool ParseLine(std::string line)
