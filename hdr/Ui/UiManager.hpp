@@ -13,7 +13,7 @@ namespace UI
 class UiManager
 {
 public:
-  UiManager(SDL_Renderer *renderer);
+  UiManager(SDL_Renderer *renderer, const std::string &app_name);
   ~UiManager();
 
   void handleEvent(SDL_Event &event);

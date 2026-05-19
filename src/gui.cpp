@@ -63,7 +63,7 @@ Gui::Gui(int width, int height, const std::string &title)
 
   m_isRunning = true;
 
-  m_uiManager = std::make_unique<UI::UiManager>(m_renderer);
+  m_uiManager = std::make_unique<UI::UiManager>(m_renderer, "cppixelsorter");
 
   // setting up filepicker callback
   m_filepicker.onSelect = [this](const std::string &filename, bool saving)

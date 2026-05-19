@@ -9,13 +9,16 @@
 #include <string>
 
 #include "Ui/Colors.hpp"
+#include "Ui/config.hpp"
 #include "Ui/logger.hpp"
 
 static bool LoadFromFile(const std::string &filename);
 
 bool UI::Theme::LoadFromConfig()
 {
-  const auto paths = {"./.cppixelsorter.theme"};
+  const auto app_name = UI::Config::get_application_name();
+
+  const auto paths = {std::format("./.{}.theme", app_name)};
 
   for (auto p : paths)
   {

@@ -1,5 +1,6 @@
 #include "Ui/UiManager.hpp"
 #include "Ui/Colors.hpp"
+#include "Ui/config.hpp"
 #include "Ui/logger.hpp"
 #include "Ui/textManager.hpp"
 #include "Ui/themes.hpp"
@@ -8,8 +9,10 @@
 
 using namespace UI;
 
-UiManager::UiManager(SDL_Renderer *renderer)
+UiManager::UiManager(SDL_Renderer *renderer, const std::string &app_name)
 {
+  Config::set_application_name(app_name);
+
   Color::LoadDefaultColorTheme();
   Theme::LoadFromConfig();
 
