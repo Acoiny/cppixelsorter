@@ -1,13 +1,14 @@
-clear = #000000
+# default color scheme
+clear = #323232
 
-button_background = #fca75d
-button_hover = #fd571b
-button_down = #c15838
+button_background = #646464
+button_hover = #505050
+button_down = #414141
 
-font = #1b6f5d
+font = #ffffff
 
-slider_idle = #fd571b
-slider_active = #46f9c7
+slider_idle = #646464
+slider_active = #414141
 
-checkbox_checked = #46f9c7
-checkbox_unchecked = #1b6f5d
+checkbox_checked = #00ff00
+checkbox_unchecked = #ff0000
