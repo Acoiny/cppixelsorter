@@ -3,6 +3,7 @@
 #include "Ui/Colors.hpp"
 #include "Ui/baseElement.hpp"
 #include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_render.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -22,8 +23,6 @@ template <typename T> class Slider : public BaseElement
   static constexpr float HEIGHT = 5;
   static constexpr float SELECTOR_RADIUS = 5;
   static constexpr T CHANGE_THRESHOLD = 1;
-  SDL_Color COLOR_IDLE = Color::SLIDER_IDLE;
-  SDL_Color COLOR_ACTIVE = Color::SLIDER_ACTIVE;
 
   enum class State
   {
@@ -58,23 +57,33 @@ public:
                             .w = SELECTOR_RADIUS * 2,
                             .h = SELECTOR_RADIUS * 2};
 
+    bool draw_outline = false;
+
     switch (m_state)
     {
     case State::IDLE:
     {
-      auto [r, g, b, a] = COLOR_IDLE;
+      auto [r, g, b, a] = Color::SLIDER_IDLE;
       SDL_SetRenderDrawColor(renderer, r, g, b, a);
       break;
     }
     case State::HOVER:
     case State::HELD:
     {
-      auto [r, g, b, a] = COLOR_ACTIVE;
+      auto [r, g, b, a] = Color::SLIDER_ACTIVE;
       SDL_SetRenderDrawColor(renderer, r, g, b, a);
+      draw_outline = true;
       break;
     }
     }
     SDL_RenderFillRect(renderer, &m_selector);
+
+    if (draw_outline)
+    {
+      auto [r, g, b, a] = Color::OUTLINE_COLOR;
+      SDL_SetRenderDrawColor(renderer, r, g, b, a);
+      SDL_RenderRect(renderer, &m_selector);
+    }
   }
 
   std::pair<EventResult, std::optional<std::shared_ptr<BaseElement>>>

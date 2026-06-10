@@ -6,6 +6,8 @@ namespace Color
 {
 SDL_Color CLEAR_COLOR;
 
+SDL_Color OUTLINE_COLOR;
+
 // button
 SDL_Color BUTTON_BACKGROUND;
 SDL_Color BUTTON_HOVER;
@@ -26,6 +28,8 @@ void LoadDevelopColorTheme()
 {
   CLEAR_COLOR = {93, 59, 107, 255};
 
+  OUTLINE_COLOR = {255, 255, 255, 255};
+
   BUTTON_BACKGROUND = {0x83, 0x3d, 0xb4, 255};
   BUTTON_HOVER = {0xa2, 0x55, 0xd9, 255};
   BUTTON_DOWN = {0xc3, 0x75, 0xf9, 255};
@@ -42,6 +46,7 @@ void LoadDevelopColorTheme()
 void LoadDefaultColorTheme()
 {
   CLEAR_COLOR = {50, 50, 50, 255};
+  OUTLINE_COLOR = {255, 255, 255, 255};
 
   BUTTON_BACKGROUND = {100, 100, 100, 255};
   BUTTON_HOVER = {80, 80, 80, 255};

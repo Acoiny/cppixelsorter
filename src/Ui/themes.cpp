@@ -4,8 +4,6 @@
 #include <cctype>
 #include <filesystem>
 #include <fstream>
-#include <print>
-#include <ranges>
 #include <string>
 
 #include "Ui/Colors.hpp"
@@ -97,6 +95,7 @@ static bool ApplyVariable(std::string variable, std::string value)
     UI::Color::CLEAR_COLOR = ParseColor(value);
   }
   // clang-format off
+  match("outline", OUTLINE_COLOR)
   match("button_background", BUTTON_BACKGROUND)
   match("button_hover", BUTTON_HOVER)
   match("button_down", BUTTON_DOWN)
@@ -106,9 +105,9 @@ static bool ApplyVariable(std::string variable, std::string value)
   match("slider_idle", SLIDER_IDLE)
   match("checkbox_checked", CHECKBOX_CHECKED)
   match("checkbox_unchecked", CHECKBOX_UNCHECKED)
-  // clang-format on
 #undef match
-                      return true;
+  return true;
+  // clang-format on
 }
 
 static bool ParseLine(std::string line)

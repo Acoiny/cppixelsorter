@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Ui/Colors.hpp"
 #include "Ui/baseElement.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_pixels.h>
@@ -48,23 +47,6 @@ public:
    */
   std::function<void()> onRightClick;
 
-  Button &setIdleColor(SDL_Color color)
-  {
-    m_idleColor = color;
-    return *this;
-  }
-  Button &setHoverColor(SDL_Color color)
-  {
-    m_hoverColor = color;
-    return *this;
-  }
-  Button &setMouseDownColor(SDL_Color color)
-  {
-    m_mouseDownColor = color;
-    return *this;
-  }
-
-protected:
 private:
   inline bool isIntersecting(float x, float y)
   {
@@ -73,10 +55,6 @@ private:
   }
 
 protected:
-  SDL_Color m_idleColor = UI::Color::BUTTON_BACKGROUND;
-  SDL_Color m_hoverColor = UI::Color::BUTTON_HOVER;
-  SDL_Color m_mouseDownColor = UI::Color::BUTTON_DOWN;
-
   SDL_FRect m_rect;
 
   ButtonState m_state = ButtonState::IDLE;

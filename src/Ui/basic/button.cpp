@@ -1,4 +1,5 @@
 #include "Ui/basic/button.hpp"
+#include "Ui/Colors.hpp"
 #include "Ui/baseElement.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
@@ -18,14 +19,14 @@ void Button::draw(SDL_Renderer *renderer)
   switch (m_state)
   {
   case ButtonState::IDLE:
-    col = m_idleColor;
+    col = Color::BUTTON_BACKGROUND;
     break;
   case ButtonState::MOUSE_HOVER:
-    col = m_hoverColor;
+    col = Color::BUTTON_HOVER;
     render_outline = true;
     break;
   case ButtonState::MOUSE_HELD:
-    col = m_mouseDownColor;
+    col = Color::BUTTON_DOWN;
     render_outline = true;
     break;
   default:
@@ -38,7 +39,8 @@ void Button::draw(SDL_Renderer *renderer)
 
   if (render_outline)
   {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    auto [r, g, b, a] = Color::OUTLINE_COLOR;
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
     SDL_RenderRect(renderer, &m_rect);
   }
 }

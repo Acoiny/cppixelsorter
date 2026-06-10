@@ -13,6 +13,7 @@ UiManager::UiManager(SDL_Renderer *renderer, const std::string &app_name)
 {
   Config::set_application_name(app_name);
 
+  // load default config first, then overwrite it with custom config file
   Color::LoadDefaultColorTheme();
   Theme::LoadFromConfig();
 
