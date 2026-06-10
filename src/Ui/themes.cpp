@@ -16,14 +16,22 @@ bool UI::Theme::LoadFromConfig()
 {
   const auto app_name = UI::Config::get_application_name();
 
-  const auto paths = {std::format("./.{}.theme", app_name)};
+  std::string paths[] = {std::format("./.{}.theme", app_name),
+                         Config::get_config_dir()};
 
   for (auto p : paths)
   {
-    if (std::filesystem::exists(p))
+    if (p.length() > 0 && std::filesystem::exists(p))
     {
       if (LoadFromFile(p))
+      {
+        UI::Logger::Debug("Successfully loaded theme from '{}'", p);
         return true;
+      }
+      else
+      {
+        UI::Logger::Debug("Failed to load theme from '{}'", p);
+      }
     }
   }
 

@@ -14,5 +14,7 @@ namespace Config
 void set_application_name(const std::string &name);
 
 const std::string_view get_application_name();
+
+const std::string get_config_dir();
 } // namespace Config
 } // namespace UI
