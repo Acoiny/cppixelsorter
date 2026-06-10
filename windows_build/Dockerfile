@@ -1,6 +1,6 @@
 FROM alpine:latest as sdl3-cross-compile
 
-RUN apk add mingw-w64-gcc make
+RUN apk add mingw-w64-gcc make binutils
 
 WORKDIR /deps
 
