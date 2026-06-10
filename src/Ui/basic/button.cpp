@@ -12,6 +12,9 @@ Button::Button(float x, float y, float w, float h) : m_rect{x, y, w, h} {}
 void Button::draw(SDL_Renderer *renderer)
 {
   SDL_Color col{};
+
+  bool render_outline = false;
+
   switch (m_state)
   {
   case ButtonState::IDLE:
@@ -19,9 +22,11 @@ void Button::draw(SDL_Renderer *renderer)
     break;
   case ButtonState::MOUSE_HOVER:
     col = m_hoverColor;
+    render_outline = true;
     break;
   case ButtonState::MOUSE_HELD:
     col = m_mouseDownColor;
+    render_outline = true;
     break;
   default:
     break;
@@ -30,6 +35,12 @@ void Button::draw(SDL_Renderer *renderer)
   auto [r, g, b, a] = col;
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
   SDL_RenderFillRect(renderer, &m_rect);
+
+  if (render_outline)
+  {
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderRect(renderer, &m_rect);
+  }
 }
 
 std::pair<EventResult, std::optional<std::shared_ptr<BaseElement>>>
