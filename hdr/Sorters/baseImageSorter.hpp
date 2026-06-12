@@ -26,7 +26,13 @@ protected: // methods
                          bool reverse = false);
 
   void sort_column_ttb(ImageData &image, int column_index, int start, int end,
-                       std::array<int, 360> &hues, bool reverse = false);
+                       std::array<int, 360> &brights, bool reverse = false);
+
+  void sort_horizontal_ltr(ImageData &image, int min_hue, int max_hue,
+                           bool reverse = false);
+
+  void sort_row_ltr(ImageData &image, int row_index, int start, int end,
+                    std::array<int, 360> &brights, bool reverse = false);
 
   /**
    * Returns the hue of a rgb value
