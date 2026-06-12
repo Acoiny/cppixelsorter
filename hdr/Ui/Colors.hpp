@@ -7,6 +7,9 @@ namespace Color
 {
 extern SDL_Color CLEAR_COLOR;
 
+// background color, for elements that don't fill their whole screen
+extern SDL_Color BACKGROUND;
+
 // outline color (e.g. button outline on hover)
 extern SDL_Color OUTLINE_COLOR;
 

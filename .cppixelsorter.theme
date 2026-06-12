@@ -1,5 +1,6 @@
 # default color scheme
 clear = #323232
+background = #3b3b3b
 
 button_background = #646464
 button_hover = #505050

@@ -38,5 +38,7 @@ CheckBox::HandleMouseEvent(SDL_Event &event)
 void CheckBox::HandleResizeEvent(const SDL_FRect &space)
 {
   m_rect = space;
+  auto smaller = std::min(space.w, space.h);
+  m_rect.w = m_rect.h = smaller;
   applyMargin(m_rect);
 }

@@ -103,6 +103,7 @@ static bool ApplyVariable(std::string variable, std::string value)
     UI::Color::CLEAR_COLOR = ParseColor(value);
   }
   // clang-format off
+  match("background", BACKGROUND)
   match("outline", OUTLINE_COLOR)
   match("button_background", BUTTON_BACKGROUND)
   match("button_hover", BUTTON_HOVER)
