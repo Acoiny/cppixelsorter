@@ -96,6 +96,8 @@ Gui::Gui(int width, int height, const std::string &title)
     dropdown->SetMargin(DEFAULT_MARGIN);
     dropdown->AddOption("Top-Down");
     dropdown->AddOption("Bottom-Up");
+    dropdown->AddOption("Left-Right");
+    dropdown->AddOption("Right-Left");
 
     m_dropdown = dropdown;
 
@@ -346,6 +348,14 @@ void Gui::ThreadedSort()
     else if (option == "Bottom-Up")
     {
       m_thread_data.task->sort_direction = SORT_DIRECTION::VERTICAL_BTT;
+    }
+    else if (option == "Left-Right")
+    {
+      m_thread_data.task->sort_direction = SORT_DIRECTION::HORIZON_LTR;
+    }
+    else if (option == "Right-Left")
+    {
+      m_thread_data.task->sort_direction = SORT_DIRECTION::HORIZON_RTL;
     }
   }
 
