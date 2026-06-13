@@ -29,7 +29,7 @@ public:
    */
   Dropdown &AddOption(const std::string &name);
 
-  const std::string &getSelected() const;
+  std::function<void(const std::string &)> onSelectionChange;
 
 private:
   inline bool isIntersecting(float x, float y, SDL_FRect rect)

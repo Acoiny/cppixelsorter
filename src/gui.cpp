@@ -94,10 +94,38 @@ Gui::Gui(int width, int height, const std::string &title)
 
     auto dropdown = vb->addElement<UI::Dropdown>();
     dropdown->SetMargin(DEFAULT_MARGIN);
-    dropdown->AddOption("Top-Down");
-    dropdown->AddOption("Bottom-Up");
-    dropdown->AddOption("Left-Right");
-    dropdown->AddOption("Right-Left");
+    dropdown->AddOption("Top-Down")
+        .AddOption("Bottom-Up")
+        .AddOption("Left-Right")
+        .AddOption("Right-Left");
+
+    dropdown->onSelectionChange = [this](auto val)
+    {
+      if (val == "Top-Down")
+      {
+        m_sort_direction = SORT_DIRECTION::VERTICAL_TTB;
+      }
+      else if (val == "Bottom-Up")
+      {
+        m_sort_direction = SORT_DIRECTION::VERTICAL_BTT;
+      }
+      else if (val == "Left-Right")
+      {
+        m_sort_direction = SORT_DIRECTION::HORIZON_LTR;
+      }
+      else if (val == "Right-Left")
+      {
+        m_sort_direction = SORT_DIRECTION::HORIZON_RTL;
+      }
+      else
+      {
+        return;
+      }
+
+      // run sorting (if autosort is on) when changing sort direction
+      if (m_autosort)
+        ThreadedSort();
+    };
 
     m_dropdown = dropdown;
 
@@ -337,26 +365,9 @@ void Gui::ThreadedSort()
     std::lock_guard lock(m_thread_data.mutex);
     m_thread_data.task = std::make_unique<SortTask>(SortTask{
         .image = m_original_image,
-        .hue_values = {.min = m_slider_value.min, .max = m_slider_value.max}});
-
-    const std::string &option = m_dropdown->getSelected();
-
-    if (option == "Top-Down")
-    {
-      m_thread_data.task->sort_direction = SORT_DIRECTION::VERTICAL_TTB;
-    }
-    else if (option == "Bottom-Up")
-    {
-      m_thread_data.task->sort_direction = SORT_DIRECTION::VERTICAL_BTT;
-    }
-    else if (option == "Left-Right")
-    {
-      m_thread_data.task->sort_direction = SORT_DIRECTION::HORIZON_LTR;
-    }
-    else if (option == "Right-Left")
-    {
-      m_thread_data.task->sort_direction = SORT_DIRECTION::HORIZON_RTL;
-    }
+        .hue_values = {.min = m_slider_value.min, .max = m_slider_value.max},
+        .sort_direction = m_sort_direction,
+    });
   }
 
   // now wake up thread
