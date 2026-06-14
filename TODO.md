@@ -1,11 +1,11 @@
 # Todo's
 ## UI
+- [ ] finish checkbox's look
 - [x] add margin into baseelement and make it set-able
 - [ ] Enable saving of only selected (zoomed in) region
 - [x] Make extra basic texturerect class (for hue-bar)
 - [ ] adjust button sizes, maybe absolute?
 - [ ] add textures for buttons and hue slider
-- [ ] finish checkbox's look
 - [ ] add dropdown picker
 - [ ] add editable text box (for hue)
 - [x] Cursor styles
