@@ -10,25 +10,19 @@
 
 BaseImageSorter::BaseImageSorter(const SortTask &task) : m_task(task) {}
 
-ImageData BaseImageSorter::RunTask()
+ImageData BaseImageSorter::RunTask(bool reverse)
 {
   ImageData newImage = m_task.image;
 
   switch (m_task.sort_direction)
   {
-  case SORT_DIRECTION::VERTICAL_TTB:
-    sort_vertical_ttb(newImage, m_task.hue_values.min, m_task.hue_values.max);
-    break;
-  case SORT_DIRECTION::VERTICAL_BTT:
+  case SORT_DIRECTION::UP_DOWN:
     sort_vertical_ttb(newImage, m_task.hue_values.min, m_task.hue_values.max,
-                      true);
+                      reverse);
     break;
-  case SORT_DIRECTION::HORIZON_LTR:
-    sort_horizontal_ltr(newImage, m_task.hue_values.min, m_task.hue_values.max);
-    break;
-  case SORT_DIRECTION::HORIZON_RTL:
+  case SORT_DIRECTION::LEFT_RIGHT:
     sort_horizontal_ltr(newImage, m_task.hue_values.min, m_task.hue_values.max,
-                        true);
+                        reverse);
     break;
   default:
     throw std::runtime_error("Unsupported sort option!");

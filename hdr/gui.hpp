@@ -74,13 +74,15 @@ private:
 
   bool m_autosort = false;
 
+  bool m_reverse_sorting = false;
+
   struct
   {
     int min = 0;
     int max = 360;
   } m_slider_value;
 
-  SORT_DIRECTION m_sort_direction = SORT_DIRECTION::VERTICAL_TTB;
+  SORT_DIRECTION m_sort_direction = SORT_DIRECTION::UP_DOWN;
 
   std::unique_ptr<UI::UiManager> m_uiManager;
 

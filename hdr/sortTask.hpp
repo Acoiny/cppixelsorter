@@ -14,10 +14,12 @@ enum class PIXEL_CRITERIA
 
 enum class SORT_DIRECTION
 {
-  VERTICAL_TTB,
-  VERTICAL_BTT,
-  HORIZON_LTR,
-  HORIZON_RTL,
+  UP_DOWN,
+  LEFT_RIGHT,
+  // VERTICAL_TTB,
+  // VERTICAL_BTT,
+  // HORIZON_LTR,
+  // HORIZON_RTL,
   // TODO: add more sorting behaviours
 };
 
@@ -40,5 +42,5 @@ struct SortTask
   // criterion, by which spans get sorted
   PIXEL_CRITERIA sort_criterion = PIXEL_CRITERIA::BRIGHTNESS;
   // basically the "path" the spans lie on
-  SORT_DIRECTION sort_direction = SORT_DIRECTION::VERTICAL_TTB;
+  SORT_DIRECTION sort_direction = SORT_DIRECTION::UP_DOWN;
 };

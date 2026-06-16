@@ -17,7 +17,7 @@ public:
   // virtual void sort_vertical(int min_hue, int max_hue) = 0;
   //
   // virtual void write_to_file(const std::string &filename) = 0;
-  ImageData RunTask();
+  ImageData RunTask(bool reverse);
 
   ~BaseImageSorter() = default;
 
