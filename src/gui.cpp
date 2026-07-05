@@ -92,14 +92,44 @@ Gui::Gui(int width, int height, const std::string &title)
     save_btn->onLeftClick = [this]() { m_filepicker.open(true); };
     save_btn->SetMargin(DEFAULT_MARGIN);
 
-    auto dropdown = vb->addElement<UI::Dropdown>();
-    dropdown->SetMargin(DEFAULT_MARGIN);
-    dropdown->AddOption("Top-Down");
-    dropdown->AddOption("Bottom-Up");
-    dropdown->AddOption("Left-Right");
-    dropdown->AddOption("Right-Left");
+    {
+      auto dropdown_hbox = vb->addElement<UI::HBox>();
+      auto dropdown = dropdown_hbox->addElementFrac<UI::Dropdown>(3);
+      dropdown->SetMargin(DEFAULT_MARGIN);
+      dropdown->AddOption("Up/Down").AddOption("Left/Right");
 
-    m_dropdown = dropdown;
+      dropdown->onSelectionChange = [this](auto val)
+      {
+        if (val == "Up/Down")
+        {
+          m_sort_direction = SORT_DIRECTION::UP_DOWN;
+        }
+        else if (val == "Left/Right")
+        {
+          m_sort_direction = SORT_DIRECTION::LEFT_RIGHT;
+        }
+        else
+        {
+          return;
+        }
+
+        // run sorting (if autosort is on) when changing sort direction
+        if (m_autosort)
+          ThreadedSort();
+      };
+
+      m_dropdown = dropdown;
+      auto chb = dropdown_hbox->addElement<UI::CheckBox>();
+      chb->SetMargin(DEFAULT_MARGIN);
+      chb->onChange = [this](bool value)
+      {
+        m_reverse_sorting = value;
+        if (m_autosort)
+          ThreadedSort();
+      };
+
+      dropdown_hbox->addElement<UI::TextBox>("reverse?");
+    }
 
     // hue-sliders
     {
@@ -223,7 +253,7 @@ Gui::Gui(int width, int height, const std::string &title)
           lock.unlock();
 
           BaseImageSorter sorter(*task); // yes yes, that's illegal... TODO: fix
-          ImageData result = sorter.RunTask();
+          ImageData result = sorter.RunTask(m_reverse_sorting);
 
           lock.lock();
           m_thread_data.result_image = std::move(result);
@@ -317,7 +347,7 @@ void Gui::RunSort()
 
   BaseImageSorter sorter(task);
   Timer t;
-  sorter.RunTask();
+  sorter.RunTask(m_reverse_sorting);
   auto msg = std::format("Sorting took {}", t.get());
   UI::Logger::Info("{}", msg);
   m_infoText->setText(msg);
@@ -337,26 +367,9 @@ void Gui::ThreadedSort()
     std::lock_guard lock(m_thread_data.mutex);
     m_thread_data.task = std::make_unique<SortTask>(SortTask{
         .image = m_original_image,
-        .hue_values = {.min = m_slider_value.min, .max = m_slider_value.max}});
-
-    const std::string &option = m_dropdown->getSelected();
-
-    if (option == "Top-Down")
-    {
-      m_thread_data.task->sort_direction = SORT_DIRECTION::VERTICAL_TTB;
-    }
-    else if (option == "Bottom-Up")
-    {
-      m_thread_data.task->sort_direction = SORT_DIRECTION::VERTICAL_BTT;
-    }
-    else if (option == "Left-Right")
-    {
-      m_thread_data.task->sort_direction = SORT_DIRECTION::HORIZON_LTR;
-    }
-    else if (option == "Right-Left")
-    {
-      m_thread_data.task->sort_direction = SORT_DIRECTION::HORIZON_RTL;
-    }
+        .hue_values = {.min = m_slider_value.min, .max = m_slider_value.max},
+        .sort_direction = m_sort_direction,
+    });
   }
 
   // now wake up thread

@@ -3,6 +3,7 @@
 #include "Ui/logger.hpp"
 #include "cli.hpp"
 #include "imageData.hpp"
+#include "sortTask.hpp"
 #include "stb_image.h"
 
 #include "gui.hpp"
@@ -20,6 +21,7 @@ void usage(const std::string &progname)
   std::println(stderr, R"(Usage: {} <infile> [OPTIONS]
     OPTIONAL:
         --hue       | -h <min>[:<max>]          Hue threshold.
+        --direction | -d <direction>            Direction to sort in. E.g. ttb, btt, ltr, rtl.
         --outfile   | -o <file>                 Output file name. Ending specifies filetype.
         --gui       | -g                        Activates graphical user interface.
         --log-level <level>                     Takes comma-separated log-levels:
@@ -41,6 +43,7 @@ enum class APP_MODE
 
 const struct option long_options[] = {
     {"hue", required_argument, nullptr, 'h'},
+    {"direction", required_argument, nullptr, 'd'},
     {"outfile", required_argument, nullptr, 'o'},
     {"gui", no_argument, nullptr, 'g'},
     {"log-level", required_argument, nullptr, 'l'},
@@ -63,9 +66,13 @@ int main(int argc, char *argv[])
   int hue_min = 0;
   int hue_max = 360;
 
+  SORT_DIRECTION sort_direction = SORT_DIRECTION::UP_DOWN;
+  bool reverse_direction = false;
+
   APP_MODE mode = APP_MODE::CLI;
 
-  while ((c = getopt_long(argc, argv, "gh:o:l:v", long_options, nullptr)) != -1)
+  while ((c = getopt_long(argc, argv, "gh:d:o:l:v", long_options, nullptr)) !=
+         -1)
   {
     switch (c)
     {
@@ -82,6 +89,12 @@ int main(int argc, char *argv[])
       auto res = parseHue(optarg);
       hue_min = res.first;
       hue_max = res.second;
+      break;
+    }
+    case 'd':
+    {
+      std::println("Sort direction argument not given!");
+      return 2;
       break;
     }
     case 'o':
@@ -117,13 +130,15 @@ int main(int argc, char *argv[])
   }
 
   ImageData image(infile);
-  SortTask task{.image = image, .hue_values = {.min = hue_min, .max = hue_max}};
+  SortTask task{.image = image,
+                .hue_values = {.min = hue_min, .max = hue_max},
+                .sort_direction = sort_direction};
   BaseImageSorter sorter(task);
 
   Timer t = Timer();
 
   // img.sort_vertical_ttb(hue_value);
-  image = sorter.RunTask();
+  image = sorter.RunTask(reverse_direction);
 
   auto duration = t.get();
 

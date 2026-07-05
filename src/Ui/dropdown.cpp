@@ -113,12 +113,14 @@ Dropdown &Dropdown::AddOption(const std::string &name)
     m_main_button->setText(name);
   }
 
-  ptr->onLeftClick = [this, name]() { m_main_button->setText(name); };
+  ptr->onLeftClick = [this, name]()
+  {
+    m_main_button->setText(name);
+
+    // invoke callback here
+    if (onSelectionChange)
+      onSelectionChange(name);
+  };
   m_options.push_back(ptr);
   return *this;
-}
-
-const std::string &Dropdown::getSelected() const
-{
-  return m_main_button->getText();
 }
