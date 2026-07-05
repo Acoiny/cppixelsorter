@@ -24,17 +24,6 @@ ImageData BaseImageSorter::RunTask(bool reverse)
     sort_horizontal_ltr(newImage, m_task.hue_values.min, m_task.hue_values.max,
                         reverse);
     break;
-  case SORT_DIRECTION::VERTICAL_BTT:
-    sort_vertical_ttb(newImage, m_task.hue_values.min, m_task.hue_values.max,
-                      true);
-    break;
-  case SORT_DIRECTION::HORIZON_LTR:
-    sort_horizontal_ltr(newImage, m_task.hue_values.min, m_task.hue_values.max);
-    break;
-  case SORT_DIRECTION::HORIZON_RTL:
-    sort_horizontal_ltr(newImage, m_task.hue_values.min, m_task.hue_values.max,
-                        true);
-    break;
   default:
     throw std::runtime_error("Unsupported sort option!");
   }
