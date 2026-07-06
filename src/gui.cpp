@@ -1,23 +1,23 @@
 #include "gui.hpp"
 #include "Sorters/baseImageSorter.hpp"
-#include "Ui/Colors.hpp"
-#include "Ui/UiManager.hpp"
-#include "Ui/basic/checkbox.hpp"
-#include "Ui/basic/textBox.hpp"
-#include "Ui/basic/textButton.hpp"
-#include "Ui/container/hbox.hpp"
-#include "Ui/container/vbox.hpp"
-#include "Ui/dropdown.hpp"
-#include "Ui/logger.hpp"
-#include "Ui/slider.hpp"
-#include "basicTextureRect.hpp"
 #include "filepicker.hpp"
+#include <sui/Colors.hpp>
+#include <sui/UiManager.hpp>
+#include <sui/basic/checkbox.hpp>
+#include <sui/basic/textBox.hpp>
+#include <sui/basic/textButton.hpp>
+#include <sui/basicTextureRect.hpp>
+#include <sui/container/hbox.hpp>
+#include <sui/container/vbox.hpp>
+#include <sui/dropdown.hpp>
+#include <sui/logger.hpp>
+#include <sui/slider.hpp>
 
 #include "imageData.hpp"
 #include "sortTask.hpp"
 #include "stb_image.h"
 #include "timer.hpp"
-#include "zoomableTextureRect.hpp"
+#include <sui/zoomableTextureRect.hpp>
 
 #include <SDL3/SDL.h>
 
@@ -33,7 +33,7 @@
 
 static void Error(const std::string &msg)
 {
-  UI::Logger::Fatal("Error: {} - {}", msg, SDL_GetError());
+  sui::Logger::Fatal("Error: {} - {}", msg, SDL_GetError());
 }
 
 Gui::Gui(int width, int height, const std::string &title)
@@ -63,7 +63,7 @@ Gui::Gui(int width, int height, const std::string &title)
 
   m_isRunning = true;
 
-  m_uiManager = std::make_unique<UI::UiManager>(m_renderer, "cppixelsorter");
+  m_uiManager = std::make_unique<sui::UiManager>(m_renderer, "cppixelsorter");
 
   // setting up filepicker callback
   m_filepicker.onSelect = [this](const std::string &filename, bool saving)
@@ -75,26 +75,26 @@ Gui::Gui(int width, int height, const std::string &title)
   };
 
   // TODO: properly construct elements!
-  auto hb = m_uiManager->addElement<UI::HBox>();
+  auto hb = m_uiManager->addElement<sui::HBox>();
   {
     constexpr float DEFAULT_MARGIN = 5;
-    auto vb = hb->addElement<UI::VBox>();
+    auto vb = hb->addElement<sui::VBox>();
 
-    auto load_btn = vb->addElement<UI::TextButton>("Load");
+    auto load_btn = vb->addElement<sui::TextButton>("Load");
     load_btn->onLeftClick = [this]() { m_filepicker.open(); };
     load_btn->SetMargin(DEFAULT_MARGIN);
 
-    auto sort_btn = vb->addElement<UI::TextButton>("Sort");
+    auto sort_btn = vb->addElement<sui::TextButton>("Sort");
     sort_btn->onLeftClick = std::bind(&Gui::ThreadedSort, this);
     sort_btn->SetMargin(DEFAULT_MARGIN);
 
-    auto save_btn = vb->addElement<UI::TextButton>("Save");
+    auto save_btn = vb->addElement<sui::TextButton>("Save");
     save_btn->onLeftClick = [this]() { m_filepicker.open(true); };
     save_btn->SetMargin(DEFAULT_MARGIN);
 
     {
-      auto dropdown_hbox = vb->addElement<UI::HBox>();
-      auto dropdown = dropdown_hbox->addElementFrac<UI::Dropdown>(3);
+      auto dropdown_hbox = vb->addElement<sui::HBox>();
+      auto dropdown = dropdown_hbox->addElementFrac<sui::Dropdown>(3);
       dropdown->SetMargin(DEFAULT_MARGIN);
       dropdown->AddOption("Up/Down").AddOption("Left/Right");
 
@@ -119,7 +119,7 @@ Gui::Gui(int width, int height, const std::string &title)
       };
 
       m_dropdown = dropdown;
-      auto chb = dropdown_hbox->addElement<UI::CheckBox>();
+      auto chb = dropdown_hbox->addElement<sui::CheckBox>();
       chb->SetMargin(DEFAULT_MARGIN);
       chb->onChange = [this](bool value)
       {
@@ -128,26 +128,27 @@ Gui::Gui(int width, int height, const std::string &title)
           ThreadedSort();
       };
 
-      dropdown_hbox->addElement<UI::TextBox>("reverse?");
+      dropdown_hbox->addElement<sui::TextBox>("reverse?");
     }
 
     // hue-sliders
     {
-      auto minSliderBox = vb->addElement<UI::HBox>();
+      auto minSliderBox = vb->addElement<sui::HBox>();
 
       // min slider elements
-      auto minSlider = minSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360);
+      auto minSlider =
+          minSliderBox->addElementFrac<sui::Slider<int>>(3, 0, 360);
       minSlider->SetMargin({.right = 10, .left = 10});
-      auto minSliderText = minSliderBox->addElement<UI::TextBox>("Min: 0°");
+      auto minSliderText = minSliderBox->addElement<sui::TextBox>("Min: 0°");
 
       // hue texture
       {
-        auto hue_box = vb->addElement<UI::HBox>();
-        auto huebar_texture = hue_box->addElementFrac<UI::BasicTextureRect>(3);
+        auto hue_box = vb->addElement<sui::HBox>();
+        auto huebar_texture = hue_box->addElementFrac<sui::BasicTextureRect>(3);
         huebar_texture->setKeepRatio(false).SetMargin(
             {.top = 10, .bottom = 100});
 
-        hue_box->addElementFrac<UI::TextBox>(1, "");
+        hue_box->addElementFrac<sui::TextBox>(1, "");
 
         auto stream = SDL_IOFromConstMem(assets_huebar, assets_huebar_len);
         auto surf = SDL_LoadSurface_IO(stream, true);
@@ -156,14 +157,14 @@ Gui::Gui(int width, int height, const std::string &title)
         huebar_texture->SetMargin({.right = 10, .left = 10});
       }
 
-      auto maxSliderBox = vb->addElement<UI::HBox>();
+      auto maxSliderBox = vb->addElement<sui::HBox>();
       auto maxSlider =
-          maxSliderBox->addElementFrac<UI::Slider<int>>(3, 0, 360, 360);
+          maxSliderBox->addElementFrac<sui::Slider<int>>(3, 0, 360, 360);
       maxSlider->SetMargin({.right = 10, .left = 10});
-      auto maxSliderText = maxSliderBox->addElement<UI::TextBox>("Max: 360°");
+      auto maxSliderText = maxSliderBox->addElement<sui::TextBox>("Max: 360°");
 
-      std::weak_ptr<UI::TextBox> w_minSliderText = minSliderText;
-      std::weak_ptr<UI::Slider<int>> w_maxSlider = maxSlider;
+      std::weak_ptr<sui::TextBox> w_minSliderText = minSliderText;
+      std::weak_ptr<sui::Slider<int>> w_maxSlider = maxSlider;
 
       // capturing weak pointers
       minSlider->onValueChange = [this, w_minSliderText, w_maxSlider](int value)
@@ -183,8 +184,8 @@ Gui::Gui(int width, int height, const std::string &title)
           ThreadedSort();
       }; // std::bind_front(&Gui::SliderChanged, this);
 
-      std::weak_ptr<UI::TextBox> w_maxSliderText = maxSliderText;
-      std::weak_ptr<UI::Slider<int>> w_minSlider = minSlider;
+      std::weak_ptr<sui::TextBox> w_maxSliderText = maxSliderText;
+      std::weak_ptr<sui::Slider<int>> w_minSlider = minSlider;
 
       maxSlider->onValueChange = [this, w_maxSliderText, w_minSlider](int value)
       {
@@ -205,22 +206,22 @@ Gui::Gui(int width, int height, const std::string &title)
     }
 
     // spacer
-    vb->addElementFrac<UI::TextBox>(9, "");
+    vb->addElementFrac<sui::TextBox>(9, "");
 
-    m_infoText = vb->addElementFrac<UI::TextBox>(1, "");
+    m_infoText = vb->addElementFrac<sui::TextBox>(1, "");
 
     // autosorting checkbox
     {
-      auto hb = vb->addElementFrac<UI::HBox>(1);
-      auto chBox = hb->addElementFrac<UI::CheckBox>(1, false);
+      auto hb = vb->addElementFrac<sui::HBox>(1);
+      auto chBox = hb->addElementFrac<sui::CheckBox>(1, false);
       chBox->onChange = [this](bool value) { m_autosort = value; };
       chBox->SetMargin(DEFAULT_MARGIN);
 
-      hb->addElementFrac<UI::TextBox>(3, "Autosort");
+      hb->addElementFrac<sui::TextBox>(3, "Autosort");
     }
   }
 
-  m_texturerect = hb->addElementFrac<ZoomableTextureRect>(5);
+  m_texturerect = hb->addElementFrac<sui::ZoomableTextureRect>(5);
   // "sending" a resize event to update UI layout
   {
     SDL_Event fake_event;
@@ -304,7 +305,7 @@ void Gui::Update()
   }
 
   {
-    auto [r, g, b, a] = UI::Color::CLEAR_COLOR;
+    auto [r, g, b, a] = sui::Color::CLEAR_COLOR;
     SDL_SetRenderDrawColor(m_renderer, r, g, b, a);
   }
   SDL_RenderClear(m_renderer);
@@ -328,7 +329,7 @@ void Gui::RunSort()
 {
   if (!m_original_image.pixels)
   {
-    UI::Logger::Warn("Load an image before sorting!");
+    sui::Logger::Warn("Load an image before sorting!");
     return;
   }
 
@@ -337,7 +338,7 @@ void Gui::RunSort()
 
   if (!m_sorted_image.pixels)
   {
-    UI::Logger::Error("Unable to copy image");
+    sui::Logger::Error("Unable to copy image");
     return;
   }
 
@@ -349,7 +350,7 @@ void Gui::RunSort()
   Timer t;
   sorter.RunTask(m_reverse_sorting);
   auto msg = std::format("Sorting took {}", t.get());
-  UI::Logger::Info("{}", msg);
+  sui::Logger::Info("{}", msg);
   m_infoText->setText(msg);
 
   m_texturerect->setTexture(m_renderer, m_sorted_image.toSurface());
@@ -359,7 +360,7 @@ void Gui::ThreadedSort()
 {
   if (!m_original_image.pixels)
   {
-    UI::Logger::Warn("Load an image before sorting!");
+    sui::Logger::Warn("Load an image before sorting!");
     return;
   }
   // first, set new task using the mutex
@@ -380,7 +381,7 @@ void Gui::SaveImage(const std::string &filename)
 {
   if (m_sorted_image.pixels == nullptr && m_original_image.pixels == nullptr)
   {
-    UI::Logger::Warn("No image to save!");
+    sui::Logger::Warn("No image to save!");
     return;
   }
 
@@ -391,6 +392,6 @@ void Gui::SaveImage(const std::string &filename)
   }
   catch (std::runtime_error &e)
   {
-    UI::Logger::Error("{}", e.what());
+    sui::Logger::Error("{}", e.what());
   }
 }

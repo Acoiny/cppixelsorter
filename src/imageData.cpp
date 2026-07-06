@@ -1,6 +1,6 @@
 #include "imageData.hpp"
 
-#include "Ui/logger.hpp"
+#include <sui/logger.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -123,21 +123,21 @@ void ImageData::free()
 
 bool ImageData::write_to_file(const std::string &filepath)
 {
-  UI::Logger::Info("writing to {}", filepath);
+  sui::Logger::Info("writing to {}", filepath);
   if (filepath.ends_with(".jpg") || filepath.ends_with(".jpeg"))
   {
-    UI::Logger::Info("Writing to file: {}", filepath);
+    sui::Logger::Info("Writing to file: {}", filepath);
     return 0 != stbi_write_jpg(filepath.c_str(), width, height, channels,
                                pixels, 100);
   }
   else if (filepath.ends_with(".png"))
   {
-    UI::Logger::Info("Writing to file: {}", filepath);
+    sui::Logger::Info("Writing to file: {}", filepath);
     return 0 != stbi_write_png(filepath.c_str(), width, height, channels,
                                pixels, width * channels);
   }
 
-  UI::Logger::Error("Unable to safe to file: {}", filepath);
+  sui::Logger::Error("Unable to safe to file: {}", filepath);
   return false;
 }
 

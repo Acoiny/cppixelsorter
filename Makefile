@@ -3,6 +3,8 @@ MAKEFLAGS=-j
 
 BINARY := cppixelsorter
 
+LIBSUI_DIR := sui/hdr
+
 INSTALL_DIR=~/.local/bin/
 
 # arguments for the `make run` command
@@ -20,7 +22,7 @@ RELEASE_FLAGS := -O3
 # CFLAGS = -Wall -Wextra -Werror -std=gnu++23 -march=native -Wno-unused-parameter
 CFLAGS = -std=gnu++23 -fopenmp -Wall -Wno-unused-parameter # -finline-functions -fno-exceptions
 
-CFLAGS += -I hdr
+CFLAGS += -I hdr -I$(LIBSUI_DIR)
 
 SRCDIR := src
 
@@ -56,7 +58,7 @@ debug: CFLAGS += $(DEBUG_FLAGS)
 
 embeds:
 	xxd -i assets/icon.png > src/embed_data.cpp
-	xxd -i assets/Archivo-Regular.ttf >> src/embed_data.cpp
+	# xxd -i assets/Archivo-Regular.ttf >> src/embed_data.cpp
 	# generating the huebar on the fly :)
 	python scripts/huebar.py | xxd -i -n assets_huebar >> src/embed_data.cpp
 
@@ -65,11 +67,11 @@ run: $(BINARY_DEBUG)
 	./$(BINARY_DEBUG) $(RUN_ARGS)
 
 $(BINARY): $(OBJECT_FILES)
-	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS) sui/libsui.a
 	strip $@
 
 $(BINARY_DEBUG): $(DOBJECT_FILES)
-	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS) sui/libsui.a
 
 ## Release objects
 # rule for all object files directly in the src folder
@@ -104,6 +106,7 @@ $(ASSEMBLY_FILES): $(DOBJECT_FILES)
 	objdump -d -S $< > $@
 
 clean:
+	make -C sui clean
 	rm -f $(OBJECT_FILES) $(DOBJECT_FILES) $(ASSEMBLY_FILES) $(BINARY) $(BINARY_DEBUG)
 
 rebuild:

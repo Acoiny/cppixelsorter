@@ -1,10 +1,10 @@
 #include "Sorters/baseImageSorter.hpp"
-#include "Ui/cursorManager.hpp"
-#include "Ui/logger.hpp"
 #include "cli.hpp"
 #include "imageData.hpp"
 #include "sortTask.hpp"
 #include "stb_image.h"
+#include <sui/cursorManager.hpp>
+#include <sui/logger.hpp>
 
 #include "gui.hpp"
 #include "timer.hpp"
@@ -173,7 +173,7 @@ int gui_mode(const char *infile, const std::string &log_levels)
 {
   uint8_t log_flags = parseLoggerFlags(log_levels);
 
-  UI::Logger::SetMode((UI::Logger::Mode)log_flags);
+  sui::Logger::SetMode((sui::Logger::Mode)log_flags);
 
   // GUI
   Gui gui(1200, 600, "Pixelsorter");

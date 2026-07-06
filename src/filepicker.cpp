@@ -1,5 +1,5 @@
 #include "filepicker.hpp"
-#include "Ui/logger.hpp"
+#include <sui/logger.hpp>
 
 #include <SDL3/SDL.h>
 
@@ -16,18 +16,18 @@ void SDLCALL callback(void *userdata, const char *const *filelist,
 
   if (!filelist)
   {
-    UI::Logger::Error("An error occured: {}", SDL_GetError());
+    sui::Logger::Error("An error occured: {}", SDL_GetError());
     return;
   }
   else if (!*filelist)
   {
-    UI::Logger::Debug("File dialog cancelled");
+    sui::Logger::Debug("File dialog cancelled");
     return;
   }
 
   while (*filelist)
   {
-    UI::Logger::Info("Full path to selected file: '{}'", *filelist);
+    sui::Logger::Info("Full path to selected file: '{}'", *filelist);
 
     if (fp->onSelect)
       fp->onSelect(*filelist, fp->m_isSaving);

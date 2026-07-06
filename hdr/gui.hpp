@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Ui/UiManager.hpp"
-#include "Ui/basic/textBox.hpp"
-#include "Ui/dropdown.hpp"
 #include "filepicker.hpp"
 #include "imageData.hpp"
 #include "sortTask.hpp"
-#include "zoomableTextureRect.hpp"
 #include <SDL3/SDL.h>
 #include <condition_variable>
 #include <memory>
 #include <string>
+#include <sui/UiManager.hpp>
+#include <sui/basic/textBox.hpp>
+#include <sui/dropdown.hpp>
+#include <sui/zoomableTextureRect.hpp>
 #include <thread>
 
 class Gui
@@ -84,15 +84,15 @@ private:
 
   SORT_DIRECTION m_sort_direction = SORT_DIRECTION::UP_DOWN;
 
-  std::unique_ptr<UI::UiManager> m_uiManager;
+  std::unique_ptr<sui::UiManager> m_uiManager;
 
   // textboxes that change frequently
-  std::shared_ptr<UI::TextBox> m_infoText;
-  // std::shared_ptr<UI::TextBox> m_sliderText;
+  std::shared_ptr<sui::TextBox> m_infoText;
+  // std::shared_ptr<sui::TextBox> m_sliderText;
 
-  std::shared_ptr<UI::Dropdown> m_dropdown;
+  std::shared_ptr<sui::Dropdown> m_dropdown;
 
-  std::shared_ptr<ZoomableTextureRect> m_texturerect;
+  std::shared_ptr<sui::ZoomableTextureRect> m_texturerect;
 
   std::jthread m_thread;
 };

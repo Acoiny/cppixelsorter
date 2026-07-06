@@ -1,5 +1,5 @@
 #include "cli.hpp"
-#include "Ui/logger.hpp"
+#include <sui/logger.hpp>
 
 #include <bitset>
 #include <cstdint>
@@ -49,7 +49,7 @@ uint8_t parseLoggerFlags(const std::string &arg)
   uint8_t res = 0;
 
   // set all mode for now, so we can print errors during parsing
-  UI::Logger::SetMode(UI::Logger::Mode::all);
+  sui::Logger::SetMode(sui::Logger::Mode::all);
 
   auto fields =
       arg | split(',') |
@@ -71,7 +71,7 @@ uint8_t parseLoggerFlags(const std::string &arg)
     }
     else
     {
-      UI::Logger::Error("Ignored unknown logger flag '{}'", f);
+      sui::Logger::Error("Ignored unknown logger flag '{}'", f);
     }
   }
 
