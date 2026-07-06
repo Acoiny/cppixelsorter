@@ -43,6 +43,8 @@ $(shell mkdir -p $(OUTDIR)/debug)
 
 LDFLAGS +=-lSDL3 -lSDL3_ttf
 
+STATIC_LIBS := sui/libsui.a
+
 .PHONY := all debug release clean
 
 all: debug
@@ -55,6 +57,7 @@ release: CFLAGS += $(RELEASE_FLAGS)
 
 debug: $(BINARY_DEBUG)
 debug: CFLAGS += $(DEBUG_FLAGS)
+debug: STATIC_LIBS = sui/debug_libsui.a
 
 embeds:
 	xxd -i assets/icon.png > src/embed_data.cpp
@@ -67,11 +70,13 @@ run: $(BINARY_DEBUG)
 	./$(BINARY_DEBUG) $(RUN_ARGS)
 
 $(BINARY): $(OBJECT_FILES)
-	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS) sui/libsui.a
+	make -C sui release
+	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(STATIC_LIBS)
 	strip $@
 
 $(BINARY_DEBUG): $(DOBJECT_FILES)
-	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS) sui/libsui.a
+	make -C sui debug
+	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(STATIC_LIBS)
 
 ## Release objects
 # rule for all object files directly in the src folder
