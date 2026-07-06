@@ -111,8 +111,11 @@ $(ASSEMBLY_FILES): $(DOBJECT_FILES)
 	objdump -d -S $< > $@
 
 clean:
-	make -C sui clean
 	rm -f $(OBJECT_FILES) $(DOBJECT_FILES) $(ASSEMBLY_FILES) $(BINARY) $(BINARY_DEBUG)
+
+clean-all:
+	make -C sui clean
+	make clean
 
 rebuild:
 	$(DEL)
