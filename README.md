@@ -22,6 +22,8 @@ program without any arguments.
 If you want to pass an input file you can pass the `-g` or `--gui`
 flag to the program and it will start in GUI mode with the image loaded.
 
+For the GUI it uses the [sui](https://github.com/acoiny/sui) library.
+
 ## Building
 To build the program a few libraries are required.
 
