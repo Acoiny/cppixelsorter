@@ -3,6 +3,7 @@
 #include "imageData.hpp"
 #include "sortTask.hpp"
 #include "stb_image.h"
+#include <algorithm>
 #include <sui/cursorManager.hpp>
 #include <sui/logger.hpp>
 
@@ -93,8 +94,34 @@ int main(int argc, char *argv[])
     }
     case 'd':
     {
-      std::println("Sort direction argument not given!");
-      return 2;
+      std::string dir = optarg;
+      // lowercase it
+      std::transform(dir.begin(), dir.end(), dir.begin(),
+                     [](auto c) { return std::tolower(c); });
+
+      if (dir == "ttb")
+      {
+        sort_direction = SORT_DIRECTION::UP_DOWN;
+      }
+      else if (dir == "btt")
+      {
+        sort_direction = SORT_DIRECTION::UP_DOWN;
+        reverse_direction = true;
+      }
+      else if (dir == "ltr")
+      {
+        sort_direction = SORT_DIRECTION::LEFT_RIGHT;
+      }
+      else if (dir == "rtl")
+      {
+        sort_direction = SORT_DIRECTION::LEFT_RIGHT;
+        reverse_direction = true;
+      }
+      else
+      {
+        std::println(stderr, "Invalid sort direction!");
+        return 2;
+      }
       break;
     }
     case 'o':

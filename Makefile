@@ -50,7 +50,7 @@ STATIC_LIBS := sui/libsui.a
 all: debug
 
 install: release
-	mv $(BINARY) $(INSTALL_DIR)
+	cp $(BINARY) $(INSTALL_DIR)
 
 release: $(BINARY)
 release: CFLAGS += $(RELEASE_FLAGS)
