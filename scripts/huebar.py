@@ -22,4 +22,4 @@ for i in range(WIDTH):
         img.putpixel((i, j), (get_hue(i), 255, 255))
 
 # output image to stdout, so we can directly pass it to xxd -i
-img.convert("RGBA").save(stdout, format="PNG")
+img.convert("RGBA").save(stdout, format="PNG") # pyright: ignore
