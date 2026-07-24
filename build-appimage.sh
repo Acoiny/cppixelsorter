@@ -2,9 +2,18 @@
 
 set -e
 
+# move into the directory of this script
+cd "${0%/*}"
+
 create-dirs() {
-    mkdir -p AppDir/usr/bin
-    mkdir -p AppDir/usr/lib
+    if [[ -d ./AppDir ]]; then
+        echo "AppDir already exists!"
+        echo "Execute '$0 clean' to remove and then try again"
+        exit 1
+    fi
+
+    mkdir -p ./AppDir/usr/bin
+    mkdir -p ./AppDir/usr/lib
 }
 
 create-apprun() {
@@ -55,7 +64,7 @@ main() {
     case $1 in
         clean)
             rm -rf ./AppDir
-            rm ./cppixelsorter.AppImage
+            rm -f ./cppixelsorter.AppImage
             exit 0
             ;;
         '')
