@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 create-dirs() {
     mkdir -p AppDir/usr/bin
     mkdir -p AppDir/usr/lib
@@ -63,8 +65,6 @@ main() {
             exit 1
             ;;
     esac
-
-    make release
 
     create-dirs
     create-apprun

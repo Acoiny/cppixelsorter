@@ -102,6 +102,10 @@ $(OUTDIR)/debug/%.o: $(SRCDIR)/*/*/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 ## --
 
+## just so creating the appimage also works with make :)
+appimage: release
+	./build-appimage.sh
+
 # rule to dump assembly
 assembly: $(ASSEMBLY_FILES)
 assembly: CFLAGS += $(DEBUG_FLAGS)
@@ -112,6 +116,7 @@ $(ASSEMBLY_FILES): $(DOBJECT_FILES)
 
 clean:
 	rm -f $(OBJECT_FILES) $(DOBJECT_FILES) $(ASSEMBLY_FILES) $(BINARY) $(BINARY_DEBUG)
+	./build-appimage.sh clean
 
 clean-all:
 	make -C sui clean
