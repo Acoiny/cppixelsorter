@@ -71,12 +71,12 @@ run: $(BINARY_DEBUG)
 
 $(BINARY): $(OBJECT_FILES)
 	make -C sui release
-	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(STATIC_LIBS)
+	$(CXX) $(CFLAGS) $^ -o $@ $(STATIC_LIBS) $(LDFLAGS)
 	strip $@
 
 $(BINARY_DEBUG): $(DOBJECT_FILES)
 	make -C sui debug
-	$(CXX) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(STATIC_LIBS)
+	$(CXX) $(CFLAGS) $^ -o $@ $(STATIC_LIBS) $(LDFLAGS)
 
 ## Release objects
 # rule for all object files directly in the src folder
