@@ -17,3 +17,5 @@ release:
 clean:
 	make -C ../sui clean
 	make -C .. clean BINARY=cppixelsorter.exe OUTDIR=$(OUTDIR)
+	rm -rf $(OUTDIR)
+	rm -rf $(REL_DIR)
